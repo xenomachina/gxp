@@ -90,10 +90,6 @@ public class HtmlAppender extends MarkupAppender<HtmlClosure> {
 
   public <A extends Appendable> A append(A out, GxpContext gxpContext, Object value)
       throws IOException {
-    // TODO(harryh): delete this.  Only have it here to temporarily match old behavior
-    if (value == null) {
-      return out;
-    }
     Preconditions.checkNotNull(value);
     if (value instanceof Localizable) {
       append(out, gxpContext, (Localizable)value);
