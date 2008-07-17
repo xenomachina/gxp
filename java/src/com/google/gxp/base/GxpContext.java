@@ -16,7 +16,7 @@
 
 package com.google.gxp.base;
 
-import com.google.base.Objects;
+import com.google.common.base.Objects;
 
 import java.io.IOException;
 import java.util.Locale;
