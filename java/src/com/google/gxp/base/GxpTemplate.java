@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Google Inc.
+ * Copyright (C) 2008 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.google.gxp.base;
 
-import com.google.i18n.LocaleContext;
+import com.google.i18n.MessageBundle;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -43,29 +43,7 @@ public class GxpTemplate {
    * this given Locale.
    */
   protected static String getMessage(String source, Locale locale, long id, String... arguments) {
-    return LocaleContext.getInstance(source, locale).getMessage(id).toString(arguments);
-  }
-
-  /**
-   * An exception class used for "tunneling" checked exceptions across generic
-   * interface boundaries. This is currently used for calling container
-   * templates. See http://c2.com/cgi/wiki?ExceptionTunneling for a description
-   * of exception tunneling.
-   */
-  protected static final class GxpTunnelException extends GxpRuntimeException {
-    private static final long serialVersionUID = -1;
-
-    public static RuntimeException wrap(Exception cause) {
-      if (cause instanceof RuntimeException) {
-        return (RuntimeException) cause;
-      } else {
-        return new GxpTunnelException(cause);
-      }
-    }
-
-    private GxpTunnelException(Exception cause) {
-      super(cause);
-    }
+    return MessageBundle.getInstance(source, locale).getMessage(id).toString(arguments);
   }
 
   /**
@@ -90,7 +68,7 @@ public class GxpTemplate {
       } catch (IOException iox) {
         throw iox;
       } catch (Exception checkedException) {
-        throw GxpTunnelException.wrap(checkedException);
+        throw GxpRuntimeException.wrap(checkedException);
       }
     }
 
@@ -119,7 +97,7 @@ public class GxpTemplate {
 
     @Override
     public boolean equals(Object obj) {
-      return obj.getClass() == this.getClass();
+      return (obj == null) ? false : obj.getClass() == this.getClass();
     }
 
     @Override
