@@ -1,0 +1,36 @@
+<!ELEMENT schema (doctype|element|pattern|attribute)*>
+<!ATTLIST schema name CDATA #REQUIRED>
+<!ATTLIST schema content-type CDATA #REQUIRED>
+<!ATTLIST schema namespace CDATA #REQUIRED>
+<!ATTLIST schema java-type CDATA #REQUIRED>
+<!ATTLIST schema default-to-sgml CDATA #IMPLIED>
+<!ATTLIST schema sgml-content-type CDATA #IMPLIED>
+<!ATTLIST schema tag-prefix CDATA #IMPLIED>
+<!ATTLIST schema allowed-content-types CDATA #IMPLIED>
+
+<!ELEMENT doctype EMPTY>
+<!ATTLIST doctype name CDATA #REQUIRED>
+<!ATTLIST doctype public-id CDATA #REQUIRED>
+<!ATTLIST doctype system-id CDATA #REQUIRED>
+<!ATTLIST doctype sgml-public-id CDATA #IMPLIED>
+<!ATTLIST doctype sgml-system-id CDATA #IMPLIED>
+
+<!ELEMENT element EMPTY>
+<!ATTLIST element name CDATA #REQUIRED>
+<!ATTLIST element flags CDATA #IMPLIED>
+<!ATTLIST element content CDATA #IMPLIED>
+<!ATTLIST element doctypes CDATA #IMPLIED>
+
+<!ELEMENT pattern EMPTY>
+<!ATTLIST pattern name CDATA #REQUIRED>
+<!ATTLIST pattern regex CDATA #IMPLIED>
+
+<!ELEMENT attribute EMPTY>
+<!ATTLIST attribute name CDATA #REQUIRED>
+<!ATTLIST attribute elements CDATA #IMPLIED>
+<!ATTLIST attribute except-elements CDATA #IMPLIED>
+<!ATTLIST attribute pattern CDATA #IMPLIED>
+<!ATTLIST attribute regex CDATA #IMPLIED>
+<!ATTLIST attribute flags CDATA #IMPLIED>
+<!ATTLIST attribute default CDATA #IMPLIED>
+<!ATTLIST attribute example CDATA #IMPLIED>
