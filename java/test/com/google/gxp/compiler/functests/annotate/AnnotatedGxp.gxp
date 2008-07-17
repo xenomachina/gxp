@@ -1,0 +1,33 @@
+<!DOCTYPE gxp:template SYSTEM "http://www.corp.google.com/eng/projects/ui/xhtml.ent">
+<!--
+ Copyright (C) 2008 Google Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<gxp:template name='com.google.gxp.compiler.functests.annotate.AnnotatedGxp'
+              java:annotate='@BazAnnotation'
+              xmlns='http://www.w3.org/1999/xhtml'
+              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
+              xmlns:gxp='http://google.com/2001/gxp'
+              xmlns:java='http://google.com/2001/gxp/code/java'>
+
+<java:annotate with="@BuzAnnotation" />
+<java:annotate element="class"     with="@QuxAnnotation" />
+<java:annotate element="interface" with="@QuuxAnnotation" />
+<java:annotate element="instance"  with="@QuuuxAnnotation" />
+
+<gxp:constructor java:annotate='@FooAnnotation'>
+  <gxp:param name="s1" cpp:type='const char *' java:type="String" java:annotate='@BarAnnotation'/>
+</gxp:constructor>
+
+</gxp:template>
