@@ -30,14 +30,6 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
     assertOutputEquals("<i><b>12345</b></i>");
   }
 
-  public void testLegacyCall() throws Exception {
-    LegacyCallerGxp.write(out, gxpContext, 0);
-    assertOutputEquals("<i><b>0</b></i>");
-
-    LegacyCallerGxp.write(out, gxpContext, 12345);
-    assertOutputEquals("<i><b>12345</b></i>");
-  }
-
   public void testBooleanParam() throws Exception {
     BooleanParamCallerGxp.write(out, gxpContext);
     assertOutputEquals("yes\n" + "no\n" + "yes\n" + "no");
