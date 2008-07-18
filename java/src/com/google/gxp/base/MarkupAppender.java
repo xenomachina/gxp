@@ -116,7 +116,7 @@ public class MarkupAppender<T extends MarkupClosure> {
    */
   public <A extends Appendable> A append(A out, GxpContext gxpContext, char value)
       throws IOException {
-    CharEscapers.escape(out, getCharEscaper(gxpContext)).append(value);
+    getCharEscaper(gxpContext).escape(out).append(value);
     return out;
   }
 
@@ -164,7 +164,7 @@ public class MarkupAppender<T extends MarkupClosure> {
   public <A extends Appendable> A append(A out, GxpContext gxpContext, CharSequence value)
       throws IOException {
     Preconditions.checkNotNull(value);
-    CharEscapers.escape(out, getCharEscaper(gxpContext)).append(value);
+    getCharEscaper(gxpContext).escape(out).append(value);
     return out;
   }
 }

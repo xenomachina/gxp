@@ -60,7 +60,7 @@ public class HtmlClosures {
     Preconditions.checkNotNull(text);
     return new HtmlClosure() {
         public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          CharEscapers.escape(out, CharEscapers.HTML_ESCAPE).append(text);
+          CharEscapers.HTML_ESCAPE.escape(out).append(text);
         }
       };
   }
@@ -74,8 +74,7 @@ public class HtmlClosures {
     Preconditions.checkNotNull(value);
     return new HtmlClosure() {
         public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          CharEscapers.escape(out, CharEscapers.HTML_ESCAPE).append(
-              value.toString(gxpContext.getLocale()));
+          CharEscapers.HTML_ESCAPE.escape(out).append(value.toString(gxpContext.getLocale()));
         }
       };
   }

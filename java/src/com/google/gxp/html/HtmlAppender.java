@@ -80,7 +80,7 @@ public class HtmlAppender extends MarkupAppender<HtmlClosure> {
   public <A extends Appendable> A append(A out, GxpContext gxpContext, PlaintextClosure closure)
       throws IOException {
     Preconditions.checkNotNull(closure);
-    closure.write(CharEscapers.escape(out, getCharEscaper(gxpContext)), gxpContext);
+    closure.write(getCharEscaper(gxpContext).escape(out), gxpContext);
     return out;
   }
 
