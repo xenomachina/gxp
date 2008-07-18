@@ -16,10 +16,8 @@
 
 package com.google.gxp.base;
 
-import com.google.common.base.ReferenceType;
 import com.google.common.collect.Lists;
 import com.google.common.collect.PrimitiveArrays;
-import com.google.common.collect.ReferenceCache;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,29 +30,12 @@ import java.util.List;
  */
 public final class Message {
   /**
-   * To optimize our use of memory, we keep a cache of message
-   * Strings to previously created Message instances. Our
-   * getInstance factory method can then return an already
-   * existing instance instead of creating a redundant new one.
-   *
-   * We use a ReferenceCache(STRONG, WEAK) so that Messages that are not in
-   * use can be garbage collected.
-   */
-  private static final ReferenceCache<String, Message> messageCache =
-    new ReferenceCache<String, Message>(ReferenceType.STRONG, ReferenceType.WEAK) {
-      @Override
-      public Message create(String msg) {
-        return new Message(msg);
-      }
-    };
-
-  /**
    * Get an instance of Message.
    *
    * @param msg parameterized text string
    */
   public static Message getInstance(String msg) {
-    return messageCache.get(msg);
+    return new Message(msg);
   }
 
   private final String msg;

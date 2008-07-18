@@ -49,6 +49,8 @@ import org.apache.tools.ant.Task;
  * An Ant Task that can be used to invoke gxpc.
  */
 public class GxpcTask extends Task implements GxpcConfiguration {
+  private static final String[] DEFAULT_INCLUDES = { "**/*.gxp" };
+
   private final FileSystem fs = SystemFileSystem.INSTANCE;
   private SourcePathFileSystem sourcePathFs;
   private Set<FileRef> sourceFiles;
@@ -60,6 +62,11 @@ public class GxpcTask extends Task implements GxpcConfiguration {
   private String srcpaths;
   private String destdir;
   private String target;
+  private boolean i18nwarn = true;
+
+  public GxpcTask() {
+    fileScanner.setIncludes(DEFAULT_INCLUDES);
+  }
 
   public void execute() throws BuildException {
     fileScanner.scan();
@@ -127,6 +134,10 @@ public class GxpcTask extends Task implements GxpcConfiguration {
     this.target = target;
   }
 
+  public void setI18nwarn(boolean i18nwarn) {
+    this.i18nwarn = i18nwarn;
+  }
+
   ////////////////////////////////////////////////////////////////////////////////
   // Getters (GxpcConfiguration implementation)
   ////////////////////////////////////////////////////////////////////////////////
@@ -164,6 +175,10 @@ public class GxpcTask extends Task implements GxpcConfiguration {
     return null;
   }
 
+  public FileRef getPropertiesFile() {
+    return null;
+  }
+
   public boolean isVerboseEnabled() {
     return false;
   }
@@ -193,11 +208,11 @@ public class GxpcTask extends Task implements GxpcConfiguration {
       Suppliers.memoize(new Supplier<AlertPolicy>() {
         public AlertPolicy get() {
           ConfigurableAlertPolicy result = new ConfigurableAlertPolicy();
-          if (true) {
+          if (i18nwarn) {
             result.setSeverity(UnextractableContentAlert.class,
                                Severity.WARNING);
           }
-          if (false) {
+          if (true) {
             result.setTreatWarningsAsErrors(true);
           }
           return result;

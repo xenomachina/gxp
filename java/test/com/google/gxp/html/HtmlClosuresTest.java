@@ -21,7 +21,6 @@ import com.google.common.io.Files;
 import com.google.gxp.base.GxpContext;
 import com.google.gxp.testing.BaseFunctionalTestCase;
 import com.google.gxp.testing.TestLocalizable;
-import com.google.gxp.testing.TestLocalizableHtml;
 import com.google.i18n.Localizable;
 
 import java.io.*;

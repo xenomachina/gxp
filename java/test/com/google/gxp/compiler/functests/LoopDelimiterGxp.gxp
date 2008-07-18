@@ -21,33 +21,28 @@
               xmlns:msg='http://google.com/2001/gxp/msg'
               xmlns:nomsg='http://google.com/2001/gxp/nomsg'>
 
-<gxp:import class='com.google.common.collect.Sets'/>
-
 <gxp:param name='count' type='int' />
 
 <b>
-  <gxp:loop type='int' var='i' iterable='Sets.asIntegerSet(0, count - 1)'
-            delimiter=''>
+  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' delimiter=''>
     !
   </gxp:loop>
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterable='Sets.asIntegerSet(0, count - 1)'
-            delimiter='&amp;'>
+  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' delimiter='&amp;'>
     !
   </gxp:loop>
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterable='Sets.asIntegerSet(0, count - 1)'
-            expr:delimiter='","'>
+  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' expr:delimiter='","'>
     !
   </gxp:loop>
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterable='Sets.asIntegerSet(0, count - 1)'>
+  <gxp:loop type='int' var='i' iterator='new IntIterator(count)'>
     <gxp:attr name='delimiter'>
       <gxp:msg>,</gxp:msg>
     </gxp:attr>
@@ -56,13 +51,13 @@
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterable='Sets.asIntegerSet(0, count - 1)' msg:delimiter=','>
+  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' msg:delimiter=','>
     !
   </gxp:loop>
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterable='Sets.asIntegerSet(0, count - 1)' nomsg:delimiter=','>
+  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' nomsg:delimiter=','>
     !
   </gxp:loop>
 </b>

@@ -300,7 +300,7 @@ public class Gxpc implements Callable<AlertSet> {
    * @param config the {@code GxpcConfiguration} to use for compilation
    * @param stderr where to print error messages.
    */
-  static int main(final GxpcConfiguration config, final Appendable stderr) throws IOException {
+  public static int main(final GxpcConfiguration config, final Appendable stderr) throws IOException {
     if (config.getSourceFiles().isEmpty()) {
       stderr.append("No input files\n");
       return 1;

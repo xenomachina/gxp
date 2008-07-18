@@ -34,10 +34,11 @@ import com.google.gxp.compiler.parser.Parser;
 import com.google.gxp.compiler.parser.SaxXmlParser;
 import com.google.gxp.compiler.schema.BuiltinSchemaFactory;
 import com.google.gxp.compiler.schema.SchemaFactory;
-import static com.google.testing.util.TestUtil.assertContains;
+import static com.google.testing.util.MoreAsserts.assertContainsRegex;
 import junit.framework.TestCase;
 
 import java.io.*;
+import java.util.regex.Pattern;
 
 /**
  * Tests for CompilationSet.
@@ -53,6 +54,10 @@ public class CompilationSetTest extends TestCase {
       + " xmlns:gxp='http://google.com/2001/gxp'"
       + " xmlns:call='http://google.com/2001/gxp/templates'"
       + " xmlns:expr='http://google.com/2001/gxp/expressions'";
+
+  private void assertContains(String expected, String actual) {
+    assertContainsRegex(Pattern.quote(expected), actual);
+  }
 
   /**
    * Common logic for testing code generation paths. Compiles the supplied

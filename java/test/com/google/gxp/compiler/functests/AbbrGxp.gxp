@@ -18,14 +18,12 @@
               xmlns="http://www.w3.org/1999/xhtml"
               xmlns:gxp="http://google.com/2001/gxp">
 
-<gxp:import class='com.google.common.collect.Sets'/>
-
 <gxp:param name='x' type='int' />
 
 <gxp:abbr type="int" name="x2" expr='x * x'>
   <gxp:abbr type="HtmlClosure" name="xs">
     <gxp:attr name="expr">
-      &lt;<gxp:loop type='int' var='i' iterable='Sets.asIntegerSet(0, x - 1)'>
+      &lt;<gxp:loop type='int' var='i' iterator='new IntIterator(x)'>
         *
       </gxp:loop>&gt;
     </gxp:attr>

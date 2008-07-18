@@ -16,7 +16,7 @@
 -->
 <gxp:template name="com.google.gxp.base.dynamic.ThrowableError"
               xmlns="http://www.w3.org/1999/xhtml"
-              xmlns:call="http://google.com/2001/gxp/templates"
+              xmlns:call="http://google.com/2001/gxp/call"
               xmlns:gxp="http://google.com/2001/gxp">
 
 <gxp:param name='t' type='Throwable' />

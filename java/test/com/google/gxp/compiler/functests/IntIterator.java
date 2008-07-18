@@ -16,21 +16,30 @@
 
 package com.google.gxp.compiler.functests;
 
-import com.google.testing.suitebuilder.TestSuiteBuilder;
-
-import junit.framework.Test;
+import java.util.Iterator;
 
 /**
- * Functional tests for {@link com.google.gxp.compiler}.
- *
- * @owner gxpc-eng@google.com
+ * Trivial {@code Iterator} that will count from 0 to (max - 1).
  */
-public class JavaTests {
-  public static Test suite() {
-    return new TestSuiteBuilder()
-        .withClassPath()
-        .addPackageRecursive(JavaTests.class.getPackage())
-        .excludeTags("Suppress")
-        .create();
+public class IntIterator implements Iterator<Integer> {
+  private int current;
+  private int max;
+
+  public IntIterator(int max) {
+    this.current = 0;
+    this.max = max;
+  }
+
+  public boolean hasNext() {
+    return (current < max);
+  }
+
+  public Integer next() {
+    current++;
+    return (current - 1);
+  }
+
+  public void remove() {
+    throw new UnsupportedOperationException();
   }
 }

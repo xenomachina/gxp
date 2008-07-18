@@ -20,12 +20,10 @@
               xmlns:call='http://google.com/2001/gxp/call'
               xmlns:expr='http://google.com/2001/gxp/expressions'>
 
-<gxp:import class='com.google.common.collect.Sets'/>
-
 <gxp:param name='count' type='int' />
 
 <b>
-  <gxp:loop type='int' var='i' iterator='Sets.asIntegerSet(0, count - 1).iterator()'>
+  <gxp:loop type='int' var='i' iterator='new IntIterator(count)'>
     !
   </gxp:loop>
 </b>

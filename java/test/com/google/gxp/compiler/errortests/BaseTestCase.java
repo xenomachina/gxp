@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.errortests;
 
 import com.google.common.base.CharEscapers;
-import com.google.common.collect.ImmutableMapBuilder;
+import com.google.common.collect.ImmutableMap;
 import com.google.gxp.compiler.alerts.Alert.Severity;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.alerts.common.SaxAlert;
@@ -64,15 +64,15 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
     "(Pair<List<List<Foo>>, Bar>)anotherGenericCast",
   };
 
-  private static Map<String, String> ILLEGAL_OPERATORS
-    = new ImmutableMapBuilder<String, String>()
+  private static ImmutableMap<String, String> ILLEGAL_OPERATORS
+    = new ImmutableMap.Builder<String, String>()
       .put("i++", "++")
       .put("i instanceof Foo", "instanceof")
       .put("i = 10", "=")
       .put("i & 1", "&")
       .put("i >> 2", ">>")
       .put("i >>> 2", ">>>")
-      .getMap();
+      .build();
 
   private static String[] ILLEGAL_EXPRESSIONS = {
     "\"unclosed String",

@@ -45,11 +45,6 @@ public class CallErrorTest extends BaseTestCase {
   }
 
   public void testCall_invalidExprAttributes() throws Exception {
-    // legacy style
-    assertIllegalExpressionDetected(
-        "<gxp:param type='String' name='x'/><legacycall:" + getTemplateBaseName()
-        + " x='", "'/>", 2, 36);
-
     // old style with expr:
     assertIllegalExpressionDetected(
         "<gxp:param type='String' name='x'/><call:" + getTemplateBaseName()
@@ -86,8 +81,6 @@ public class CallErrorTest extends BaseTestCase {
     FileRef callee = createFile("callee", "<gxp:param type='int' name='y'/>");
     FileRef caller = createFile("caller",
                                 "<gxp:param type='int' name='x'/>",
-                                "<legacycall:callee y='x' expr:y='x'/>",
-                                "",
                                 "<call:callee y='1'>",
                                 "  <gxp:attr name='y'>",
                                 "    5",
@@ -101,9 +94,8 @@ public class CallErrorTest extends BaseTestCase {
                                 "</call:callee>");
     compileFiles(callee, caller);
 
-    assertAlert(new MultiValueAttributeError(pos(3, 1), "<legacycall:callee>", "'y' attribute"));
-    assertAlert(new MultiValueAttributeError(pos(6, 3), "<call:callee>", "'y' attribute"));
-    assertAlert(new MultiValueAttributeError(pos(12, 3), "<call:callee>", "'y' attribute"));
+    assertAlert(new MultiValueAttributeError(pos(4, 3), "<call:callee>", "'y' attribute"));
+    assertAlert(new MultiValueAttributeError(pos(10, 3), "<call:callee>", "'y' attribute"));
     assertNoUnexpectedAlerts();
   }
 

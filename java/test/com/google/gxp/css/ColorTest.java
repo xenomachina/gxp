@@ -194,11 +194,11 @@ public class ColorTest extends TestCase {
     }
   }
 
-  void testFrom24BitRgb() throws Exception {
-    assertEquals("#000000", Color.from24BitRgb(0).toString());
+  public void testFrom24BitRgb() throws Exception {
+    assertEquals("#000", Color.from24BitRgb(0).toString());
     assertEquals("#800000", Color.from24BitRgb(0x800000).toString());
-    assertEquals("#00FA98", Color.from24BitRgb(0xFA98).toString());
+    assertEquals("#00fa98", Color.from24BitRgb(0xFA98).toString());
     assertEquals("#123", Color.from24BitRgb(0x112233).toString());
-    assertEquals("#010A0F", Color.from24BitRgb(0x10A0F).toString());
+    assertEquals("#010a0f", Color.from24BitRgb(0x10A0F).toString());
   }
 }
