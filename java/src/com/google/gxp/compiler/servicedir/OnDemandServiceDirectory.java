@@ -17,7 +17,6 @@
 package com.google.gxp.compiler.servicedir;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ReferenceCache;
 import com.google.gxp.compiler.CompilationSet;
 import com.google.gxp.compiler.CompilationUnit;
 import com.google.gxp.compiler.base.Callable;
@@ -32,20 +31,23 @@ import com.google.gxp.compiler.base.TemplateName;
  */
 public class OnDemandServiceDirectory implements ServiceDirectory {
   private final CompilationSet compilationSet;
-  private final ReferenceCache<TemplateName.FullyQualified, Root> signatures =
-    new ReferenceCache<TemplateName.FullyQualified, Root>() {
-      private static final long serialVersionUID = 1;
-      @Override
-      public Root create(TemplateName.FullyQualified templateName) {
-        CompilationUnit compilationUnit = compilationSet.getCompilationUnit(templateName);
-        return (compilationUnit == null)
-            ? null
-            : compilationUnit.getReparentedTree().getRoot();
-      }
-    };
 
   public OnDemandServiceDirectory(CompilationSet compilationSet) {
     this.compilationSet = Objects.nonNull(compilationSet);
+  }
+
+  /**
+   * @return a {@code Root} based on a {@code TemplateName}.
+   * @throws IllegalArgumentException if {@code templateName} is not fully
+   * qualified (ie: does not have a package name)
+   */
+  private Root getRoot(TemplateName templateName) {
+    if (templateName.getPackageName() == null) {
+      throw new IllegalArgumentException("templateName must be fully qualified");
+    }
+    CompilationUnit compilationUnit = compilationSet.getCompilationUnit(
+        (TemplateName.FullyQualified) templateName);
+    return (compilationUnit == null) ? null : compilationUnit.getReparentedTree().getRoot();
   }
 
   /**
@@ -55,8 +57,7 @@ public class OnDemandServiceDirectory implements ServiceDirectory {
    * qualified (ie: does not have a package name)
    */
   public Callable getCallable(TemplateName templateName) {
-    validateTemplateName(templateName);
-    Root root = signatures.get(templateName);
+    Root root = getRoot(templateName);
     return (root == null) ? null : root.getCallable();
   }
 
@@ -67,8 +68,7 @@ public class OnDemandServiceDirectory implements ServiceDirectory {
    * qualified (ie: does not have a package name)
    */
   public InstanceCallable getInstanceCallable(TemplateName templateName) {
-    validateTemplateName(templateName);
-    Root root = signatures.get(templateName);
+    Root root = getRoot(templateName);
     return (root == null) ? null : root.getInstanceCallable();
   }
 
@@ -79,18 +79,7 @@ public class OnDemandServiceDirectory implements ServiceDirectory {
    * qualified (ie: does not have a package name)
    */
   public Implementable getImplementable(TemplateName templateName) {
-    validateTemplateName(templateName);
-    Root root = signatures.get(templateName);
+    Root root = getRoot(templateName);
     return (root == null) ? null : root.getImplementable();
-  }
-
-  /**
-   * @throws IllegalArgumentException if {@code templateName} is not fully
-   * qualified (ie: does not have a package name)
-   */
-  private static void validateTemplateName(TemplateName templateName) {
-    if (templateName.getPackageName() == null) {
-      throw new IllegalArgumentException("templateName must be fully qualified");
-    }
   }
 }
