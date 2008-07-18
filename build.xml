@@ -82,8 +82,15 @@
           srcpaths="${test.dir}"
           destdir="${genfiles.dir}"
           target="com.google.gxp.compiler.dynamictests.xxx"
+          dynamic="true"
           i18nwarn="false" />
-    <javac destdir="${build.dir}/tests">
+    <copy todir="${build.dir}/classes">
+      <fileset dir="${genfiles.dir}/">
+        <include name="com/google/gxp/compiler/functests/*.properties" />
+      </fileset>
+    </copy>
+
+    <javac destdir="${build.dir}/tests" debug="true" debuglevel="lines,source">
       <src>
         <pathelement location="${test.dir}/" />
         <pathelement location="${genfiles.dir}/com/google/gxp/compiler/dynamictests/" />

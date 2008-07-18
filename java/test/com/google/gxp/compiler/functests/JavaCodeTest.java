@@ -100,10 +100,12 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
     StringEvalGxp.write(out, gxpContext, s);
     assertOutputEquals("foo xyz&lt;&gt;&amp;&#17185;&nbsp;&quot;&#39;123 bar");
 
-    // TODO(laurence): throw NullPointerException instead (writing the word
-    // "null" is what the gxpc.py did, but seems wrong.)
-    StringEvalGxp.write(out, gxpContext, null);
-    assertOutputEquals("foo null bar");
+    try {
+      StringEvalGxp.write(out, gxpContext, null);
+      fail("should throw NPE");
+    } catch (NullPointerException e) {
+      // good
+    }
   }
 
   public void testSpacePreservation() throws Exception {
@@ -155,11 +157,12 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
     StringExprGxp.write(out, gxpContext, s);
     assertOutputEquals("click <a href=\"xyz&lt;&gt;&amp;&#17185;&nbsp;&quot;&#39;123\">here</a>.");
 
-    // TODO(laurence): throw NullPointerException if the attribute is required,
-    // or leave it out entirely if the attribute is optional. (writing the word
-    // "null" is what the gxpc.py did, but seems wrong.)
-    StringExprGxp.write(out, gxpContext, null);
-    assertOutputEquals("click <a href=\"null\">here</a>.");
+    try {
+      StringExprGxp.write(out, gxpContext, null);
+      fail("should throw NPE");
+    } catch (NullPointerException e) {
+      // good
+    }
   }
 
   public void testIfBasic() throws Exception {
@@ -544,13 +547,10 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
 
     assertOutputEquals(
         "<div onclick=\"&quot;alert(\\x27foo \\x3c \\x3e \\x27 \\x22\\x27);&quot;\">1</div>\n"
-        + "<div onclick=\"alert(&#39;foo &lt; &gt; &#39; &quot;&#39;);\">2</div>\n"
+        + "<div onclick=\"alert(&quot;foo \\x3c \\x3e \\x27 \\x22&quot;);\">2</div>\n"
         + "<div onclick=\"alert(&quot;foo \\x3c \\x3e \\x27 \\x22&quot;);\">3</div>\n"
-        + "<div onclick=\"alert(&#39;foo &lt; &gt; &#39; &quot;&#39;);\">4</div>\n"
-        + "<div onclick=\"foo &lt; &gt; &#39; &quot;\">5</div>\n"
-        + "<div onclick=\"alert(&quot;foo \\x3c \\x3e \\x27 \\x22&quot;);\">6</div>\n"
-        + "<div onclick=\"alert(&quot;foo \\x3c \\x3e \\x27 \\x22&quot;);\">7</div>\n"
-        + "<div onclick=\"alert(&quot;foo \\x3c \\x3e \\x27 \\x22&quot;);\">8</div>");
+        + "<div onclick=\"alert(&quot;foo \\x3c \\x3e \\x27 \\x22&quot;);\">4</div>\n"
+        + "<div onclick=\"alert(&quot;foo \\x3c \\x3e \\x27 \\x22&quot;);\">5</div>");
   }
 
   //////////////////////////////////////////////////////////////////////

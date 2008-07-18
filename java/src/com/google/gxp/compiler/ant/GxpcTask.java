@@ -56,12 +56,14 @@ public class GxpcTask extends Task implements GxpcConfiguration {
   private Set<FileRef> sourceFiles;
   private Set<FileRef> schemaFiles;
   private List<FileRef> sourcePaths;
+  private FileRef outputDir;
   private SortedSet<Phase> dotPhases;
 
   private final FileScanner fileScanner = new DirectoryScanner();
   private String srcpaths;
   private String destdir;
   private String target;
+  private boolean dynamic = false;
   private boolean i18nwarn = true;
 
   public GxpcTask() {
@@ -83,7 +85,7 @@ public class GxpcTask extends Task implements GxpcConfiguration {
     if (destdir == null) {
       destdir = System.getProperty("user.dir");
     }
-    FileRef outputDir = fs.parseFilename(destdir);
+    outputDir = fs.parseFilename(destdir);
 
     sourcePaths = Lists.newArrayList();
     for (FileRef sourcePath : fs.parseFilenameList(srcpaths)) {
@@ -134,6 +136,10 @@ public class GxpcTask extends Task implements GxpcConfiguration {
     this.target = target;
   }
 
+  public void setDynamic(boolean dynamic) {
+    this.dynamic = dynamic;
+  }
+
   public void setI18nwarn(boolean i18nwarn) {
     this.i18nwarn = i18nwarn;
   }
@@ -159,7 +165,7 @@ public class GxpcTask extends Task implements GxpcConfiguration {
   public CodeGeneratorFactory getCodeGeneratorFactory() {
     DefaultCodeGeneratorFactory result =  new DefaultCodeGeneratorFactory();
     result.setRuntimeMessageSource(target);
-    result.setDynamicModeEnabled(false);
+    result.setDynamicModeEnabled(dynamic);
     result.setSourceFiles(getSourceFiles());
     result.setSchemaFiles(getSchemaFiles());
     result.setSourcePaths(sourcePaths);
@@ -176,7 +182,9 @@ public class GxpcTask extends Task implements GxpcConfiguration {
   }
 
   public FileRef getPropertiesFile() {
-    return null;
+    return (target != null)
+        ? outputDir.join("/" + target.replace(".", "/") + "_en.properties")
+        : null;
   }
 
   public boolean isVerboseEnabled() {

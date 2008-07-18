@@ -42,7 +42,7 @@ public class HtmlAppender extends MarkupAppender<HtmlClosure> {
 
   @Override
   protected CharEscaper getCharEscaper(GxpContext gxpContext) {
-    return CharEscapers.HTML_ESCAPE;
+    return CharEscapers.getFullHtmlEscaper();
   }
 
   //////////////////////////////////////////////////////////////////////

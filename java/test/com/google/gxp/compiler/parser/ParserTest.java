@@ -304,7 +304,7 @@ public class ParserTest extends TestCase {
   }
 
   private static final String GXP_NS  = "http://google.com/2001/gxp";
-  private static final String CALL_NS = "http://google.com/2001/gxp/templates";
+  private static final String CALL_NS = "http://google.com/2001/gxp/call";
   private static final String HTML_NS = "http://www.w3.org/1999/xhtml";
   public void testElementsExist() throws Exception {
     assertElementExists(GXP_NS, "attr");

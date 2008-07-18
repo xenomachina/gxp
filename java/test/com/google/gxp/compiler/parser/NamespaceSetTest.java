@@ -43,7 +43,7 @@ public class NamespaceSetTest extends TestCase {
                instanceof ExprNamespace);
     assertTrue(alertSetBuilder.buildAndClear().isEmpty());
     assertTrue(nsSet.get(alertSetBuilder, sourcePosition,
-                         "http://google.com/2001/gxp/templates")
+                         "http://google.com/2001/gxp/call")
                instanceof CallNamespace);
     assertTrue(alertSetBuilder.buildAndClear().isEmpty());
     assertTrue(nsSet.get(alertSetBuilder, sourcePosition,
