@@ -39,7 +39,7 @@ import java.util.*;
 import java.io.*;
 import junit.framework.TestCase;
 
-import static com.google.testing.util.MoreAsserts.*;
+import static com.google.gxp.testing.MoreAsserts.*;
 
 /**
  * Tests for {@code GxpcFlags}.

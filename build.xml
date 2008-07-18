@@ -18,6 +18,10 @@
     <pathelement location="${lib.dir}/google-io-extra.jar" />
   </path>
 
+  <target name="clean" description="Remove generated files.">
+    <delete dir="${build.dir}"/>
+  </target>
+
   <target name="init">
     <mkdir dir="${build.dir}/classes" />
     <mkdir dir="${build.dir}/genfiles" />
@@ -53,6 +57,11 @@
           srcpaths="${src.dir}"
           destdir="${genfiles.dir}"
           target="com.google.gxp.base.dynamic.xxx" />
+    <copy todir="${build.dir}/classes">
+      <fileset dir="${genfiles.dir}/">
+        <include name="com/google/gxp/base/dynamic/*.properties" />
+      </fileset>
+    </copy>
     <javac destdir="${build.dir}/classes" debug="on">
       <src>
         <pathelement location="${src.dir}/com/google/gxp/base/" />
@@ -68,11 +77,6 @@
   </target>
 
   <target name="compile.tests" depends="compile.runtime">
-    <!-- <gxpc srcdir="${test.dir}/com/google/gxp/compiler/functests/call/subdir"
-          srcpaths="${test.dir}"
-          destdir="${genfiles.dir}"
-          target="com.google.gxp.compiler.functests.call.subdirxxx"
-          i18nwarn="false" /> -->
     <gxpc srcdir="${test.dir}/com/google/gxp/compiler/functests/"
           srcpaths="${test.dir}"
           destdir="${genfiles.dir}"

@@ -24,7 +24,7 @@ import com.google.gxp.testing.BaseFunctionalTestCase;
 import java.io.*;
 import java.util.*;
 
-import static com.google.testing.util.MoreAsserts.*;
+import static com.google.gxp.testing.MoreAsserts.*;
 
 /**
  * Functional tests for {@link com.google.gxp.compiler.java.JavaCodeGenerator

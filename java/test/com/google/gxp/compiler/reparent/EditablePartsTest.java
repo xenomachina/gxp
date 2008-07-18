@@ -30,7 +30,7 @@ import com.google.gxp.compiler.base.StringConstant;
 import com.google.gxp.compiler.GxpcTestCase;
 import com.google.gxp.compiler.parser.NullNamespace;
 
-import static com.google.testing.util.MoreAsserts.*;
+import static com.google.gxp.testing.MoreAsserts.*;
 
 /**
  * Tests {@link EditableParts}.

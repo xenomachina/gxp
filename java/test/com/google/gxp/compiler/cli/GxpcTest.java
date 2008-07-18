@@ -22,7 +22,7 @@ import com.google.gxp.compiler.fs.InMemoryFileSystem;
 import java.io.*;
 import junit.framework.TestCase;
 
-import static com.google.testing.util.MoreAsserts.*;
+import static com.google.gxp.testing.MoreAsserts.*;
 
 /**
  * Tests for {@code Gxpc}.

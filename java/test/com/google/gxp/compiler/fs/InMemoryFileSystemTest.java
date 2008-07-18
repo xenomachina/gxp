@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.Reader;
 import java.io.Writer;
 
-import com.google.testing.util.MoreAsserts;
+import com.google.gxp.testing.MoreAsserts;
 
 /**
  * Tests of {@link InMemoryFileSystem}.

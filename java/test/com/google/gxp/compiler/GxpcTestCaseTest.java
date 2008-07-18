@@ -27,7 +27,7 @@ import com.google.gxp.compiler.parser.NullNamespace;
 import com.google.gxp.compiler.parser.ParsedAttribute;
 import com.google.gxp.compiler.schema.Schema;
 
-import static com.google.testing.util.MoreAsserts.*;
+import static com.google.gxp.testing.MoreAsserts.*;
 
 /**
  * Tests of GxpcTestCase.

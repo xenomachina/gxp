@@ -18,8 +18,7 @@ package com.google.gxp.compiler.fs;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Characters;
-import com.google.testing.util.MoreAsserts;
-import com.google.testing.util.TestUtil;
+import com.google.gxp.testing.MoreAsserts;
 
 import junit.framework.TestCase;
 
@@ -36,10 +35,13 @@ public class SystemFileSystemTest extends TestCase {
     assertEquals("/", fs.getRoot().getName());
   }
 
+  public String getTmpDir() {
+    return "/tmp";
+  }
+
   public void testOpenInputStream() throws Exception {
     String systemFnam =
-        TestUtil.getSrcDir()
-        + "/google3/javatests/com/google/gxp/compiler/fs/"
+        "java/test/com/google/gxp/compiler/fs/"
         + "SystemFileSystemTest-testOpenInputStream-input.txt";
     FileRef fnam = fs.parseFilename(systemFnam);
 
@@ -86,7 +88,7 @@ public class SystemFileSystemTest extends TestCase {
 
   private FileRef fileRef(String relPath) throws Exception {
     String qualifiedSystemFnam =
-        TestUtil.getTmpDir() + File.separator + relPath;
+        getTmpDir() + File.separator + relPath;
     FileRef result = fs.parseFilename(qualifiedSystemFnam);
     assertEquals(qualifiedSystemFnam, result.toFilename());
     return result;
@@ -108,7 +110,7 @@ public class SystemFileSystemTest extends TestCase {
   }
 
   public void testOpenWriter_encodingFailure() throws Exception {
-    String systemFnam = TestUtil.getTmpDir() + File.separator + "ascii.txt";
+    String systemFnam = getTmpDir() + File.separator + "ascii.txt";
     FileRef fnam = fs.parseFilename(systemFnam);
     Writer writer = fnam.openWriter(Charsets.US_ASCII);
     try {

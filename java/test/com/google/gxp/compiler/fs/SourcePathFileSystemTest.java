@@ -19,8 +19,7 @@ package com.google.gxp.compiler.fs;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.testing.util.MoreAsserts;
-import static com.google.testing.util.MoreAsserts.*;
+import com.google.gxp.testing.MoreAsserts;
 
 import junit.framework.TestCase;
 
@@ -234,10 +233,10 @@ public class SourcePathFileSystemTest extends TestCase {
   public void testGetSourceFilenames() throws Exception {
     replay();
 
-    assertContentsAnyOrder(fs.getSourceFileRefs(),
-                           ABSTRACT_SRCFILE1,
-                           ABSTRACT_SRCFILE2,
-                           ABSTRACT_SRCFILE3);
+    MoreAsserts.assertContentsAnyOrder(fs.getSourceFileRefs(),
+                                       ABSTRACT_SRCFILE1,
+                                       ABSTRACT_SRCFILE2,
+                                       ABSTRACT_SRCFILE3);
   }
 
   /**
@@ -251,8 +250,8 @@ public class SourcePathFileSystemTest extends TestCase {
         ImmutableList.of(new FileRef(mockStore, "/foo/Bar.gxp")),
         new FileRef(mockStore, "/"));
     root = fs.getRoot();
-    assertContentsAnyOrder(fs.getSourceFileRefs(),
-                           root.join("/foo/Bar.gxp"));
+    MoreAsserts.assertContentsAnyOrder(fs.getSourceFileRefs(),
+                                       root.join("/foo/Bar.gxp"));
   }
 
   private void replay() {

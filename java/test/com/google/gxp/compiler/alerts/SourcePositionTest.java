@@ -20,7 +20,7 @@ import com.google.gxp.compiler.fs.FileRef;
 
 import junit.framework.TestCase;
 
-import static com.google.testing.util.MoreAsserts.*;
+import static com.google.gxp.testing.MoreAsserts.*;
 
 /**
  * Tests for {@link SourcePosition}.

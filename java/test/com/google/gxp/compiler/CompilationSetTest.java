@@ -34,7 +34,9 @@ import com.google.gxp.compiler.parser.Parser;
 import com.google.gxp.compiler.parser.SaxXmlParser;
 import com.google.gxp.compiler.schema.BuiltinSchemaFactory;
 import com.google.gxp.compiler.schema.SchemaFactory;
-import static com.google.testing.util.MoreAsserts.assertContainsRegex;
+
+import static com.google.gxp.testing.MoreAsserts.assertContainsRegex;
+
 import junit.framework.TestCase;
 
 import java.io.*;
