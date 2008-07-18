@@ -105,7 +105,7 @@ public class CssAppender {
       throws IOException {
     Preconditions.checkNotNull(value);
     out.append('"');
-    CSS_STRING_ESCAPER.appen(value);
+    CSS_STRING_ESCAPER.escape(out).append(value);
     out.append('"');
     return out;
   }

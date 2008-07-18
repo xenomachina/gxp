@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<project name="gxp">
+  <description>
+    build.xml file for the open source implementation of gxp
+  </description>
+
+  <property environment="env" />
+  <property file="build.properties" />
+
+  <target name="compile.compiler">
+    <mkdir dir="${build.dir}/classes" />
+    <javac srcdir="${src.dir}/com/google/"
+           includes="gxp/compiler/**/*.java,
+                     transconsole/common/*/*.java"
+           excludes="gxp/compiler/cli/*.java,
+                     gxp/compiler/ant/*.java"
+           debug="on"
+           destdir="${build.dir}/classes">
+      <classpath>
+        <pathelement location="${lib.dir}/google-collect-snapshot-20080530.jar" />
+        <pathelement location="${lib.dir}/google-base-extra.jar" />
+        <pathelement location="${lib.dir}/google-collect-extra.jar" />
+        <pathelement location="${lib.dir}/google-io-extra.jar" />
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="compile.runtime">
+    <mkdir dir="${build.dir}/classes" />
+    <javac srcdir="${src.dir}"
+           debug="on"
+           destdir="${build.dir}/classes">
+      <classpath>
+        <pathelement location="${lib.dir}/google-collect-snapshot-20080530.jar" />
+        <pathelement location="${lib.dir}/json.jar" />
+        <pathelement location="${lib.dir}/google-base-extra.jar" />
+        <pathelement location="${lib.dir}/google-io-extra.jar" />
+      </classpath>
+    </javac>
+  </target>
+</project>
