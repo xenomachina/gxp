@@ -16,10 +16,9 @@
 
 package com.google.gxp.base;
 
-import com.google.i18n.MessageBundle;
-
 import java.io.IOException;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * This is the superclass of all GXP templates. Contains helper classes and
@@ -37,13 +36,14 @@ public class GxpTemplate {
    * @param source message source to use
    * @param locale the Locale to translate this message to
    * @param id numeric ID of message to retrieve
-   * @param arguments the arguments necessary for the specified message
+   * @param parameters the parameters necessary for the specified message
    *
    * @return a String representing the specified message with the given arguments in
    * this given Locale.
    */
-  protected static String getMessage(String source, Locale locale, long id, String... arguments) {
-    return MessageBundle.getInstance(source, locale).getMessage(id).toString(arguments);
+  protected static String getMessage(String source, Locale locale, long id, String... parameters) {
+    ResourceBundle bundle = ResourceBundle.getBundle(source, locale);
+    return Message.getInstance(bundle.getString(String.valueOf(id))).toString(parameters);
   }
 
   /**

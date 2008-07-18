@@ -27,13 +27,20 @@
 
   <target name="compile.runtime">
     <mkdir dir="${build.dir}/classes" />
-    <javac srcdir="${src.dir}"
+    <javac srcdir="${src.dir}/com/google/"
+           includes="i18n/Localizable.java,
+                     gxp/base/*.java,
+                     gxp/css/*.java,
+                     gxp/html/*.java,
+                     gxp/js/*.java,
+                     gxp/text/*.java"
            debug="on"
            destdir="${build.dir}/classes">
       <classpath>
         <pathelement location="${lib.dir}/google-collect-snapshot-20080530.jar" />
         <pathelement location="${lib.dir}/json.jar" />
         <pathelement location="${lib.dir}/google-base-extra.jar" />
+        <pathelement location="${lib.dir}/google-collect-extra.jar" />
         <pathelement location="${lib.dir}/google-io-extra.jar" />
       </classpath>
     </javac>
