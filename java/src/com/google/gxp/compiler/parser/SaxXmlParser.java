@@ -162,7 +162,7 @@ public class SaxXmlParser implements XmlParser {
                              Attributes saxAttrs) throws SAXException {
       try {
         int attrCount = saxAttrs.getLength();
-        List<ParsedAttribute> attrs = Lists.newArrayListWithCapacity(attrCount);
+        List<ParsedAttribute> attrs = Lists.newArrayListWithExpectedSize(attrCount);
         for (int i = 0; i < attrCount; i++) {
           // XXX Annoyingly, SAX doesn't tell us the attribute's position, so
           // we fudge it and use the containing element's position.

@@ -51,8 +51,8 @@ public class DotWriter implements GraphSink {
   }
 
   public void recordNode(String nodeId, Map<String, String> properties) {
-    List<String> names = Lists.newArrayListWithCapacity(properties.size());
-    List<String> values = Lists.newArrayListWithCapacity(properties.size());
+    List<String> names = Lists.newArrayListWithExpectedSize(properties.size());
+    List<String> values = Lists.newArrayListWithExpectedSize(properties.size());
     for (Map.Entry<String, String> entry : properties.entrySet()) {
       names.add(dotEscape(entry.getKey()));
       values.add(dotEscape(entry.getValue()));

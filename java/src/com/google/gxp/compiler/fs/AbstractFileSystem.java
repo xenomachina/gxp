@@ -62,7 +62,7 @@ public abstract class AbstractFileSystem implements FileSystem {
    */
   public final List<FileRef> parseFilenameList(String filenameList) {
     String[] filenames = getFilenameListDelimiter().split(filenameList, -1);
-    List<FileRef> result = Lists.newArrayListWithCapacity(filenames.length);
+    List<FileRef> result = Lists.newArrayListWithExpectedSize(filenames.length);
     for (int i = 0; i < filenames.length; i++) {
       result.add(parseFilename(filenames[i]));
     }

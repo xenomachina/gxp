@@ -88,7 +88,7 @@ public class DynamicImplJavaCodeGenerator extends JavaCodeGenerator {
       public Void visitExtractedMessage(ExtractedMessage msg) {
         String org = msg.getTcMessage().getOriginal();
         List<Expression> params = msg.getParameters();
-        List<String> paramVars = Lists.newArrayListWithCapacity(params.size());
+        List<String> paramVars = Lists.newArrayListWithExpectedSize(params.size());
 
         for (Expression param : params) {
           String varName = createVarName("ph");
