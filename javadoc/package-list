@@ -1,4 +1,6 @@
 com.google.gxp.base
+com.google.gxp.base.dynamic
+com.google.gxp.css
 com.google.gxp.html
 com.google.gxp.js
 com.google.gxp.text
