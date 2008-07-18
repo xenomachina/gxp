@@ -29,6 +29,7 @@
   <target name="init">
     <mkdir dir="${build.dir}/classes" />
     <mkdir dir="${build.dir}/genfiles" />
+    <mkdir dir="${build.dir}/javadoc" />
     <mkdir dir="${build.dir}/tests" />
   </target>
 
@@ -96,6 +97,18 @@
       <rule pattern="org.apache.xerces.**"  result="com.google.gxp.org.apache.xerces.@1" />
       <rule pattern="com.google.common.**"  result="com.google.gxp.com.google.common.@1" />
     </jarjar>
+  </target>
+
+  <target name="javadoc" depends="init">
+    <javadoc packagenames="${javadoc.packagenames}"
+             destdir="${build.dir}/javadoc"
+             protected="true"
+             windowtitle="Google XML Pages - ${version} (BETA)">
+      <sourcepath>
+        <pathelement location="${src.dir}"/>
+      </sourcepath>
+      <link href="http://java.sun.com/javase/6/docs/api"/>
+    </javadoc>
   </target>
 
   <target name="compile.tests" depends="compile.runtime">
