@@ -1,0 +1,28 @@
+GXP relies on the following JARs in one way or another.  A copy of the jar is
+included for convenience.
+
+args4j-2.0.9.jar - A snapshot of the args4j command line processing library.
+See https://args4j.dev.java.net/.
+
+easymock.jar - A snapshot of the EasyMock testing tool (only used by tests).
+See http://www.easymock.org/.
+
+google-base-extra.jar - Some Google code that we haven't quite open sourced
+yet in the com.google.common.base package.
+
+google-collect-snapshot-20080530.jar - A snapshot of the Google Collections
+Library.  See http://code.google.com/p/google-collections/.
+
+google-io-extra.jar - Some Google code that we haven't quite open sourced
+yet in the com.google.common.io package.
+
+jarjar-1.0rc7.jar - The JarJar tool (used only for creating the release
+jar).  See http://code.google.com/p/jarjar/.
+
+json.jar - A snapshot of the JSON library.  See http://www.json.org/.
+
+junit-4.4.jar - A snapshot of the junit testing library (used only by tests).
+See http://www.junit.org/
+
+xercesImplNoMetaInf.jar - A snapshot of the xerces XML parsing library. See
+http://xerces.apache.org/xerces-j/.
