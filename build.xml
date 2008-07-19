@@ -30,6 +30,7 @@
     <mkdir dir="${build.dir}/classes" />
     <mkdir dir="${build.dir}/genfiles" />
     <mkdir dir="${build.dir}/javadoc" />
+    <mkdir dir="${build.dor}/compiler.javadoc" />
     <mkdir dir="${build.dir}/tests" />
   </target>
 
@@ -100,14 +101,32 @@
   </target>
 
   <target name="javadoc" depends="init">
-    <javadoc packagenames="${javadoc.packagenames}"
+    <javadoc packagenames="com.google.gxp.*,com.google.i18n"
+             excludepackagenames="com.google.gxp.compiler.*"
              destdir="${build.dir}/javadoc"
              protected="true"
              windowtitle="Google XML Pages - ${version} (BETA)">
       <sourcepath>
         <pathelement location="${src.dir}"/>
       </sourcepath>
+      <classpath refid="classpath.jars" />
       <link href="http://java.sun.com/javase/6/docs/api"/>
+      <link href="http://www.json.org/javadoc/"/>
+      <link href="http://gxp.googlecode.com/svn/trunk/javadoc/" />
+    </javadoc>
+  </target>
+
+  <target name="compiler.javadoc" depends="init">
+    <javadoc packagenames="com.google.gxp.compiler.*,com.google.gxp.transconsole.*"
+             destdir="${build.dir}/compiler.javadoc"
+             protected="true"
+             windowtitle="GXP Compiler ${version} (BETA)">
+      <sourcepath>
+        <pathelement location="${src.dir}"/>
+      </sourcepath>
+      <classpath refid="classpath.jars" />
+      <link href="http://java.sun.com/javase/6/docs/api" />
+      <link href="http://gxp.googlecode.com/svn/trunk/javadoc/" />
     </javadoc>
   </target>
 

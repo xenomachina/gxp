@@ -54,7 +54,7 @@ public class GxpTemplate {
    */
   protected abstract static class TunnelingGxpClosure implements GxpClosure {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @throws GxpTunnelException when the underlying implementation throws a
      * checked exception other than {@code IOException}.
