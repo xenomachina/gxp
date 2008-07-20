@@ -28,7 +28,7 @@ import java.io.StringWriter;
 /**
  * A {@code HtmlClosure} that will print the stack trace of a
  * {@code Throwable}. In general, you'll want to wrap this inside
- * of a pair of <pre> tags.
+ * of a pair of &lt;pre&gt; tags.
  */
 public class ThrowableClosure implements HtmlClosure {
   private final Throwable t;

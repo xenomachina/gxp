@@ -75,7 +75,7 @@ public class CompilationSet {
     /**
      * Creates a {@code CompilationSet}.
      *
-     * @param parser the {@code Parser} that will be used for parsing sourc
+     * @param parser the {@code Parser} that will be used for parsing source
      *     files
      * @param codeGeneratorFactory the {@code CodeGeneratorFactory} that will be
      *     used for constructing {@code CodeGenerator}s, which in turn will be
