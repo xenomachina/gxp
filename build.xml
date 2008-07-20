@@ -74,6 +74,7 @@
         <pathelement location="${src.dir}/com/google/gxp/css/" />
         <pathelement location="${src.dir}/com/google/gxp/html/" />
         <pathelement location="${src.dir}/com/google/gxp/js/" />
+        <pathelement location="${src.dir}/com/google/gxp/rss/" />
         <pathelement location="${src.dir}/com/google/gxp/text/" />
         <pathelement location="${src.dir}/com/google/i18n/" />
         <pathelement location="${genfiles.dir}/com/google/gxp/base/dynamic/" />
@@ -142,9 +143,15 @@
           target="com.google.gxp.compiler.dynamictests.xxx"
           dynamic="true"
           i18nwarn="false" />
+    <gxpc srcdir="${test.dir}/com/google/gxp/rss/"
+          srcpaths="${test.dir}"
+          destdir="${genfiles.dir}"
+          target="com.google.gxp.rss.xxx"
+          schemas="java/src/com/google/gxp/rss/rss20.xml" />
     <copy todir="${build.dir}/classes">
       <fileset dir="${genfiles.dir}/">
         <include name="com/google/gxp/compiler/functests/*.properties" />
+        <include name="com/google/gxp/rss/*.properties" />
       </fileset>
     </copy>
 
@@ -153,6 +160,7 @@
         <pathelement location="${test.dir}/" />
         <pathelement location="${genfiles.dir}/com/google/gxp/compiler/dynamictests/" />
         <pathelement location="${genfiles.dir}/com/google/gxp/compiler/functests/" />
+        <pathelement location="${genfiles.dir}/com/google/gxp/rss/" />
       </src>
       <classpath refid="classpath.jars" />
       <classpath>

@@ -1,0 +1,73 @@
+<schema name="rss20"
+        namespace="http://backend.userland.com/rss2"
+        content-type="application/rss+xml"
+        default-to-sgml="false"
+        java-type="com.google.gxp.rss.RssClosure"
+        java-appender="com.google.gxp.rss.RssAppender"
+        java-imports="com.google.gxp.rss.*">
+
+  <element name="author"/>
+  <element name="category"/>
+  <element name="channel"/>
+  <element name="cloud"/>
+  <element name="comments"/>
+  <element name="copyright"/>
+  <element name="description"/>
+  <element name="docs"/>
+  <element name="enclosure"/>
+  <element name="generator"/>
+  <element name="guid"/>
+  <element name="height"/>
+  <element name="image"/>
+  <element name="item"/>
+  <element name="language"/>
+  <element name="lastBuildDate"/>
+  <element name="link"/>
+  <element name="managingEditor"/>
+  <element name="name"/>
+  <element name="pubDate"/>
+  <element name="rss"/>
+  <element name="skipDays"/>
+  <element name="skipHours"/>
+  <element name="source"/>
+  <element name="textInput"/>
+  <element name="title"/>
+  <element name="ttl"/>
+  <element name="url"/>
+  <element name="webMaster"/>
+  <element name="width"/>
+
+  <attribute name="domain"
+             elements="category cloud"/>
+
+  <attribute name="isPermaLink"
+             elements="guid"
+             regex="true|false"/>
+
+  <attribute name="length"
+             elements="enclosure"
+             flags="required"/>
+
+  <attribute name="path"
+             elements="cloud"/>
+
+  <attribute name="port"
+             elements="cloud"/>
+
+  <attribute name="protocol"
+             elements="cloud"/>
+
+  <attribute name="registerProcedure"
+             elements="cloud"/>
+
+  <attribute name="type"
+             elements="enclosure"
+             flags="required"/>
+
+  <attribute name="url"
+             elements="enclosure source"
+             flags="required"/>
+
+  <attribute name="version"
+             elements="rss"/>
+</schema>

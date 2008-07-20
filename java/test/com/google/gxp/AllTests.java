@@ -106,6 +106,15 @@ public class AllTests extends TestCase {
     suite.addTestSuite(com.google.gxp.compiler.dynamictests.JavaCodeTest.class);
     suite.addTestSuite(com.google.gxp.compiler.dynamictests.DynamicTest.class);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Non HTML Markup Tests
+    ////////////////////////////////////////////////////////////////////////////////
+
+    // rss
+    suite.addTestSuite(com.google.gxp.rss.JavaCodeTest.class);
+    suite.addTestSuite(com.google.gxp.rss.RssAppenderTest.class);
+    suite.addTestSuite(com.google.gxp.rss.RssClosuresTest.class);
+
     return suite;
   }
 }

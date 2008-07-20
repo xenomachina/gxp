@@ -54,7 +54,7 @@ public class GxpcTask extends Task implements GxpcConfiguration {
   private final FileSystem fs = SystemFileSystem.INSTANCE;
   private SourcePathFileSystem sourcePathFs;
   private Set<FileRef> sourceFiles;
-  private Set<FileRef> schemaFiles;
+  private Set<FileRef> schemaFiles = Sets.newHashSet();
   private List<FileRef> sourcePaths;
   private FileRef outputDir;
   private SortedSet<Phase> dotPhases;
@@ -78,9 +78,6 @@ public class GxpcTask extends Task implements GxpcConfiguration {
     for (String includedFile : fileScanner.getIncludedFiles()) {
       underlyingInputFiles.add(fs.parseFilename(baseDir + includedFile));
     }
-
-    schemaFiles = Sets.newHashSet();
-    // TODO(harryh): fill this in
 
     if (destdir == null) {
       destdir = System.getProperty("user.dir");
@@ -130,6 +127,12 @@ public class GxpcTask extends Task implements GxpcConfiguration {
 
   public void setDestdir(String destdir) {
     this.destdir = destdir;
+  }
+
+  public void setSchemas(String schemas) {
+    for (String schema : schemas.split(",")) {
+      schemaFiles.add(fs.parseFilename(schema));
+    }
   }
 
   public void setTarget(String target) {
