@@ -75,10 +75,10 @@ public class CompilationSet {
     /**
      * Creates a {@code CompilationSet}.
      *
-     * @param parser the {@code Parser} that will be used for parsing source
+     * @param parser the {@code Parser} that will be used for parsing sourc
      *     files
      * @param codeGeneratorFactory the {@code CodeGeneratorFactory} that will be
-     *     used for constructing {@link CodeGenerator}s, which in turn will be
+     *     used for constructing {@code CodeGenerator}s, which in turn will be
      *     used to generate output
      */
     public Builder(Parser parser, CodeGeneratorFactory codeGeneratorFactory,

@@ -45,7 +45,7 @@ public interface FileStore {
   /**
    * Opens the stream corresponding to the specified filename for writing.
    * Client code should call {@link FileRef#openOutputStream()} or {@link
-   * FileRef#openWriter(String)} instead.
+   * FileRef#openWriter(Charset)} instead.
    */
   OutputStream openOutputStream(FileRef fileRef) throws IOException;
 

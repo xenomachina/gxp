@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A null {@Root}. Appears in the tree when no appropriate {@code Root} could
+ * A null {@code Root}. Appears in the tree when no appropriate {@code Root} could
  * be created.
  */
 public class NullRoot extends AbstractNode implements Root {

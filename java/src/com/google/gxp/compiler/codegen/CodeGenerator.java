@@ -21,9 +21,7 @@ import com.google.gxp.compiler.alerts.AlertSink;
 import java.io.IOException;
 
 /**
- * Something that generates code. A {@code CodeGenerator} is typically obtained
- * by calling {@link
- * com.google.gxp.compiler.CompilationUnit#getCodeGenerator(OutputLanguage)}
+ * Something that generates code.
  */
 public interface CodeGenerator {
   /**

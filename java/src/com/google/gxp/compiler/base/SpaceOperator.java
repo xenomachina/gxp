@@ -73,7 +73,7 @@ public enum SpaceOperator implements Function<String,String> {
   protected abstract String impl(String s);
 
   /**
-   * {@inheritdoc}
+   * {@inheritDoc}
    *
    * @throws IllegalArgumentException if input contains non-whitespace
    * characters.

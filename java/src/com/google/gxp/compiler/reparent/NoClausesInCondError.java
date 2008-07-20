@@ -26,8 +26,8 @@ import com.google.gxp.compiler.base.Node;
  */
 public class NoClausesInCondError extends ErrorAlert {
   /**
-   * @param parentNode the attribute's parent {@code Node}.
-   * @param attr the attribute
+   * @param pos the {@code SourcePosition} of the error.
+   * @param displayName the display name of the {@code Node} that has an error.
    */
   public NoClausesInCondError(SourcePosition pos, String displayName) {
     super(pos, displayName + " must contain at least one clause.");

@@ -58,7 +58,7 @@ public abstract class AbstractFileSystem implements FileSystem {
    *
    * <p>This implementation splits {@code filenameList} using the result of
    * {@link #getFilenameListDelimiter()} and parses the resulting filenames
-   * with {@link #parseFilename()}.
+   * with {@link #parseFilename(String)}.
    */
   public final List<FileRef> parseFilenameList(String filenameList) {
     String[] filenames = getFilenameListDelimiter().split(filenameList, -1);

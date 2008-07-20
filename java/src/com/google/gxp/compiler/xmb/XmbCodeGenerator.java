@@ -28,7 +28,8 @@ import com.google.transconsole.common.xml.XmbBundleWriter;
 import java.io.IOException;
 
 /**
- * A {@link CodeGenerator} which generates XMB (XML Message Bundle) files.
+ * A {@link com.google.gxp.compiler.codegen.CodeGenerator} which generates XMB
+ * (XML Message Bundle) files.
  */
 public class XmbCodeGenerator extends BaseCodeGenerator<MessageExtractedTree> {
   private static final CharEscaper XML_ASCII_ESCAPER = new XmlCharsetEscaper(Charsets.US_ASCII);

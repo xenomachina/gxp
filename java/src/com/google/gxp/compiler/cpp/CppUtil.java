@@ -29,8 +29,9 @@ import com.google.gxp.compiler.base.OutputLanguage;
  */
 public class CppUtil {
   /**
-   * Validate the given NativeExpression and adds {@link Alert}s to the
-   * {@link AlertSink} if necessary.
+   * Validate the given NativeExpression and adds
+   * {@link com.google.gxp.compiler.alerts.Alert}s to the
+   * {@link com.google.gxp.compiler.alerts.AlertSink} if necessary.
    */
   public static void validateExpression(AlertSink alertSink, NativeExpression expr) {
     // TODO(harryh): actually do some validation

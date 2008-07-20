@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+package com.google.gxp.compiler.fs;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * This package contains an abstraction for a filesystem. This provides an
  * abstraction layer between the GXP compiler and the API available to the
@@ -66,8 +71,3 @@
  * {@code /MyProject/java/com/google/my.gxp} in an eclipse-based filesystem.
  * {@code buffer#3: Snarf.java} in some unknown editing environment
  */
-
-package com.google.gxp.compiler.fs;
-
-import java.io.InputStream;
-import java.io.OutputStream;

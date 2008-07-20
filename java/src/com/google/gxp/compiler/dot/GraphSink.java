@@ -31,15 +31,12 @@ public interface GraphSink {
 
   /**
    * Called at the end of the graph.
-   *
-   * @param name the name of the graph
    */
   public void digraphEnd();
 
   /**
    * Called once for each record node.
    *
-   * @param nodeId unique ID for the node
    * @param nodeId unique ID for the node
    */
   public void recordNode(String nodeId, Map<String, String> properties);
@@ -58,7 +55,7 @@ public interface GraphSink {
    *
    * @param fromNodeId ID of source node
    * @param label the edge's label
-   * @param fromNodeId ID of destination node
+   * @param toNodeId ID of destination node
    */
   public void edge(String fromNodeId, String label, String toNodeId);
 }

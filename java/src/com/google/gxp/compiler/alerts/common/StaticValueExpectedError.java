@@ -22,7 +22,8 @@ import com.google.gxp.compiler.base.Node;
 
 /**
  * An {@link com.google.gxp.compiler.alerts.Alert Alert} that indicates that a
- * particular {@link Expression} must be statically evaluatable.
+ * particular {@link com.google.gxp.compiler.base.Expression} must be
+ * statically evaluatable.
  */
 public class StaticValueExpectedError extends ErrorAlert {
   public StaticValueExpectedError(Node node) {

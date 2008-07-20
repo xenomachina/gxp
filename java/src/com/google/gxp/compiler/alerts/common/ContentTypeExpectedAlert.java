@@ -20,8 +20,8 @@ import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
 /**
- * {@link Alert} which indicates that a node expecting a {@code content-type}
- * had a different kind of type.
+ * {@link com.google.gxp.compiler.alerts.Alert} which indicates that a node
+ * expecting a {@code content-type} had a different kind of type.
  */
 public class ContentTypeExpectedAlert extends ErrorAlert {
   public ContentTypeExpectedAlert(SourcePosition sourcePosition,

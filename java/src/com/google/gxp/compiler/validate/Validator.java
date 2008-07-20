@@ -68,7 +68,7 @@ import java.util.Set;
 
 /**
  * Validates the tree. This validation primarily deals with {@code Call}s and
- * {@call OutputElement}s. Essentially, the attributes and content of these
+ * {@code OutputElement}s. Essentially, the attributes and content of these
  * nodes are checked, and any issues are reported as {@code Alert}s in the
  * resulting {@code ValidatedTree}. Also, {@code BoundCall}s will be converted
  * into {@code ValidatedCall}s. ({@code OutputElement}s aren't modified.)
