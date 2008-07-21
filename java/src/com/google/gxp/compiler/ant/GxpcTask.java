@@ -47,6 +47,10 @@ import org.apache.tools.ant.Task;
 
 /**
  * An Ant Task that can be used to invoke gxpc.
+ *
+ * NOTE(harryh): this was just kind of hacked together for the Open Source
+ * release.  It's not used internally at Google, and probably could use
+ * some love.
  */
 public class GxpcTask extends Task implements GxpcConfiguration {
   private static final String[] DEFAULT_INCLUDES = { "**/*.gxp" };

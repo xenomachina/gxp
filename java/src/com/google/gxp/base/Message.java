@@ -17,11 +17,13 @@
 package com.google.gxp.base;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.PrimitiveArrays;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Message class manages a parameterized text string.  It can be used
@@ -29,13 +31,17 @@ import java.util.List;
  * texts.
  */
 public final class Message {
+  private static final Map<String, Message> messageCache = Maps.newHashMap();
   /**
    * Get an instance of Message.
    *
    * @param msg parameterized text string
    */
   public static Message getInstance(String msg) {
-    return new Message(msg);
+    if (!messageCache.containsKey(msg)) {
+      messageCache.put(msg, new Message(msg));
+    }
+    return messageCache.get(msg);
   }
 
   private final String msg;

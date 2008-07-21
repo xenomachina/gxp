@@ -62,7 +62,7 @@
     <gxpc srcdir="${src.dir}/com/google/gxp/base/dynamic/"
           srcpaths="${src.dir}"
           destdir="${genfiles.dir}"
-          target="com.google.gxp.base.dynamic.xxx" />
+          target="com.google.gxp.base.dynamic.messages" />
     <copy todir="${build.dir}/classes">
       <fileset dir="${genfiles.dir}/">
         <include name="com/google/gxp/base/dynamic/*.properties" />
@@ -135,12 +135,12 @@
     <gxpc srcdir="${test.dir}/com/google/gxp/compiler/functests/"
           srcpaths="${test.dir}"
           destdir="${genfiles.dir}"
-          target="com.google.gxp.compiler.functests.xxx"
+          target="com.google.gxp.compiler.functests.messages"
           i18nwarn="false" />
     <gxpc srcdir="${test.dir}/com/google/gxp/compiler/dynamictests/"
           srcpaths="${test.dir}"
           destdir="${genfiles.dir}"
-          target="com.google.gxp.compiler.dynamictests.xxx"
+          target="com.google.gxp.compiler.dynamictests.messages"
           dynamic="true"
           i18nwarn="false" />
     <gxpc srcdir="${test.dir}/com/google/gxp/rss/"
