@@ -3,5 +3,6 @@ com.google.gxp.base.dynamic
 com.google.gxp.css
 com.google.gxp.html
 com.google.gxp.js
+com.google.gxp.rss
 com.google.gxp.text
 com.google.i18n
