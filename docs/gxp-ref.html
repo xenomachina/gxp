@@ -145,7 +145,7 @@
               <li><a href="#attr-modifiers">Attribute modifiers</a> &mdash; used to modify or
               augment the meaning of an attribute with the same local name.
             </ul>
-          <li>Call namespaces &mdash; used to identify <a href="">call
+          <li>Call namespaces &mdash; used to identify <a href="#call-elements">call
           elements</a>
           <li>Schema namespaces &mdash; used to identify <a href="">output
           elements</a>
@@ -748,7 +748,7 @@
             The parameter is a local variable that can be used within
             expressions.
 
-            <dt>content
+            <dt id="gxp:param-content-attr">content
             <dd>For container templates. Specifies that this parameter
             should consume the content of the calling element.  The
             value of this attribute must be <code>*</code>. Only one
@@ -1163,9 +1163,89 @@
       </div>
     </div>
 
-    <h2>Call Elements</h2>
-    <div class=TODO>
-      TODO
+    <h2 id="call-elements">Call Elements</h2>
+    <div>
+      <p>There are two types of call namespaces. The unqualified call namespace,
+      and qualified call namespaces.
+
+      <p>Any namespace whose URI is of the form
+      <code>http://google.com/2001/gxp/call/<var>suffix</var></code> is a
+      qualified namespace. The <var>suffix</var> is a slash (<code>/</code>)
+      separated package identifier. It refers to the package whose name is the
+      same as suffix, but with slash (<code>/</code>) characters replaced by
+      dot (<code>.</code>) characters.
+
+      <p>The unqualified call namespace is identified by the URI
+      <code>http://google.com/2001/gxp/call</code>. By convention it uses the
+      namespace prefix <code>call:</code>.
+
+      <p>A call element is any element whose namespace is one of the two forms
+      of call namespaces. A call element invokes a template or interface, known
+      as the "callee".
+
+      <p>For a call element that uses a qualified call namespace, the
+      callee is the memeber of the package identified by the namespace whose
+      name is equal to the local name of the call element.
+
+<pre class="prettyprint lang-xml">
+xmlns:<b>foo</b>="http://google.com/2001/gxp/call/<b>bar/baz</b>"
+<small>...</small>
+&lt;!-- callee is <b>bar.baz.Quux</b> --&gt;
+&lt;<b>foo:Quux</b> <small>...</small> /&gt;
+</pre>
+
+      <p>In a call element that uses the unqualified call namespace, the local
+      name of the call element may contain dots. In this case the local name
+      is the fully qualified dotted name of the callee.
+
+<pre class="prettyprint lang-xml">
+xmlns:call="http://google.com/2001/gxp/call"
+<small>...</small>
+&lt;!-- callee is <b>bar.baz.Quux</b> --&gt;
+&lt;call:<b>bar.baz.Quux</b> <small>...</small> /&gt;
+</pre>
+
+      <p>In a call element that uses the unqualified call namespace and whose
+      local name does <em>not</em> contain dots, the package of the callee is
+      determined by the imports.
+
+<pre class="prettyprint lang-xml">
+xmlns:call="http://google.com/2001/gxp/call"
+<small>...</small>
+&lt;gxp:import class="<b>bar.baz.Quux</b>"/&gt;
+&lt;!-- callee is <b>bar.baz.Quux</b> --&gt;
+&lt;call:<b>Quux</b> <small>...</small> /&gt;
+</pre>
+
+<pre class="prettyprint lang-xml">
+xmlns:call="http://google.com/2001/gxp/call"
+<small>...</small>
+&lt;gxp:import package="<b>bar.baz</b>"/&gt;
+&lt;!-- callee is <b>bar.baz.Quux</b> --&gt;
+&lt;call:<b>Quux</b> <small>...</small> /&gt;
+</pre>
+
+      <p>Most parameters to called templates are passed via attributes. The way
+      in which plain attributes are interpreted depends on the type of the
+      corresponding <a href="#gxp:param-element"><code>gxp:param</code></a> and
+      its <code>constructor</code> (if any). If parameters are passed using
+      <code>expr:</code> attributes, the evaluated expression is passed as the
+      parameter value.
+
+      <p>Parameters may also be passed through the use of
+      <a href="#gxp:attr-element"><code>gxp:attr</code></a>. In most cases the
+      content of such a <code>gxp:attr</code> element will be evaluated lazily.
+      That is, the callee will be passed a closure containing the unevaluated
+      content.
+
+      <p>If the callee has a parameter with the <a
+      href="#gxp:param-content-attr"><code>content attribute</code></a> set to
+      <code>*</code> then the contained content of the call element will be
+      passed in to this parameter just as though it was in a
+      <code>gxp:attr</code> element that named the parameter. It is an error
+      for a call element to contain non-whitespace content unless it has a
+      parameter to accept it.
+
     </div>
 
     <h2>Output Elements</h2>
