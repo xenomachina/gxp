@@ -63,6 +63,8 @@ public class AllTests extends TestCase {
     suite.addTestSuite(com.google.gxp.compiler.cli.GxpcTest.class);
     suite.addTestSuite(com.google.gxp.compiler.collapse.SpaceCollapserTest.class);
     suite.addTestSuite(com.google.gxp.compiler.collapse.SpaceOperatorTest.class);
+    suite.addTestSuite(com.google.gxp.compiler.depend.DependencyCheckingTest.class);
+    suite.addTestSuite(com.google.gxp.compiler.depend.SerializabilityTest.class);
     suite.addTestSuite(com.google.gxp.compiler.fs.FileRefTest.class);
     suite.addTestSuite(com.google.gxp.compiler.fs.InMemoryFileSystemTest.class);
     suite.addTestSuite(com.google.gxp.compiler.fs.SourcePathFileSystemTest.class);

@@ -30,7 +30,7 @@
     <mkdir dir="${build.dir}/classes" />
     <mkdir dir="${build.dir}/genfiles" />
     <mkdir dir="${build.dir}/javadoc" />
-    <mkdir dir="${build.dor}/compiler.javadoc" />
+    <mkdir dir="${build.dir}/compiler.javadoc" />
     <mkdir dir="${build.dir}/tests" />
   </target>
 
