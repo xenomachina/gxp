@@ -1,0 +1,1341 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <title>GXP Reference</title>
+
+    <link href="prettify.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="prettify.js"></script>
+
+    <style type="text/css">
+      body {
+        font-family: sans-serif;
+      }
+
+      .TODO {
+        background-color: yellow;
+      }
+
+      td {
+        font-size: 95%
+      }
+      table {
+        border-collapse: collapse;
+      }
+
+      td, th {
+        vertical-align: top;
+        text-align: left;
+        border: 1px solid #ccc;
+        padding: .5ex;
+      }
+      th.divider {
+        background-color: #99ccff
+      }
+      span.label {
+        color: #3366ff;
+        font-variant: small-caps
+      }
+      pre {
+        overflow: visible;
+      }
+      pre.prettyprint {
+        border: 1px solid #ddd;
+        background-color: #eee;
+        padding:.5ex
+      }
+      pre.prettyprint, table {
+        margin-left: 4ex;
+        margin-right: 4ex;
+      }
+
+      code, dl.attr-list > dt {
+        color: #060;
+        font-family: monospace;
+      }
+
+      h1, h2, h3 /*, h4, h5, h6*/ {
+        padding: .25ex;
+        border-top: 1px solid black;
+        margin-bottom: 1ex;
+        padding-bottom: 0;
+      }
+      h1 { border: 0 }
+      h2 { border-color: #9af; }
+      h3 { border-color: #abf; }
+      h4 { border-color: #bcf; }
+      h5 { border-color: #cdf; }
+      h6 { border-color: #fff; }
+
+      h1 + div, h2 + div, h3 + div, h4 + div, h5 + div, h6 + div {
+       margin-left: .5cm;
+      }
+      /*
+      h1 + div { border-left: 1px solid #f00; }
+      h2 + div { border-left: 1px solid #0f0; }
+      h3 + div { border-left: 1px solid #00f; }
+      h4 + div { border-left: 1px solid #ff0; }
+      h5 + div { border-left: 1px solid #0ff; }
+      h6 + div { border-left: 1px solid #f0f; }
+      */
+
+      td p, td dl, td ul { margin-left: 0; }
+
+      .opt:after {
+        content: "optional";
+      }
+      .dyn:after {
+        content: "dynamic";
+      }
+      .dyn-opt:after {
+        content: "dynamic optional";
+      }
+      .expr:after {
+        content: "auto-dynamic";
+      }
+      .expr-opt:after {
+        content: "auto-dynamic optional";
+      }
+      .dyn:after,
+      .opt:after,
+      .dyn-opt:after,
+      .expr:after,
+      .expr-opt:after {
+        font-style: italic;
+        vertical-align: sub;
+        font-size: 50%;
+      }
+
+      dt {
+        font-weight: bold;
+      }
+
+      ol > li + li,
+      dl > dt + dt,
+      dl > dd + dt {
+        margin-top: 1em;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+  <h1>GXP Reference</h1>
+  <div>
+    <h2 id="namespaces">Namespaces</h2>
+    <div>
+
+      <h3>How Namespaces are Used</h3>
+      <div>
+        <p>The GXP language makes heavy use of <a
+        href="http://www.jclark.com/xml/xmlns.htm">XML Namespaces</a>.
+        GXP's handling of namespaces can be broken into three
+        categories:
+
+        <ul>
+          <li>Built-in Namespaces, which are used in three ways:
+            <ul>
+              <li><a href="#built-in-elements">Built-in elements</a> &mdash; the main
+              building blocks of the GXP language.
+              <li><a href="#built-in-attrs">Built-in attributes</a> &mdash; used to annotate
+              or modify elements.
+              <li><a href="#attr-modifiers">Attribute modifiers</a> &mdash; used to modify or
+              augment the meaning of an attribute with the same local name.
+            </ul>
+          <li>Call namespaces &mdash; used to identify <a href="">call
+          elements</a>
+          <li>Schema namespaces &mdash; used to identify <a href="">output
+          elements</a>
+        </ul>
+
+        <h4>Elements Without a Namespace</h4>
+        <div>
+          <p>It is an error for an element to not have any namespace.
+
+          <p>By convention, it is typical to have a default <code>xmlns</code>
+          mapping at the root level, thereby ensuring that all elements have
+          some namespace associated with them.
+        </div>
+
+        <h4>Attributes Without a Namespace</h4>
+        <div>
+          <p>The interpretation of an attributes that has no namespace is
+          determined by the element the attribute is on.
+
+          <p>Note that any attribute that does not have a namespace prefix has
+          no namespace, even if a default <code>xmlns</code> mapping has been
+          set.
+        </div>
+
+        <h4>Built-in Namespaces</h4>
+        <div>
+          <p><table summary="GXP built-in namespaces and conventional prefixes">
+            <tr>
+              <th>Namespace URI</th>
+              <th>Conventional Prefix</th>
+            </tr>
+
+            <tr>
+              <td><p><code>http://google.com/2001/gxp</code></p></td>
+              <td><p><code>gxp:</code></p></td>
+            </tr>
+
+            <tr>
+              <td><p><code>http://google.com/2001/gxp/expressions</code></p></td>
+              <td><p><code>expr:</code></p></td>
+            </tr>
+
+            <tr>
+              <td><p><code>http://google.com/2001/gxp/code/java</code></p></td>
+              <td><p><code>java:</code></p></td>
+            </tr>
+
+            <tr>
+              <td><p><code>http://google.com/2001/gxp/code/cpp</code></p></td>
+              <td><p><code>cpp:</code></p></td>
+            </tr>
+
+            <tr>
+              <td><p><code>http://google.com/2001/gxp/msg</code></p></td>
+              <td><p><code>msg:</code></p></td>
+            </tr>
+
+            <tr>
+              <td><p><code>http://google.com/2001/gxp/nomsg</code></p></td>
+              <td><p><code>nomsg:</code></p></td>
+            </tr>
+          </table>
+
+          <p>XML namespaces are identified by their namespace URI.  The
+          built-in namespaces have conventional prefixes associated with
+          them which are used throughout this document.
+
+          <p>Note that these prefixes are purely convention. In order to use
+          the prefixes shown in this table it is necessary to set up
+          the corresponding namespace mappings through the use of
+          <code>xmlns:<var>prefix</var></code> attributes.
+
+          <p>For example, in this documentation "<code>gxp:template</code>"
+          refers to the name "<code>template</code>" in the
+          <code>http://google.com/2001/gxp</code> namespace. To use this
+          conventional prefix of "<code>gxp</code>", the namespace mapping
+          <code>xmlns:gxp='http://google.com/2001/gxp'</code> must be in
+          scope.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 id="built-in-elements">Built-in Elements</h2>
+    <div>
+      <p>Built-in elements allow only the attributes shown here.
+
+      <p>Elements can be assumed to be "content elements", meaning that they
+      generate content of some sort, unless otherwise stated in the
+      <i>Context</i> section for that element.
+
+      <p>All elements, including "childless" elements, allow attibute elements
+      as children.
+
+      <p>Elements allow only content elements (and attribute elements) as
+      children unless otherwise stated in the <i>Children</i> section for that
+      element.
+
+      <h3 id="gxp:abbr-element">&lt;gxp:abbr&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Defines an "abbreviation": a local variable that may be used in
+          native expressions. The variable's scope is defined by the start
+          and end of the <code>gxp:abbr</code> element.
+
+          <p>In Java code the variable will be declared <code>final</code>.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>name
+            <dd>The name of the local variable.
+            <dt class=expr>expr
+            <dd>The value of the local variable.
+
+            <dt class=opt>type
+            <dd>See <a href="#data-types">Data Types</a>.
+            <dt class=opt>content-type
+            <dd>See <a href="#data-types">Data Types</a>.
+            <dt class=opt>gxp:type
+            <dd>See <a href="#data-types">Data Types</a>.
+            <dt class=opt>java:type
+            <dd>See <a href="#data-types">Data Types</a>.
+            <dt class=opt>cpp:type
+            <dd>See <a href="#data-types">Data Types</a>.
+
+            <dt class=opt>gxp:ispace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+            <dt class=opt>gxp:espace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+          </dl>
+        </div>
+      </div>
+
+      <h3 id="gxp:attr-element">&lt;gxp:attr&gt;</h3>
+      <div>
+
+        <h4>Description</h4>
+        <div>
+          <p>Sets the value of an attribute in the parent element to
+          the content of this <code>gxp:attr</code> element.
+
+          <p>Typicalllllly, <code>gxp:attr</code> is used to insert dynamic
+          content (such as translatable messages) into attributes of output
+          elements and template calls.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>name
+            <dd>The name of the attribute to set. It is an error to attempt to set
+            an attribute that does not exist. Setting an attribute with a specific
+            namespace via <code>gxp:attr</code> is not currently supported.
+            <dt class=expr-opt>cond
+            <dd>A condition (boolean expression) that determines whether the
+            attribute should be set or not. This is only allowed if the attribute
+            in question is optional.
+
+            <dt class=opt>gxp:ispace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+            <dt class=opt>gxp:espace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+          </dl>
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May appear as this child of any element that has attributes. Does
+          not generate any content in the parent element's body.
+        </div>
+      </div>
+
+      <h3 id="gxp:clause-element">&lt;gxp:clause&gt;</h3>
+      <div>
+
+        <h4>Description</h4>
+        <div>
+          <p>An individual clause of a
+          <a href="#gxp:cond-element"><code>gxp:cond</code></a>.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt class=expr-opt>cond
+            <dd>The condition (boolean expression) for this clause. Only the last
+            clause in a <code>gxp:cond</code> can omit this attribute, in which
+            case it is treated as though the condition is always true.
+
+            <dt class=opt>gxp:ispace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+            <dt class=opt>gxp:espace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+          </dl>
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear as the child of a <a
+          href="#gxp:cond-element"><code>gxp:cond</code></a> element.
+        </div>
+      </div>
+
+      <h3 id="gxp:cond-element">&lt;gxp:cond&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Specifies content to be included under certain conditions. Each
+          condition (and the content for that condition) is specified by a <a
+            href="#gxp:clause-element"><code>gxp:clause</code></a> element. The
+          condition for each clause is evaluated in turn.  The first clause with
+          a condition that evaluates to true has its content evaluated (which
+          becomes the value of this clause). The conditions of subsequent clauses
+          are not evaluated.</p>
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Can only contain
+          <a href="#gxp:clause-element"><code>gxp:clause</code></a>
+          elements.
+        </div>
+      </div>
+
+      <h3 id="gxp:constructor-element">&lt;gxp:constructor&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Used to designate a set of parameters and annotations as belonging
+          to a template's constructor.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Can only contain parameter and annotation elements.
+        </div>
+      </div>
+
+      <h3 id="gxp:elif-element">&lt;gxp:elif&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>An "else if". Must be the child of a <code>gxp:if</code> element.
+          Marks the start of content to include if the preceding condition(s)
+          are all false and a newly specified condition is true. Note that the
+          content in question is not the child of the <code>gxp:elif</code>,
+          but rather the siblings that appear after it within the containing
+          <code>gxp:if</code>.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>cond
+            <dd>The condition (boolean expression) for this clause.
+          </dl>
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear as the child of a <a
+          href="#gxp:if-element"><code>gxp:if</code></a> element.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+
+      <h3 id="gxp:else-element">&lt;gxp:else&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>An "else". Must be the child of a <code>gxp:if</code> element.
+          Marks the start of content to include if the preceding condition(s)
+          are all false. Note that the content in question is not the child of
+          the <code>gxp:else</code>, but rather the siblings that appear after
+          it within the containing <code>gxp:if</code>.
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear as the child of a <a
+          href="#gxp:if-element"><code>gxp:if</code></a> element.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+
+      <h3 id="gxp:eph-element">&lt;gxp:eph&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>An <u>e</u>nd of <u>p</u>lace<u>h</u>older element.  Can only
+          appear within a placeholder, and marks the end of the placeholder
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+
+      <h3 id="gxp:eval-element">&lt;gxp:eval&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Evaluates and outputs the value of a native expression.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>expr
+            <dd>The native expression to evaluate.
+            <dt>example
+            <dd>Example of what the expression might evaluate to. Used in
+            constructing placeholder examples.
+            <dt>gxp:ph
+            <dd><a href="#gxp:ph-attr"><code>gxp:ph</code> built in attribute</a>.
+          </dl>
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+
+      <h3 id="gxp:if-element">&lt;gxp:if&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>A conditional, similar to an "if" statement in most languages.
+          
+          <p>It its simplest form, a <code>gxp:if</code> conditionally
+          evaluates its children based on the <code>cond</code> attribute.
+          
+          <p>A <code>gxp:if</code> may contain zero or more
+          <code>gxp:elif</code> elements and zero or one <code>gxp:else</code>
+          elements as children which partition the list of children into
+          sub-lists, each with its own condition. (The condition for a
+          <code>gxp:else</code> is "true".)
+
+          <p>A <code>gxp:if</code> is equivalent to a <code>gxp:cond</code>
+          with one clause for the <code>gxp:if</code> itself, and an additional
+          clause for each child <code>gxp:elif</code> and
+          <code>gxp:else</code>.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>cond
+            <dd>The condition (boolean expression) for this clause.
+          </dl>
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Can contain content or if-delimiters.
+        </div>
+      </div>
+
+      <h3 id="gxp:implements-element">&lt;gxp:implements&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Indicates that a template implements a particular interface.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>interface
+            <dd>The name of a GXP interface. The GXP compiler will verify
+            that the template does, indeed, implement the specified interface.
+            <dt>java:interface
+            <dd>The name of a Java interface. This merely adds the
+            equivalent of "<code>implements <var>InterfaceName</var></code>" to
+            the generated Java code. No checking of actual conformance to the
+            specified interface will be made by the GXP compiler.
+          </dl>
+          <p>Exactly one of <code>interface</code> and
+          <code>java:interface</code> must be specified.
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear as the child of a <a
+          href="#gxp:template-element"><code>gxp:template</code></a> element.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+
+      <h3 id="gxp:import-element">&lt;gxp:import&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Equivalent to the Java <code>import</code> statement. Makes it
+          possible to refer to classes without using their fully qualified
+          names.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>class
+            <dd>The class to import.
+            <dt>package
+            <dd>The package to import.
+          </dl>
+
+          <p>Exactly one of <code>class</code> and
+          <code>package</code> must be specified.
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear as the child of a
+          <a href="#gxp:interface-element"><code>gxp:interface</code></a> or
+          <a href="#gxp:template-element"><code>gxp:template</code></a> element.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+
+      <h3 id="gxp:interface-element">&lt;gxp:interface&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Defines a template interface. An interface may be
+          implemented by one or more templates.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>name
+            <dd>Fully qualified name of the interface. In Java code,
+            this becomes the fully qualified name of a Java interface.
+            <dt class=opt>content-type
+            <dd>The output content-type (of all implementations) of this
+            interface. Defaults to <code>text/html</code>. See <a
+            href="#data-types">Data Types</a>.
+          </dl>
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear at the root level.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          May contain
+          &lt;gxp:import&gt;,
+          &lt;gxp:param&gt;,
+          &lt;gxp:throws&gt; and
+          &lt;gxp:typeparam&gt;
+          elements, in addition to content producing elements.
+        </div>
+      </div>
+
+      <h3 id="gxp:loop-element">&lt;gxp:loop&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Iterates over a sequence of objects.  The variable named by
+          <code>var</code> is set to successive elements of
+          <code>iterator</code> or <code>iterable</code>. The resulting value
+          is the concatenation of the child content for each iteration with the
+          value of <code>delimiter</code> inserted between the output from each
+          iteration.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>var
+            <dd>The loop variable, assigned the value of each element of the
+            sequence, one for each iteration of the loop.
+            <dt class=opt>delimiter
+            <dd>Delimiter value to be inserted in between successive iterations
+            of the loop. Defaults to a single space character.
+            <dt class=opt>iterable
+            <dd>The sequence to be iterated over. In Java, may be either an
+            <code>Iterable</code> or an <code>Array</code>.
+            <dt class=opt>iterator
+            <dd>The sequence to be iterated over. In Java, must be an <code>Iterator</code>.
+            <dt>type
+            <dd>Specifies the type of <code>var</code>. See <a href="#data-types">Data Types</a>.
+            <dt>content-type
+            <dd>Specifies the type of <code>var</code>. See <a href="#data-types">Data Types</a>.
+            <dt>gxp:type
+            <dd>Specifies the type of <code>var</code>. See <a href="#data-types">Data Types</a>.
+            <dt>java:type
+            <dd>Specifies the type of <code>var</code>. See <a href="#data-types">Data Types</a>.
+            <dt>cpp:type
+            <dd>Specifies the type of <code>var</code>. See <a href="#data-types">Data Types</a>.
+
+            <dt class=opt>gxp:ispace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+            <dt class=opt>gxp:espace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+          </dl>
+
+          <p>Exactly one of <code>iterable</code> and
+          <code>iterator</code> must be specified.
+        </div>
+      </div>
+
+      <h3 id="gxp:msg-element">&lt;gxp:msg&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Identifies a message that should be translated as part of the
+          localization process.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>meaning
+            <dd>Used to
+            differentiate multiple messages in the same GXP template that have
+            identical text but different meanings. <strong>Not typically seen
+            by translators</strong>, the primary purpose of this attribute is
+            to cause two messages that have the same untranslated text to get
+            different message IDs.
+            <dt>comment
+            <dd>Description of the message shown to translators.
+
+            <dt class=opt>gxp:ispace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+            <dt class=opt>gxp:espace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+          </dl>
+        </div>
+      </div>
+
+      <h3 id="gxp:nomsg-element">&lt;gxp:nomsg&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Identifies a message that should not be translated during
+          localization.
+
+          <p>Any body text that should not be translated (for example, a symbol
+          character that is not part of the sentence structure, such as a pipe
+          symbol to divide options or a bullet symbol) can be placed within a
+          <code>gxp:nomsg</code> element.</p>
+
+          <p>By default, if the compiler detects any body text that is not part
+          of a message it will reports an "unextractable" warning.
+
+          <p>To avoid this problem, make sure that all body text is contained
+          within <code>gxp:msg</code> or <code>gxp:nomsg</code> elements.</p>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt class=opt>gxp:ispace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+            <dt class=opt>gxp:espace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+          </dl>
+        </div>
+      </div>
+
+      <h3 id="gxp:param-element">&lt;gxp:param&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Defines a formal parameter for a template or interface.
+          When invoking a template from within GXP parameters are
+          generally referred to by name. When invoking a template from
+          native languages that do not have keyword argument support,
+          parameters are identified positionally.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>name
+            <dd>Name of the parameter.  Must be a legal identifier.
+            The parameter is a local variable that can be used within
+            expressions.
+
+            <dt>content
+            <dd>For container templates. Specifies that this parameter
+            should consume the content of the calling element.  The
+            value of this attribute must be <code>*</code>. Only one
+            parameter can have this attribute. When specified, the type
+            of the parameter is implicitly made the same as the
+            content-type of the enclosing template/interface.
+
+            <dt>constructor
+            <dd>Expression used to convert strings into this parameter's
+            type. Within the scope of the expression, the parameter's
+            name is a local variable containing a string. The
+            expression's value should be of the parameter's type. This
+            conversion only takes place for (non-native) static strings.
+            <p>May only be used in template parameters (not interface parameters).
+            <!-- TODO: document default constructor -->
+
+            <dt>default
+            <dd>Default value for the parameter.
+            <p>May only be used in template parameters (not interface parameters).
+
+            <dt>has-constructor
+            <dd>Indicates that this interface parameter has a
+            constructor.
+            Templates implementing this interface must specify one.
+
+            <dt>has-default
+            <dd>Indicates that this interface parameter has a default.
+            Templates implementing this interface must specify one.
+            <p>May only be used in interface parameters (not template parameters).
+
+            <dt>regex
+            <dd>Regular expression used for validating (non-native)
+            static strings.
+
+            <dt class=opt>gxp:ispace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+            <dt class=opt>gxp:espace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+
+            <dt>type
+            <dd>See <a href="#data-types">Data Types</a>.
+            <dt>content-type
+            <dd>See <a href="#data-types">Data Types</a>.
+            <dt>gxp:type
+            <dd>See <a href="#data-types">Data Types</a>.
+            <dt>java:type
+            <dd>See <a href="#data-types">Data Types</a>.
+            <dt>cpp:type
+            <dd>See <a href="#data-types">Data Types</a>.
+          </dl>
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear as the child of a
+          <a href="#gxp:constructor-element"><code>gxp:constructor</code></a>,
+          <a href="#gxp:interface-element"><code>gxp:interface</code></a> or
+          <a href="#gxp:template-element"><code>gxp:template</code></a> element.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+          <!-- TODO: not really... do we want to document the weird
+          documentation child behavior? -->
+        </div>
+      </div>
+
+      <h3 id="gxp:ph-element">&lt;gxp:ph&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Marks the start of a placeholder in a translatable message.
+          A placeholder represents content, typically dynamic content,
+          that should not be modified by translators.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>name
+            <dd>Name for the placeholder.
+            <dt>example
+            <dd>An example of the content of the placeholder. This value
+            will be shown to the translators as part of an example of
+            the message.
+          </dl>
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+
+      <h3 id="gxp:template-element">&lt;gxp:template&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Defines a template.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>name
+            <dd>Fully qualified name of the template. In Java code,
+            this becomes the fully qualified name of a Java class.
+            <dt class=opt>content-type
+            <dd>The output content-type of this template. Defaults to
+            <code>text/html</code>. See <a href="#data-types">Data
+            Types</a>.
+
+            <dt class=opt>gxp:ispace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+            <dt class=opt>gxp:espace
+            <dd>See <a href="#space-operators">Space Collapsing Operators</a>.
+          </dl>
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear at the root level.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          May contain
+          &lt;gxp:constructor&gt;,
+          &lt;gxp:implements&gt;,
+          &lt;gxp:import&gt;,
+          &lt;gxp:param&gt;,
+          &lt;gxp:throws&gt; and
+          &lt;gxp:typeparam&gt;
+          elements, in addition to content producing elements.
+        </div>
+      </div>
+
+      <h3 id="gxp:throws-element">&lt;gxp:throws&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Declares an exception that can be thrown by this template/interface.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>exception
+            <dd>The native type of the exception.
+          </dl>
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear as the child of a
+          <a href="#gxp:interface-element"><code>gxp:interface</code></a> or
+          <a href="#gxp:template-element"><code>gxp:template</code></a> element.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+
+      <h3 id="gxp:typeparam-element">&lt;gxp:typeparam&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Declares a type parameter for a template/interface.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>name
+            <dd>Name of the type variable. Must be a legal identifier.
+            <dt>extends
+            <dd>Native type that is the upper bound of the type
+            parameter.
+          </dl>
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear as the child of a
+          <a href="#gxp:interface-element"><code>gxp:interface</code></a> or
+          <a href="#gxp:template-element"><code>gxp:template</code></a> element.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+
+      <h3 id="java-annotate-element">&lt;java:annotate&gt;</h3>
+      <div>
+        <h4>Description</h4>
+        <div>
+          <p>Applies a Java annotation to a Java construct generated by
+          the containing element.
+        </div>
+
+        <h4>Attributes</h4>
+        <div>
+          <dl class=attr-list>
+            <dt>with
+            <dd>The Java annotation to apply.
+            <dt>element
+            <dd>One of <code>class</code>, <code>constructor</code>,
+            <code>instance</code>, <code>interface</code> or
+            <code>param</code>.  Used to distinguish which Java
+            construct generated by the containing element this
+            annotation should be applied to.
+          </dl>
+        </div>
+
+        <h4>Context</h4>
+        <div>
+          <p>May only appear as the child of a
+          <a href="#gxp:constructor-element"><code>gxp:constructor</code></a>,
+          <a href="#gxp:interface-element"><code>gxp:interface</code></a>,
+          <a href="#gxp:param-element"><code>gxp:param</code></a> or
+          <a href="#gxp:template-element"><code>gxp:template</code></a> element.
+        </div>
+
+        <h4>Children</h4>
+        <div>
+          <p>Childless.
+        </div>
+      </div>
+    </div>
+
+    <h2 id="built-in-attrs">Built-in Attributes</h2>
+    <div>
+      Built-in attributes are used to annotate or modify elements from multiple
+      namespaces.
+
+      <h4 id="gxp:bundles">gxp:bundles</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Used for setting multiple attributes via attribute bundles.
+          The value is a comma separated list of variable names, each of
+          which must be an attribute bundle.
+
+          <p>When used on an output element, the attributes in the
+          attribute bundles will be applied to the element in the
+          output. When used on a call element the attributes in the
+          attribute bundles will be passed in through the attribute
+          bundle parameters of the called template.
+        </div>
+
+        <h5>Elements</h5>
+        <div>
+          <p>This attribute can be applied to output elements, and call elements.
+        </div>
+      </div>
+
+      <h4 id="gxp:doctype">gxp:doctype</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Specifies that a <code>DOCTYPE</code>
+          declaration should be generated immediately before the element
+          this attribute is applied to. The value is the name of a doctype
+          defined in the element's schema.
+        </div>
+
+        <h5>Elements</h5>
+        <div>
+          <p>Can be applied to output elements that have a set of
+          doctypes set in their schema.
+        </div>
+      </div>
+
+      <h4 id="gxp:espace-attr">gxp:espace</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Sets the external space group operator.
+          See <a href="#space-operators">Space Collapsing Operators</a>.
+        </div>
+
+        <h5>Elements</h5>
+        <div>
+          <p>This attribute can be applied to some built-in elements as indicated in <a href="">Built-in
+          Elements</a>, all output elements, and call elements.
+        </div>
+      </div>
+
+      <h4 id="gxp:ispace-attr">gxp:ispace</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Sets the internal space group operator.
+          See <a href="#space-operators">Space Collapsing Operators</a>.
+        </div>
+
+        <h5>Elements</h5>
+        <div>
+          <p>This attribute can be applied to some built-in elements as indicated in <a href="">Built-in
+          Elements</a>, all output elements, and call elements.
+        </div>
+      </div>
+
+      <h4 id="gxp:ph-attr">gxp:ph</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Shorthand for creating a placeholder or pair of placeholders. When
+          used on a <code>gxp:eval</code> or an output element with no
+          children other than whitespace, creates a single placeholder
+          containing the element. When used on output elements with
+          non-whitespace content creates a pair of placeholders, one containing
+          the element's start tag, and the other containing the element's end
+          tag.
+
+          <p>When creating one placeholder, the value of this attribute is used
+          as the placeholder's name. When creating two placeholders, the start
+          tag's placeholder will be the attribute value with the suffix
+          "_start" added, and the end tag's placeholder will be the attribute
+          value with the suffix "_end" added.
+        </div>
+
+        <h5>Elements</h5>
+        <div>
+          <p>This attribute can be applied to <code>gxp:eval</code> and all
+          output elements.
+        </div>
+      </div>
+    </div>
+
+    <h2 id="attr-modifiers">Attribute Modifiers</h2>
+    <div>
+      <p>Some namespaces are used to modify or augment the meaning of a
+      namespaceless attribute with the same local name. For example, setting
+      the attribute <code>expr:src</code> sets the <code>src</code> attribute,
+      but with a different type of value (in this example, a native expression)
+      than would be set if the attribute was set directly.
+
+      <p>In general, it is only legal to set a given attribute on an element
+      once.  For example, it is not legal to use the <code>src</code> and
+      <code>expr:src</code> attribute on the same element, as this would cause
+      ambiguity. There are some exceptions to this, however, as noted below.
+
+      <p>All namespaceless attributes of output elements and call elements can
+      have attribute modifiers applied to them. Attribute modifiers can also
+      be applied to certain namespaceless attributes of built-in elements as
+      indicated in <a href="">Built-in Elements</a>.
+
+      <h4 id="expr-modifier-ns">expr:</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Sets the given attribute's value to a
+          <a href="#native-expressions">native expression</a>.  An
+          <code>expr</code>: modified attribute can be combined with output
+          language specific modified attributes, in which case the
+          <code>expr:</code> modified form is the default, used in all
+          languages except those for which a corresponding output language
+          modified attribute has been set.
+        </div>
+      </div>
+
+      <h4 id="java-modifier-ns">java:</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Output language modifier for the Java programming language. The
+          attibute value is treated as a Java 
+          <a href="#native-expressions">native expression</a> which is
+          evaluated at runtime. Can be combined with <code>expr:</code> or
+          other output language modifiers.
+        </div>
+      </div>
+
+      <h4 id="cpp-modifier-ns">cpp:</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Output language modifier for the C++ programming language. The
+          attibute value is treated as a C++ 
+          <a href="#native-expressions">native expression</a> which is
+          evaluated at runtime. Can be combined with <code>expr:</code> or
+          other output language modifiers.
+        </div>
+      </div>
+
+      <h4 id="msg-modifier-ns">msg:</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Sets attribute to a
+          translatable message (with no placeholders) where the untranslated
+          text is equal to the value specified. This is a shorthand
+          for using <code>gxp:abbr</code> in conjunction with
+          <code>gxp:msg</code>.</p>
+        </div>
+      </div>
+
+      <h4 id="nomsg-modifier-ns">nomsg:</h4>
+      <div>
+        <h5>Description</h5>
+        <div>
+          <p>Sets attribute to a non-translatable message where the text is
+          equal to the value specified. This is a shorthand for using
+          <code>gxp:abbr</code> in conjunction with <code>gxp:nomsg</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>Call Elements</h2>
+    <div class=TODO>
+      TODO
+    </div>
+
+    <h2>Output Elements</h2>
+    <div>
+      <p>All elements whose namespace is not one of the built-in namespaces or
+      a call namespace are assumed to refer to a <a href="#schemas">schema</a>.
+      These elements are known as "output elements", as such elements will
+      (potentially) appear in the output of the template. Such elements are
+      validated against the corresponding schema. It is an error if a
+      corresponding schema cannot be found.
+
+      <p>Attributes that belong to a schema namespace are not currently
+      supported. However, elements from a schema namespace can have
+      namespaceless attributes, as specified by the element's schema.
+      Namespaceless attributes on output elements, and their values, will also
+      appear in the output. When outputting in SGML mode (to generate HTML, for
+      example), boolean attributes will be output if and only if their value is
+      true.
+
+      <p>By convention, it is common to use a schema namespace as the
+      default namespace. For example, a template that generates HTML/XHTML
+      will typically include a mapping like:
+
+<pre class="prettyprint lang-xml">
+xmlns='http://www.w3.org/1999/xhtml'
+</pre>
+    </div>
+    </div>
+
+
+    <h2 id=data-types>Data Types</h2>
+    <div>
+      <p class=TODO>TODO
+    </div>
+
+    <h2 id=space-operators>Space Collapsing Operators</h2>
+    <div>
+      <p>Space collapsing can be thought of as a "preprocessing" pass. It only
+      modifies static text nodes, leaving all other nodes as they were. Within
+      text nodes, it only modifies the spaces.
+
+      <p>Spaces are dealt with in groups of continguous whitespace. Each such
+      group of contguous whitespace will be in a single text node (this is
+      assuming that adjacent text nodes have been concatenated), but a single
+      text node may contain multiple space groups.  There are two kinds of
+      space groups.  
+
+      <p>External spaces, or "espaces" are the leading spaces in the first
+      child of an element, or trailing spaces in the last child of an element.
+      There is one special case: if the only child of an element is a text node
+      that consists entirely of spaces, then they are not external spaces.
+      Intuitively, these are the spaces at the "outside edges" of an element's
+      content (hence the name "external spaces").
+
+      <p>Internal space groups, or "ispaces", consist of all other groups of
+      spaces.
+
+      <p>There are four operators for transforming space groups:
+
+      <p><table>
+        <tr>
+          <td><code>preserve</code></td>
+          <td>Leaves the spaces as they are.</td>
+        </tr>
+
+        <tr>
+          <td><code>collapse</code></td>
+          <td>If the group contains any vertical whitespaces (eg: newlines),
+          replaces the entire group with a single newline. Otherwise, replaces it
+          with a single space character.</td>
+        </tr>
+
+        <tr>
+          <td><code>normalize</code></td>
+          <td>Replaces the group of spaces with a single space character.</td>
+        </tr>
+
+        <tr>
+          <td><code>remove</code></td>
+          <td>Removes the entire group of spaces.</td>
+        </tr>
+      </table>
+
+      <p>The operators for handling ispaces and espaces can be changed
+      independently. The rules for determining which ispace/espace operator
+      is in effect for a given element are:
+
+      <ol>
+        <li>if the element has a
+        <code>gxp:ispace</code>/<code>gxp:espace</code> attribute then the
+        operator specified by that attribute is used for the respective
+        type of space group.
+
+        <li>otherwise, if the element is a call element, and the called
+        template has a "<code>content='*'</code>" <code>gxp:param</code> which
+        has a <code>gxp:ispace</code>/<code>gxp:espace</code> attribute then
+        the operator specified by that attribute is used for the respective
+        type of space group.
+
+        <li>otherwise, if the element is a <code>gxp:attr</code> element whose
+        parent is a call element, and the <code>gxp:param</code> for the
+        parameter it passes has a
+        <code>gxp:ispace</code>/<code>gxp:espace</code> attribute then the
+        the operator specified by that attribute is used for the respective
+        type of space group.
+
+        <p>This rule and the preceding rule exist to increase flexibility for
+        template authors despite the fact that space collapsing is lexically
+        scoped, rather than dynamically scoped. Consider the following example:
+
+<pre class="prettyprint lang-xml">
+
+</pre>
+
+<pre class="prettyprint lang-xml">
+&lt;gxp:template name="foo.MyPre"&gt;
+  &lt;gxp:param name=body content="*"/&gt;
+
+  &lt;pre class="foo"&gt;&lt;gxp:eval expr='body'/&gt;&lt;/pre&gt;
+&lt;/gxp:template&gt;
+</pre>
+
+        <p>Without these rules, users would not be able to rely on
+        <code>pre</code> automatically disabling space collapsing (as per rules
+        below). Instead, they'd need to explicitly disable space collapsing
+        every time they call this template:
+
+<pre class="prettyprint lang-xml">
+&lt;MyPre gxp:ispace="preserve" gxp:espace="preserve"&gt;
+This text
+is
+pre-formatted.
+&lt;/MyPre&gt;
+</pre>
+
+        <li>otherwise, if the element is a <code>gxp:msg</code> then ispace is
+        set to <code>normalize</code>/espace is set to <code>remove</code>.
+
+        <li>otherwise, if the element is an output element with the
+        preservespaces flag enabled ispace/espace is set to is set to
+        <code>preserve</code>.
+
+        <li>otherwise, if the element is the root element, then ispace is set
+        to <code>collapse</code>/espace is set to <code>remove</code>.
+
+        <li>if none of the situations above are true, the ispace/espace setting
+        is inherited from the element's parent.
+      </ol>
+    </div>
+
+    <h2 id=native-expressions>Native Expressions</h2>
+    <div>
+      <p class=TODO>TODO
+    </div>
+
+    <h2 id="schemas">Schemas</h2>
+    <div>
+      <p class=TODO>TODO
+    </div>
+  </body>
+</html>
+
+<!-- TODO: fix internal links -->
+<!-- TODO: indicate which built in element attrs are modifiable, etc.-->
+<!-- TODO: gxp:attr cannot duplicate attrs -->
+<!-- TODO: add section about attributes -->
+<!-- TODO: add section about data types -->
+<!-- TODO: message flattening -->
+<!-- TODO: english -> untranslated -->
+<!-- TODO: deal with all TODOs -->
+<!-- TODO: linkify element and attr names -->
+<!-- TODO: add extra attrs to elements that take gxp:type -->
+
