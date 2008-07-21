@@ -223,7 +223,7 @@ public class Gxpc implements Callable<AlertSet> {
 
   private static final String BANNER_STRIPE = makeStripe(79);
 
-  public static final String GXPC_EMAIL_ADDRESS = "gxpc-eng@google.com";
+  public static final String GXPC_EMAIL_ADDRESS = "gxp-users@googlegroups.com";
 
   public static final String GXPC_BUG_BANNER =
       "\n"
