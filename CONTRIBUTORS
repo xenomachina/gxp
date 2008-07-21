@@ -1,39 +1,39 @@
-================================================================================
+===============================================================================
 GXP CONTRIBUTORS
-================================================================================
-Laurence Gonsalaves lead the design of the language and architected the 
-compiler. He also implemented much of the compiler and runtime libraries.
+===============================================================================
+Laurence Gonsalves led the design of the language and compiler architecture.
+He also implemented much of the compiler and runtime libraries.
 
 Harry Heymann implemented all sorts of pieces of the compiler and runtime
 libraries and wrote many, many tests. He's especially proud of introducing
 runtime compilation, generation of markup other than HTML, and the groundwork
-for C++ code generation. He also lead the effort to open source GXP.
+for C++ code generation. He also led the effort to open source GXP.
 
 Dan Ignatoff implemented a bunch of code in the areas of gxp:interface and
 template instantiation, as well as some work on incremental compilation.
 
 Douglas Yoshinaga and Lee Carver wrote much of the GXP documentation.
-================================================================================
+===============================================================================
 As with all projects of any significant size, there is a long tail of people
 who pitched in on the details. Hopefully we haven't overlooked anyone, please
 chime in if we have.
 
-Small pieces of the compiler were worked on by:
+Robert Konigsberg made improvements to the filesystem abstraction layer and
+alert generation.
 
-Robert Konigsberg - primarily in the filesystem abstraction layer
-Mike Samuel - work allowing for custom xml entity definitions to be read from
-the local filesystem at compile time
+Mike Samuel contributed code to allow custom xml entity definitions to be
+read from the local filesystem at compile time.
 
-Some work on the runtime libraries done by Mihai Parparita, Bradley Hawkes,
-and Mike Bostock
+Some work on the runtime libraries was done by Mihai Parparita, Bradley Hawkes,
+and Mike Bostock.
 
-Sage wisodom on the design of the language dispensed by Amit Patel, Eric Veach,
-Ning Mosberger, David P. Baker, and Luiz-Otavio Zorzella.
+Sage wisdom on the design of the language was dispensed by Amit Patel,
+Eric Veach, Ning Mosberger, David P. Baker, and Luiz-Otavio Zorzella.
 
-Code reviews, and other advice on implementation was provided by Chris Lopez,
+Code reviews and other advice on implementation was provided by Chris Lopez,
 Arthur Gleckler, Erik Hilsdale, Lee Carver, Peter Kappler, and Will Rusch.
 
-Abhijit Kalamkar, David Manz, Shu Niu, Dave Borowitz, Alan Donovan, Albert Wong,
-Sridhar Sundaram and Dave Hanson contributed code to a previous version of the
-compiler and ideas to the current one.
-================================================================================
+Abhijit Kalamkar, David Manz, Shu Niu, Dave Borowitz, Alan Donovan, Albert
+Wong, Sridhar Sundaram and Dave Hanson contributed code to a previous version
+of the compiler and ideas to the current one.
+===============================================================================
