@@ -6,8 +6,8 @@
     <meta http-equiv="Content-Style-Type" content="text/css">
     <title>GXP Reference</title>
 
-    <link href="prettify.css" type="text/css" rel="stylesheet" />
-    <script type="text/javascript" src="prettify.js"></script>
+    <link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
 
     <style type="text/css">
       body {
@@ -121,7 +121,7 @@
 
   </head>
 
-  <body>
+  <body onload="prettyPrint()">
 
   <h1>GXP Reference</h1>
   <div>
@@ -1278,7 +1278,7 @@ xmlns='http://www.w3.org/1999/xhtml'
 
 <pre class="prettyprint lang-xml">
 &lt;gxp:template name="foo.MyPre"&gt;
-  &lt;gxp:param name=body content="*"/&gt;
+  &lt;gxp:param name="body" content="*"/&gt;
 
   &lt;pre class="foo"&gt;&lt;gxp:eval expr='body'/&gt;&lt;/pre&gt;
 &lt;/gxp:template&gt;
