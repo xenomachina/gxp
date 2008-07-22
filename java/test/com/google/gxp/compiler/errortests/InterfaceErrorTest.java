@@ -31,7 +31,7 @@ import com.google.gxp.compiler.validate.InterfaceParamHasDefaultValueError;
 public class InterfaceErrorTest extends BaseTestCase {
   public void testInterface_unknownContentType() throws Exception {
     compileNoHeader(
-        "<!DOCTYPE gxp:interface SYSTEM \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "<!DOCTYPE gxp:interface SYSTEM \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "",
         "<gxp:interface name='com.google.gxp.compiler.errortests."
         + "TestInterface_unknownContentType'",

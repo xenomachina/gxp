@@ -32,7 +32,7 @@ public class ParseErrorTest extends BaseTestCase {
   public void testNamespace_namespacelessElement() throws Exception {
     compileNoHeader(
         "<!DOCTYPE gxp:template SYSTEM",
-        "    \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "    \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "",
         "<gxp:template name='com.google.gxp.compiler.errortests."
         + "TestNamespace_namespacelessElement'",
@@ -81,7 +81,7 @@ public class ParseErrorTest extends BaseTestCase {
   public void testNamespace_unknown() throws Exception {
     compileNoHeader(
         "<!DOCTYPE gxp:template SYSTEM",
-        "    \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "    \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "",
         "<gxp:template name='com.google.gxp.compiler.errortests.gxp'",
         "              xmlns='http://www.w3.org/1999/xhtml'",

@@ -140,7 +140,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
 
     StringBuilder sb = new StringBuilder();
     sb.append("<!DOCTYPE gxp:template SYSTEM"
-              + " \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">");
+              + " \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">");
     sb.append("<gxp:template name='"
               + CharEscapers.XML_ESCAPE.escape(getPackage() + "." + name) + "'");
     sb.append(" xmlns='http://www.w3.org/1999/xhtml'");
@@ -178,7 +178,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
 
     StringBuilder sb = new StringBuilder();
     sb.append("<!DOCTYPE gxp:interface SYSTEM"
-              + " \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">");
+              + " \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">");
     sb.append("<gxp:interface name='"
               + CharEscapers.XML_ESCAPE.escape(getPackage() + "." + name) + "'");
     sb.append(" xmlns='http://www.w3.org/1999/xhtml'");

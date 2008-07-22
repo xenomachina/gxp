@@ -31,7 +31,7 @@ import com.google.gxp.compiler.validate.ConflictingVarNameError;
 public class BasicErrorTest extends BaseTestCase {
   public void testElement_nonTemplateRoot() throws Exception {
     compileNoHeader(
-        "<!DOCTYPE gxp:template SYSTEM \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "<!DOCTYPE gxp:template SYSTEM \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "",
         "<html xmlns='http://www.w3.org/1999/xhtml'></html>");
     assertAlert(new InvalidRootError(pos(3,44), "<html>"));
@@ -39,7 +39,7 @@ public class BasicErrorTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
 
     compileNoHeader(
-        "<!DOCTYPE gxp:template SYSTEM \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "<!DOCTYPE gxp:template SYSTEM \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "",
         "<gxp:if xmlns:gxp='http://google.com/2001/gxp' cond='false'></gxp:if>");
     assertAlert(new InvalidRootError(pos(3,61), "<gxp:if>"));

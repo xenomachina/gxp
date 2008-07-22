@@ -195,7 +195,7 @@ public class CallErrorTest extends BaseTestCase {
   public void testCall_badContentType() throws Exception {
     FileRef callee = createFileNoHeader(
         "callee",
-        "<!DOCTYPE gxp:template SYSTEM \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "<!DOCTYPE gxp:template SYSTEM \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "<gxp:template name='com.google.gxp.compiler.errortests.callee'",
         "              xmlns:gxp='http://google.com/2001/gxp'",
         "              content-type='text/javascript'>",
@@ -232,7 +232,7 @@ public class CallErrorTest extends BaseTestCase {
   public void testCall_badContentTypeForCallInParam() throws Exception {
     FileRef innerCallee = createFileNoHeader(
         "innerCallee",
-        "<!DOCTYPE gxp:template SYSTEM \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "<!DOCTYPE gxp:template SYSTEM \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "<gxp:template name='com.google.gxp.compiler.errortests.innerCallee'",
         "              xmlns:gxp='http://google.com/2001/gxp'",
         "              content-type='text/javascript'>",

@@ -50,7 +50,7 @@ public class CompilationSetTest extends TestCase {
   private final FileSystem fs = new InMemoryFileSystem();
   private static final String DOCTYPE =
       "<!DOCTYPE gxp:template SYSTEM "
-      + "\"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">";
+      + "\"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">";
   private static final String NAMESPACE_DECLS =
       " xmlns='http://www.w3.org/1999/xhtml'"
       + " xmlns:gxp='http://google.com/2001/gxp'"

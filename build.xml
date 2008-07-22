@@ -50,6 +50,8 @@
         <include name="com/google/gxp/compiler/schema/*.xml" />
       </fileset>
     </copy>
+    <copy file="resources/xhtml.ent"
+          tofile="${build.dir}/classes/com/google/gxp/compiler/parser/xhtml.ent" />
     <taskdef name="gxpc" classname="com.google.gxp.compiler.ant.GxpcTask">
       <classpath refid="classpath.jars" />
       <classpath>

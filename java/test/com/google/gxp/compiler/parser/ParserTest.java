@@ -169,13 +169,13 @@ public class ParserTest extends TestCase {
   public void testWithDoctype() throws Exception {
     ParseTree tree = parse(
         "<!DOCTYPE gxp:template SYSTEM "
-        + "\"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">\n"
+        + "\"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">\n"
         + "<gxp:template "
         + "xmlns:gxp='http://google.com/2001/gxp'/>");
     assertEquals(1, tree.getAlerts().size());
     Alert alert = Iterables.getOnlyElement(tree.getAlerts());
     assertEquals(
-        "Resolved entity `http://www.corp.google.com/eng/projects/ui/xhtml.ent`"
+        "Resolved entity `http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent`"
         + " to `/com/google/gxp/compiler/parser/xhtml.ent`",
         alert.getMessage());
   }

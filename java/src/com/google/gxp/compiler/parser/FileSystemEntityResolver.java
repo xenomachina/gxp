@@ -30,7 +30,7 @@ import java.io.InputStream;
  * An entity resolver implementation that can resolve entities based on an
  * abstract file system that interprets public ids that start with // as
  * file system paths relative to the build system root, and that
- * can resolve System IDs under http://www.corp.google.com/eng/projects/ui/
+ * can resolve System IDs under http://gxp.googlecode.com/svn/trunk/resources/
  * to a resouce available from the class path.
  */
 public class FileSystemEntityResolver implements SourceEntityResolver {
@@ -39,7 +39,7 @@ public class FileSystemEntityResolver implements SourceEntityResolver {
    * prefix for files resolved using the java classloader.
    */
   private static final String EXTERNAL_ENTITY_PREFIX =
-      "http://www.corp.google.com/eng/projects/ui/";
+      "http://gxp.googlecode.com/svn/trunk/resources/";
 
   /**
    * prefix for public ids that are resolved relative to the revision control or
@@ -47,7 +47,7 @@ public class FileSystemEntityResolver implements SourceEntityResolver {
    */
   private static final String SOURCE_ROOT_PUBLIC_ID_PREFIX = "//";
 
-  private FileSystem fileSystem;
+  private final FileSystem fileSystem;
 
   public FileSystemEntityResolver(FileSystem fileSystem) {
     this.fileSystem = Objects.nonNull(fileSystem);
@@ -61,19 +61,13 @@ public class FileSystemEntityResolver implements SourceEntityResolver {
    *     could not be retrieved.
    * @throws UnsupportedExternalEntityException if the protocol isn't recognized
    */
-  public InputStream resolveEntity(
-      SourcePosition pos, String publicId, String systemId, AlertSink alertSink)
+  public InputStream resolveEntity(SourcePosition pos, String publicId, String systemId,
+                                   AlertSink alertSink)
       throws IOException {
 
     if (systemId.startsWith(EXTERNAL_ENTITY_PREFIX)) {
-      Class<?> cls = getClass();
-      String resourceName =
-          "/" + cls.getPackage().getName().replace('.', '/') +
-          "/" + systemId.substring(EXTERNAL_ENTITY_PREFIX.length());
-      alertSink.add(new EntityResolvedNotification(
-                        pos, systemId, resourceName));
-
-      InputStream stream = cls.getResourceAsStream(resourceName);
+      InputStream stream = resolveEntityFromResource(
+          pos, systemId, EXTERNAL_ENTITY_PREFIX.length(), alertSink);
       if (stream != null) {
         return stream;
       }
@@ -81,13 +75,11 @@ public class FileSystemEntityResolver implements SourceEntityResolver {
                publicId.startsWith(SOURCE_ROOT_PUBLIC_ID_PREFIX)) {
       // If the public id starts with // treat it as a path relative to
       // the build system / project root.
-      String relPath =
-          publicId.substring(SOURCE_ROOT_PUBLIC_ID_PREFIX.length());
+      String relPath = publicId.substring(SOURCE_ROOT_PUBLIC_ID_PREFIX.length());
       if (!"".equals(relPath) && !relPath.startsWith("/")) {
         // convert URI path to local file system conventions
         FileRef file = fileSystem.getRoot().join(relPath);
-        alertSink.add(new EntityResolvedNotification(
-                           pos, publicId, file.toFilename()));
+        alertSink.add(new EntityResolvedNotification(pos, publicId, file.toFilename()));
         return file.openInputStream();
       }
     }
@@ -95,8 +87,18 @@ public class FileSystemEntityResolver implements SourceEntityResolver {
     throw unresolved(pos, publicId, systemId, null);
   }
 
-  private static RuntimeException unresolved(
-      SourcePosition pos, String publicId, String systemId, Throwable cause) {
+  private InputStream resolveEntityFromResource(SourcePosition pos, String systemId,
+                                                int prefixLength, AlertSink alertSink)
+      throws IOException {
+    Class<?> cls = getClass();
+    String resourceName = "/" + cls.getPackage().getName().replace('.', '/') +
+                          "/" + systemId.substring(prefixLength);
+    alertSink.add(new EntityResolvedNotification(pos, systemId, resourceName));
+    return cls.getResourceAsStream(resourceName);
+  }
+
+  private static RuntimeException unresolved(SourcePosition pos, String publicId,
+                                             String systemId, Throwable cause) {
     UnsupportedExternalEntityException error =
         new UnsupportedExternalEntityException(pos, publicId, systemId);
     if (cause != null) {
@@ -110,11 +112,8 @@ public class FileSystemEntityResolver implements SourceEntityResolver {
    * file.
    */
   public static class EntityResolvedNotification extends InfoAlert {
-    private EntityResolvedNotification(
-        SourcePosition entityRefPos, String id, String realPath) {
-      super(entityRefPos,
-            "Resolved entity `" + id + "` to `" + realPath + "`");
+    private EntityResolvedNotification(SourcePosition entityRefPos, String id, String realPath) {
+      super(entityRefPos, "Resolved entity `" + id + "` to `" + realPath + "`");
     }
   }
-
 }

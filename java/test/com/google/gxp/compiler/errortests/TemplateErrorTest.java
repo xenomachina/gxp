@@ -54,7 +54,7 @@ import com.google.gxp.compiler.validate.TooManyContentParametersError;
 public class TemplateErrorTest extends BaseTestCase {
   public void testTemplate_filenameMismatch() throws Exception {
     compileNoHeader(
-        "<!DOCTYPE gxp:template SYSTEM \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "<!DOCTYPE gxp:template SYSTEM \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "",
         "<gxp:template name='com.google.WrongName'",
         "              xmlns='http://www.w3.org/1999/xhtml'",
@@ -70,7 +70,7 @@ public class TemplateErrorTest extends BaseTestCase {
     FileRef gxp = createFile("Holy!Cow!", "Hello");
     compileFiles(gxp);
     assertAlert(new InvalidNameError(
-             pos(1, 557), "com.google.gxp.compiler.errortests.Holy!Cow!"));
+             pos(1, 560), "com.google.gxp.compiler.errortests.Holy!Cow!"));
     assertNoUnexpectedAlerts();
   }
 
@@ -86,7 +86,7 @@ public class TemplateErrorTest extends BaseTestCase {
 
   public void testTemplate_unknownContentType() throws Exception {
     compileNoHeader(
-        "<!DOCTYPE gxp:template SYSTEM \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "<!DOCTYPE gxp:template SYSTEM \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "",
         "<gxp:template name='com.google.gxp.compiler.errortests."
         + "TestTemplate_unknownContentType'",
@@ -418,7 +418,7 @@ public class TemplateErrorTest extends BaseTestCase {
 
   public void testCannotImplementInterfaceWithDifferentSchema() throws Exception {
     FileRef refInterface = createFileNoHeader("testInterface",
-        "<!DOCTYPE gxp:interface SYSTEM \"http://www.corp.google.com/eng/projects/ui/xhtml.ent\">",
+        "<!DOCTYPE gxp:interface SYSTEM \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">",
         "",
         "<gxp:interface name='com.google.gxp.compiler.errortests.testInterface'",
         "               content-type='text/javascript'",
