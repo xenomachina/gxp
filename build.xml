@@ -97,7 +97,6 @@
       <zipfileset src="${lib.dir}/google-base-extra.jar" />
       <zipfileset src="${lib.dir}/google-io-extra.jar" />
       <rule pattern="org.kohsuke.args4j.**" result="com.google.gxp.org.kohsuke.args4j.@1" />
-      <rule pattern="org.json.**"           result="com.google.gxp.org.json.@1" />
       <rule pattern="org.apache.xerces.**"  result="com.google.gxp.org.apache.xerces.@1" />
       <rule pattern="com.google.common.**"  result="com.google.gxp.com.google.common.@1" />
     </jarjar>
