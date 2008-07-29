@@ -19,9 +19,9 @@ package com.google.gxp.compiler.errortests;
 import com.google.gxp.compiler.alerts.common.BadNodePlacementError;
 import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
+import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.reparent.InvalidDoctypeError;
-import com.google.gxp.compiler.reparent.MultiValueAttributeError;
 
 /**
  * Tests of proper error reporting by the GXP compiler relating to {@code

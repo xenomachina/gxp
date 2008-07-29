@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.gxp.compiler.reparent;
+package com.google.gxp.compiler.alerts.common;
 
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.Node;
 import com.google.gxp.compiler.parser.Namespace;
+import com.google.gxp.compiler.reparent.Attribute;
 
 /**
  * An {@link ErrorAlert} which indicates that the specified attribute already

@@ -18,6 +18,7 @@ package com.google.gxp.compiler.reparent;
 
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
+import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.base.AbstractNode;
 import com.google.gxp.compiler.base.Node;

@@ -71,6 +71,11 @@ public class CollapseExpression extends Expression {
   }
 
   @Override
+  public boolean alwaysOnlyWhitespace() {
+    return subexpression.alwaysOnlyWhitespace();
+  }
+
+  @Override
   public <T> T acceptVisitor(ExpressionVisitor<T> visitor) {
     return visitor.visitCollapseExpression(this);
   }

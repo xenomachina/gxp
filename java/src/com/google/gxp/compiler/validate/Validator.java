@@ -25,7 +25,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.AlertSink;
-import com.google.gxp.compiler.alerts.common.BadNodePlacementError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
 import com.google.gxp.compiler.alerts.common.NoDefaultValueForConditionalArgumentError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
@@ -284,25 +283,7 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
     public Call visitBoundCall(final BoundCall call) {
       Callable callee = call.getCallee();
 
-      // TODO(laurence): de-dupe before we get here so that we can use an
-      // ImmutableMap.Builder instead?
-      final Map<String, Attribute> attrMap = Maps.newHashMap();
-
-      Expression content = call.getContent().acceptVisitor(this);
-
-      FormalParameter contentParam = callee.getContentConsumingParameter();
-      boolean contentIgnorable = content.alwaysEmpty();
-      if (contentParam == null) {
-        if (!contentIgnorable) {
-          alertSink.add(new BadNodePlacementError(content, call));
-        }
-      } else {
-        if (!contentIgnorable || !contentParam.hasDefault()) {
-          attrMap.put(contentParam.getPrimaryName(),
-                      new Attribute(call, contentParam.getPrimaryName(),
-                                    content, null));
-        }
-      }
+      final ImmutableMap.Builder<String, Attribute> newAttrBuilder = ImmutableMap.builder();
 
       // this is a map of all Name->AttributeValidators for the bundles
       // parameters of the callee.  We will remove items from the map
@@ -321,8 +302,7 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
       // it remains unchanged for the entire execution of this function
       Set<String> allowedAttributes = ImmutableSet.copyOf(validatorMap.keySet());
 
-      for (final Map.Entry<String, Attribute> param :
-           call.getAttributes().entrySet()) {
+      for (final Map.Entry<String, Attribute> param : call.getAttributes().entrySet()) {
         Expression actualArgument = param.getValue().getValue();
         if (actualArgument instanceof AttrBundleParam) {
           AttrBundleParam bundle = (AttrBundleParam) actualArgument;
@@ -330,12 +310,11 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
             validatorMap.remove(validator.getName());
           }
         }
-        attrMap.put(param.getKey(), visitAttribute(param.getValue()));
+        newAttrBuilder.put(param.getKey(), visitAttribute(param.getValue()));
       }
 
-      validateAttributeBundles(call, call.getAttrBundles(),
-                               validatorMap, allowedAttributes);
-      Map<String, Attribute> newAttrParams = ImmutableMap.copyOf(attrMap);
+      validateAttributeBundles(call, call.getAttrBundles(), validatorMap, allowedAttributes);
+      Map<String, Attribute> newAttrParams = newAttrBuilder.build();
 
       // check for missing required attributes
       for (FormalParameter parameter : callee.getParameters()) {

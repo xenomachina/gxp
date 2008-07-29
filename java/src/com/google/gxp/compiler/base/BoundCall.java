@@ -30,46 +30,35 @@ import java.util.*;
  */
 public class BoundCall extends Call {
   private final Callable callee;
-  private final Expression content;
 
   public BoundCall(SourcePosition sourcePosition,
                    String displayName,
                    Callable callee,
                    Map<String, Attribute> attributes,
-                   List<String> attrBundles,
-                   Expression content) {
+                   List<String> attrBundles) {
     super(sourcePosition, displayName, Objects.nonNull(callee.getSchema()),
           attributes, attrBundles);
     this.callee = Objects.nonNull(callee);
-    this.content = Objects.nonNull(content);
   }
 
   public BoundCall(Call fromCall,
                    Callable callee,
-                   Map<String, Attribute> attributes,
-                   Expression content) {
+                   Map<String, Attribute> attributes) {
     super(fromCall.getSourcePosition(), fromCall.getDisplayName(),
           Objects.nonNull(callee.getSchema()), attributes,
           fromCall.getAttrBundles());
     this.callee = Objects.nonNull(callee);
-    this.content = Objects.nonNull(content);
   }
 
   public Callable getCallee() {
     return callee;
   }
 
-  public Expression getContent() {
-    return content;
-  }
-
-  public BoundCall withParamsAndContent(Map<String, Attribute> newAttributes,
-                                        Expression newContent) {
-    return (Objects.equal(getAttributes(), newAttributes)
-            && Objects.equal(getContent(), newContent))
+  public BoundCall withParams(Map<String, Attribute> newAttributes) {
+    return Objects.equal(getAttributes(), newAttributes)
         ? this
         : new BoundCall(getSourcePosition(), getDisplayName(), callee,
-                        newAttributes, getAttrBundles(), newContent);
+                        newAttributes, getAttrBundles());
   }
 
   @Override
@@ -78,8 +67,7 @@ public class BoundCall extends Call {
     for (Map.Entry<String, Attribute> param : getAttributes().entrySet()) {
       mapBuilder.put(param.getKey(), visitor.visitAttribute(param.getValue()));
     }
-    Expression newContent = getContent().acceptVisitor(visitor);
-    return withParamsAndContent(mapBuilder.build(), newContent);
+    return withParams(mapBuilder.build());
   }
 
   @Override
@@ -95,15 +83,13 @@ public class BoundCall extends Call {
 
   public boolean equals(BoundCall that) {
     return equalsCall(that)
-        && Objects.equal(callee, that.callee)
-        && Objects.equal(content, that.content);
+        && Objects.equal(callee, that.callee);
   }
 
   @Override
   public int hashCode() {
     return Objects.hashCode(
         callHashCode(),
-        callee,
-        content);
+        callee);
   }
 }

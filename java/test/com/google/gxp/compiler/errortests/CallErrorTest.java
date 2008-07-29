@@ -20,6 +20,7 @@ import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.alerts.common.BadNodePlacementError;
 import com.google.gxp.compiler.alerts.common.InvalidNameError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
+import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
 import com.google.gxp.compiler.alerts.common.NoDefaultValueForConditionalArgumentError;
 import com.google.gxp.compiler.base.TemplateName;
 import com.google.gxp.compiler.bind.BadParameterError;
@@ -28,7 +29,6 @@ import com.google.gxp.compiler.bind.InvalidParameterFailedRegexError;
 import com.google.gxp.compiler.escape.TypeError;
 import com.google.gxp.compiler.fs.FileRef;
 import com.google.gxp.compiler.java.IllegalJavaPrimitiveError;
-import com.google.gxp.compiler.reparent.MultiValueAttributeError;
 
 /**
  * Tests of proper error reporting by the GXP compiler relating to calls.
@@ -264,6 +264,31 @@ public class CallErrorTest extends BaseTestCase {
     compileFiles(callee, caller);
 
     assertAlert(new TypeError(pos(4,5), "<b>", "text/html", "text/plain"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testCall_multipleBodyAttributes() throws Exception {
+    FileRef callee = createFile("callee", "<gxp:param name='body' content='*' />");
+    FileRef caller = createFile("caller",
+                                "<call:callee expr:body='HtmlClosures.EMPTY' />");
+    compileFiles(callee, caller);
+    assertNoUnexpectedAlerts();
+
+    caller = createFile("caller",
+                        "<call:callee>",
+                        "  <gxp:attr name='body'>",
+                        "    foo",
+                        "  </gxp:attr>",
+                        "</call:callee>");
+    compileFiles(callee, caller);
+    assertNoUnexpectedAlerts();
+
+    caller = createFile("caller",
+                        "<call:callee expr:body='HtmlClosures.EMPTY'>",
+                        "  foo",
+                        "</call:callee>");
+    compileFiles(callee, caller);
+    assertAlert(new MultiValueAttributeError(pos(2,1), "<call:callee>", "'body' attribute"));
     assertNoUnexpectedAlerts();
   }
 }

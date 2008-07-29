@@ -24,6 +24,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.AlertSink;
+import com.google.gxp.compiler.alerts.common.BadNodePlacementError;
+import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
 import com.google.gxp.compiler.base.AttrBundleParam;
 import com.google.gxp.compiler.base.BoundCall;
 import com.google.gxp.compiler.base.BoundImplementsDeclaration;
@@ -151,11 +153,9 @@ public class Binder implements Function<ReparentedTree, BoundTree> {
         alertSink.add(new CallableNotFoundError(call, calleeName));
         return new StringConstant(call, null, "");
       } else {
-        final ImmutableMap.Builder<String, Attribute> newAttrBuilder =
-            ImmutableMap.builder();
+        final ImmutableMap.Builder<String, Attribute> newAttrBuilder = ImmutableMap.builder();
 
-        // construct a Map of attribute bundles with one entry for
-        // each bundle parameter
+        // construct a Map of attribute bundles with one entry for each bundle parameter
         final Map<String, Map<AttributeValidator, Attribute>> attrBundles = Maps.newHashMap();
         for (FormalParameter parameter : callee.getParameters()) {
           if (parameter.getType() instanceof BundleType) {
@@ -164,15 +164,12 @@ public class Binder implements Function<ReparentedTree, BoundTree> {
           }
         }
 
-        Expression content = apply(call.getContent());
-        content = prepareExpressionAsParameterValue(callee.getContentConsumingParameter(),
-                                                    content);
-
-        for (final String param : params.keySet()) {
-          final FormalParameter parameter = callee.getParameter(param);
-          Attribute attr = params.get(param);
+        for (final Map.Entry<String, Attribute> param : params.entrySet()) {
+          final String name = param.getKey();
+          final FormalParameter parameter = callee.getParameter(name);
+          Attribute attr = param.getValue();
           if (parameter == null) {
-            alertSink.add(new BadParameterError(attr.getValue(), callee, param));
+            alertSink.add(new BadParameterError(attr.getValue(), callee, name));
             continue;
           }
           // TODO(harryh): maybe better to use a  DefaultingExpressionVisitor
@@ -182,13 +179,11 @@ public class Binder implements Function<ReparentedTree, BoundTree> {
             // TODO(harryh): maybe this should be in Validator?
             if (!parameter.regexMatches(oc)) {
               alertSink.add(new InvalidParameterFailedRegexError(
-                                calleeName, param, parameter.getRegex(), oc));
+                                calleeName, name, parameter.getRegex(), oc));
             }
-            if (parameter.hasConstructor()) {
-              attr = attr.withValue(new ConstructedConstant(oc, oc.getValue(), callee, parameter));
-            } else {
-              attr = attr.withValue(parameter.getType().parseObjectConstant(param, oc, alertSink));
-            }
+            attr = parameter.hasConstructor()
+                ? attr.withValue(new ConstructedConstant(oc, oc.getValue(), callee, parameter))
+                : attr.withValue(parameter.getType().parseObjectConstant(name, oc, alertSink));
           }
 
           attr = attr.withValue(prepareExpressionAsParameterValue(parameter, attr.getValue()));
@@ -197,12 +192,12 @@ public class Binder implements Function<ReparentedTree, BoundTree> {
 
           parameter.getType().acceptTypeVisitor(new DefaultingTypeVisitor<Void>() {
             protected Void defaultVisitType(Type type) {
-              newAttrBuilder.put(param, updatedAttr);
+              newAttrBuilder.put(name, updatedAttr);
               return null;
             }
 
             public Void visitBundleType(BundleType type) {
-              final AttributeValidator validator = type.getValidator(param);
+              final AttributeValidator validator = type.getValidator(name);
               String innerContentTypeString = validator.getContentType();
               if (innerContentTypeString != null) {
                 Schema innerSchema = schemaFactory.fromContentTypeName(innerContentTypeString);
@@ -240,8 +235,28 @@ public class Binder implements Function<ReparentedTree, BoundTree> {
                                            newBundle, null));
         }
 
+        // Handle content parameter
+        FormalParameter contentParam = callee.getContentConsumingParameter();
+        Expression content = prepareExpressionAsParameterValue(contentParam,
+                                                               apply(call.getContent()));
+        boolean contentIgnorable = content.alwaysOnlyWhitespace();
+        if (contentParam == null) {
+          if (!contentIgnorable) {
+            alertSink.add(new BadNodePlacementError(content, call));
+          }
+        } else {
+          String paramName = contentParam.getPrimaryName();
+          if (!contentIgnorable && params.containsKey(paramName)) {
+            alertSink.add(new MultiValueAttributeError(call, params.get(paramName)));
+          } else if (!contentIgnorable
+                     || (!contentParam.hasDefault() && !params.containsKey(paramName))) {
+            newAttrBuilder.put(contentParam.getPrimaryName(),
+                               new Attribute(call, paramName, content, null));
+          }
+        }
+
         requirements.add(callee);
-        return new BoundCall(call, callee, newAttrBuilder.build(), content);
+        return new BoundCall(call, callee, newAttrBuilder.build());
       }
     }
 
@@ -265,14 +280,12 @@ public class Binder implements Function<ReparentedTree, BoundTree> {
                                                                 Expression expr) {
       if (parameter != null) {
         // TODO(laurence): don't use instanceof here
-        if (!parameter.getType().isContent()
-            && (expr instanceof ConvertibleToContent)) {
+        if (!parameter.getType().isContent() && (expr instanceof ConvertibleToContent)) {
           expr = ((ConvertibleToContent) expr).getSubexpression();
         }
 
         // TODO(laurence): don't use instanceof here
-        if ((expr instanceof CollapseExpression)
-            || (expr instanceof ConvertibleToContent)) {
+        if ((expr instanceof CollapseExpression) || (expr instanceof ConvertibleToContent)) {
           return CollapseExpression.create(expr, parameter.getSpaceOperators());
         }
       }

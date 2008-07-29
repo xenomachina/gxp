@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
+import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.base.AttributeName;
 import com.google.gxp.compiler.base.Expression;

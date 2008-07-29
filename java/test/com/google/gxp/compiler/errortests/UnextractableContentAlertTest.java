@@ -330,6 +330,16 @@ public class UnextractableContentAlertTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
   }
 
+  public void testInMsgInCall_text() throws Exception {
+    compile("<gxp:param name='body' content='*' />",
+            "",
+            "<call:TestInMsgInCall_text>",
+            "  text",
+            "</call:TestInMsgInCall_text>");
+    assertAlert(new UnextractableContentAlert(pos(4, 28), "text"));
+    assertNoUnexpectedAlerts();
+  }
+
   public void testInMsgInPlaceholder_text() throws Exception {
     compile("<gxp:msg>",
             "<gxp:ph name='p' example='x'/>"

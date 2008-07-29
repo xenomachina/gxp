@@ -20,6 +20,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.SourcePosition;
+import com.google.gxp.compiler.base.AttrBundleParam;
+import com.google.gxp.compiler.base.Call;
 import com.google.gxp.compiler.base.CollapseExpression;
 import com.google.gxp.compiler.base.Concatenation;
 import com.google.gxp.compiler.base.DefaultingExpressionVisitor;
@@ -83,6 +85,7 @@ public class SpaceCollapser implements Function<BoundTree,SpaceCollapsedTree> {
    */
   private static class SearchingVisitor extends ExhaustiveExpressionVisitor {
     private final SpaceOperatorSet spaceOperators;
+    private boolean useSpecialAttrCollapsing = true;
 
     SearchingVisitor() {
       this(DEFAULT_SPACE_OPERATORS);
@@ -128,7 +131,14 @@ public class SpaceCollapser implements Function<BoundTree,SpaceCollapsedTree> {
 
     @Override
     public Attribute visitAttribute(Attribute attr) {
-      Expression newValue = this.with(ATTR_SPACE_OPERATORS).apply(attr.getValue());
+      // useSpecialAttrCollapsing is used here to decide if ispace should
+      // (by default) be normalized.  We do this for Attributes of OutputElements
+      // and Attribute Bundles (which are essentially for OutputElements) because
+      // we generally don't want \ns in these cases.  We do NOT use alternate
+      // collapsing rules for Attributes that belong to calls.
+      Expression newValue = useSpecialAttrCollapsing
+          ? this.with(ATTR_SPACE_OPERATORS).apply(attr.getValue())
+          : apply(attr.getValue());
       Expression newCondition = attr.getCondition();
       if (newCondition != null) {
         newCondition = apply(newCondition);
@@ -137,15 +147,38 @@ public class SpaceCollapser implements Function<BoundTree,SpaceCollapsedTree> {
       return attr.withValue(newValue).withCondition(newCondition);
     }
 
+    @Override
     public Expression visitOutputElement(OutputElement element) {
+      boolean oldUseSpecialAttrCollapsing = useSpecialAttrCollapsing;
+      useSpecialAttrCollapsing = true;
       ElementValidator validator = element.getValidator();
       SearchingVisitor contentVisitor =
           validator.isFlagSet(ElementValidator.Flag.PRESERVESPACES)
             ? this.with(PRESERVING_SPACE_OPERATORS)
             : this;
-      return element.withAttributesAndContent(
+      Expression result = element.withAttributesAndContent(
           Util.map(element.getAttributes(), getAttributeFunction()),
           element.getContent().acceptVisitor(contentVisitor));
+      useSpecialAttrCollapsing = oldUseSpecialAttrCollapsing;
+      return result;
+    }
+
+    @Override
+    public Expression visitAttrBundleParam(AttrBundleParam bundle) {
+      boolean oldUseSpecialAttrCollapsing = useSpecialAttrCollapsing;
+      useSpecialAttrCollapsing = true;
+      Expression result = super.visitAttrBundleParam(bundle);
+      useSpecialAttrCollapsing = oldUseSpecialAttrCollapsing;
+      return result;
+    }
+
+    @Override
+    public Expression visitCall(Call call) {
+      boolean oldUseSpecialAttrCollapsing = useSpecialAttrCollapsing;
+      useSpecialAttrCollapsing = false;
+      Expression result = super.visitCall(call);
+      useSpecialAttrCollapsing = oldUseSpecialAttrCollapsing;
+      return result;
     }
   }
 

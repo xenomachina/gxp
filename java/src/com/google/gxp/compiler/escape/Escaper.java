@@ -287,8 +287,7 @@ public class Escaper implements Function<PlaceholderInsertedTree, EscapedTree> {
         Callable callee = call.getCallee();
 
         // tranform params
-        ImmutableMap.Builder<String, Attribute> newParams =
-            ImmutableMap.builder();
+        ImmutableMap.Builder<String, Attribute> newParams = ImmutableMap.builder();
 
         for (Map.Entry<String, Attribute> p : call.getAttributes().entrySet()) {
           String key = p.getKey();
@@ -299,14 +298,7 @@ public class Escaper implements Function<PlaceholderInsertedTree, EscapedTree> {
           newParams.put(key, value);
         }
 
-        // transform content
-        Expression newContent = call.getContent();
-        newContent = (callee.getContentConsumingParameter() == null)
-            ? apply(newContent)
-            : callee.getContentConsumingParameter().getType()
-                .acceptTypeVisitor(typeVisitor).apply(newContent);
-
-        Expression result = call.withParamsAndContent(newParams.build(), newContent);
+        Expression result = call.withParams(newParams.build());
 
         // If we are inside of an attribute with a content-type that matches the
         // content-type of the call, we'll need to escape the results into the
