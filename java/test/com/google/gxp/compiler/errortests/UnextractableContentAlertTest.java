@@ -406,4 +406,29 @@ public class UnextractableContentAlertTest extends BaseTestCase {
             "alert(<gxp:msg>Goodbye, World!</gxp:msg>);");
     assertNoUnexpectedAlerts();
   }
+
+  public void testStartTagButNotEndTagInPh_visibleFollowing() throws Exception {
+    // This is a regression test for a bug where we were treating "quux" as
+    // being unextractable, even though it's in a msg.
+    compile("<gxp:msg>"
+            + "foo"
+            + "<gxp:ph name='ph1' example='bar'/><a><gxp:eph/>"
+            + "baz"
+            + "</a>"
+            + "quux"
+            + "</gxp:msg>");
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testStartTagButNotEndTagInPh_invisibleBody() throws Exception {
+    compile("<gxp:msg>"
+            + "foo"
+            + "<gxp:ph name='ph1' example='bar'/>"
+            + "<script type='text/html'>"
+            + "<gxp:eph/>"
+            + "baz"
+            + "</script>"
+            + "</gxp:msg>");
+    assertNoUnexpectedAlerts();
+  }
 }

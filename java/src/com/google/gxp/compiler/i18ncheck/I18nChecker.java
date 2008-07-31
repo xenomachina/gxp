@@ -23,15 +23,15 @@ import com.google.gxp.compiler.base.AbbrExpression;
 import com.google.gxp.compiler.base.AttrBundleParam;
 import com.google.gxp.compiler.base.BoundCall;
 import com.google.gxp.compiler.base.Call;
-import com.google.gxp.compiler.base.Callable;
 import com.google.gxp.compiler.base.CallVisitor;
+import com.google.gxp.compiler.base.Callable;
 import com.google.gxp.compiler.base.ContentType;
 import com.google.gxp.compiler.base.DefaultingTypeVisitor;
 import com.google.gxp.compiler.base.ExhaustiveExpressionVisitor;
 import com.google.gxp.compiler.base.Expression;
-import com.google.gxp.compiler.base.Parameter;
 import com.google.gxp.compiler.base.NoMessage;
 import com.google.gxp.compiler.base.OutputElement;
+import com.google.gxp.compiler.base.Parameter;
 import com.google.gxp.compiler.base.PlaceholderEnd;
 import com.google.gxp.compiler.base.PlaceholderStart;
 import com.google.gxp.compiler.base.StringConstant;
@@ -48,6 +48,7 @@ import com.google.gxp.compiler.reparent.Attribute;
 import com.google.gxp.compiler.schema.AttributeValidator;
 import com.google.gxp.compiler.schema.ContentFamily;
 import com.google.gxp.compiler.schema.ElementValidator;
+import com.google.gxp.compiler.schema.Schema;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -70,10 +71,16 @@ public class I18nChecker {
                                pivotedTree.getRoot());
   }
 
+  /**
+   * Visits a space collapsed tree and generates
+   * {@code UnextractedContentAlert} instances where appropriate.
+   */
   private static class Visitor
       extends ExhaustiveExpressionVisitor implements CallVisitor<Expression> {
     private final AlertSink alertSink;
-    private boolean alertsEnabled = true;
+    private boolean visible = true;
+    private boolean insideMsg = false;
+    private boolean insidePh = false;
     private boolean insideNoMsg = false;
 
     Visitor(AlertSink alertSink) {
@@ -82,24 +89,25 @@ public class I18nChecker {
 
     @Override
     public Template visitTemplate(Template template) {
+      boolean oldVisible = visible;
+
       // We want to examine default values, but we intentionally skip the
       // comments.
       for (Parameter parameter : template.getParameters()) {
-        alertsEnabled = parameter.getType().acceptTypeVisitor(TYPE_VISITOR);
+        visible = isTypeVisible(parameter.getType());
         Expression defaultValue = parameter.getDefaultValue();
         if (defaultValue != null) {
           defaultValue.acceptVisitor(this);
         }
+        visible = oldVisible;
       }
 
       // TODO(laurence): should probably move this check into
       // visitStringConstant instead, but we'll need access to the unescaped
       // form of the StringConstant.
-      boolean oldAlertsEnabled = alertsEnabled;
-      alertsEnabled = (template.getSchema().getContentFamily()
-                       == ContentFamily.MARKUP);
+      visible = isSchemaVisible(template.getSchema());
       template.getContent().acceptVisitor(this);
-      alertsEnabled = oldAlertsEnabled;
+      visible = oldVisible;
       return template;
     }
 
@@ -108,15 +116,17 @@ public class I18nChecker {
         Pattern.compile("[\\s\\xa0]*");
 
     /**
-     * Return true iff the specified string does not need to be translated.
+     * Return true if and only if the specified string does not need to be
+     * translated.
      */
-    private static boolean isLocaleIndependant(String s) {
+    private static boolean isLocaleIndependent(String s) {
       return LOCALE_INDEPENDENT_PATTERN.matcher(s).matches();
     }
 
     @Override
     public Expression visitStringConstant(StringConstant node) {
-      if (alertsEnabled && !isLocaleIndependant(node.evaluate())) {
+      if (visible && (!insideMsg || insidePh) && !insideNoMsg
+          && !isLocaleIndependent(node.evaluate())) {
         alertSink.add(new UnextractableContentAlert(node.getSourcePosition(),
                                                     node.getDisplayName()));
       }
@@ -125,10 +135,10 @@ public class I18nChecker {
 
     @Override
     public Expression visitAbbrExpression(AbbrExpression abbr) {
-      boolean oldAlertsEnabled = alertsEnabled;
-      alertsEnabled &= abbr.getType().acceptTypeVisitor(TYPE_VISITOR);
+      boolean oldVisible = visible;
+      visible = isTypeVisible(abbr.getType());
       apply(abbr.getValue());
-      alertsEnabled = oldAlertsEnabled;
+      visible = oldVisible;
 
       apply(abbr.getContent());
       return abbr;
@@ -141,14 +151,14 @@ public class I18nChecker {
 
     @Override
     public Expression visitBoundCall(BoundCall call) {
-      boolean oldAlertsEnabled = alertsEnabled;
+      boolean oldVisible = visible;
       Callable callee = call.getCallee();
       for (Map.Entry<String, Attribute> param : call.getAttributes().entrySet()) {
         Type type = callee.getParameterByPrimary(param.getKey()).getType();
-        alertsEnabled = !insideNoMsg && type.acceptTypeVisitor(TYPE_VISITOR);
+        visible = isTypeVisible(type);
         visitAttribute(param.getValue());
       }
-      alertsEnabled = oldAlertsEnabled;
+      visible = oldVisible;
       return call;
     }
 
@@ -164,64 +174,77 @@ public class I18nChecker {
 
     @Override
     public Expression visitOutputElement(OutputElement element) {
-      boolean oldAlertsEnabled = alertsEnabled;
+      boolean oldVisible = visible;
       ElementValidator elementValidator = element.getValidator();
+      boolean oldInsideMsg = insideMsg;
+      insideMsg = false;
       for (Attribute attr : element.getAttributes()) {
         AttributeValidator attrValidator =
             elementValidator.getAttributeValidator(attr.getName());
-        alertsEnabled = !insideNoMsg &&
-            attrValidator.isFlagSet(AttributeValidator.Flag.VISIBLETEXT);
+        visible = attrValidator.isFlagSet(AttributeValidator.Flag.VISIBLETEXT);
         visitAttribute(attr);
-        alertsEnabled = oldAlertsEnabled;
+        visible = oldVisible;
       }
-      alertsEnabled &= !elementValidator.isFlagSet(ElementValidator.Flag.INVISIBLEBODY);
+      insideMsg = oldInsideMsg;
+      visible &= !elementValidator.isFlagSet(ElementValidator.Flag.INVISIBLEBODY);
       apply(element.getContent());
-      alertsEnabled = oldAlertsEnabled;
+      visible = oldVisible;
       return element;
     }
 
     @Override
     public Expression visitAttrBundleParam(AttrBundleParam bundle) {
-      boolean oldAlertsEnabled = alertsEnabled;
+      boolean oldVisible = visible;
+      boolean oldInsideMsg = insideMsg;
+      insideMsg = false;
       for (Map.Entry<AttributeValidator, Attribute> entry : bundle.getAttrs().entrySet()) {
         AttributeValidator attrValidator = entry.getKey();
-        alertsEnabled = attrValidator.isFlagSet(AttributeValidator.Flag.VISIBLETEXT);
+        visible = attrValidator.isFlagSet(AttributeValidator.Flag.VISIBLETEXT);
         visitAttribute(entry.getValue());
       }
-      alertsEnabled = oldAlertsEnabled;
+      visible = oldVisible;
+      insideMsg = oldInsideMsg;
       return bundle;
     }
 
     @Override
     public Expression visitUnextractedMessage(UnextractedMessage msg) {
-      boolean oldAlertsEnabled = alertsEnabled;
-      alertsEnabled = false;
+      boolean oldInsideMsg = insideMsg;
+      boolean oldInsidePh = insidePh;
+      insideMsg = true;
+      insidePh = false;
       super.visitUnextractedMessage(msg);
-      alertsEnabled = oldAlertsEnabled;
+      insideMsg = oldInsideMsg;
+      insidePh = oldInsidePh;
       return msg;
     }
 
     @Override
     public Expression visitNoMessage(NoMessage noMsg) {
-      boolean oldAlertsEnabled = alertsEnabled;
-      alertsEnabled = false;
       insideNoMsg = true;
       super.visitNoMessage(noMsg);
       insideNoMsg = false;
-      alertsEnabled = oldAlertsEnabled;
       return noMsg;
     }
 
     @Override
     public Expression visitPlaceholderStart(PlaceholderStart phStart) {
-      alertsEnabled = true;
+      insidePh = true;
       return super.visitPlaceholderStart(phStart);
     }
 
     @Override
     public Expression visitPlaceholderEnd(PlaceholderEnd phEnd) {
-      alertsEnabled = false;
+      insidePh = false;
       return super.visitPlaceholderEnd(phEnd);
+    }
+
+    private static boolean isSchemaVisible(Schema schema) {
+      return (schema.getContentFamily() == ContentFamily.MARKUP);
+    }
+
+    private static boolean isTypeVisible(Type type) {
+      return type.acceptTypeVisitor(TYPE_VISITOR);
     }
 
     /**
@@ -235,7 +258,7 @@ public class I18nChecker {
       }
 
       public Boolean visitContentType(ContentType type) {
-        return (type.getSchema().getContentFamily() == ContentFamily.MARKUP);
+        return isSchemaVisible(type.getSchema());
       }
     };
   }
