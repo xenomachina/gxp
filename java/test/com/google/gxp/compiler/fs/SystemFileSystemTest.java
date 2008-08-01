@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.fs;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Join;
 import com.google.common.io.Characters;
 import com.google.gxp.testing.MoreAsserts;
 
@@ -31,17 +32,40 @@ import java.nio.charset.UnmappableCharacterException;
 public class SystemFileSystemTest extends TestCase {
   private final SystemFileSystem fs = SystemFileSystem.INSTANCE;
 
+  /**
+   * Constructs a native pathname consisting of the specified components. Pass
+   * "" as the first parameter for the result to start with the separator or as
+   * the last parameter to have the result end with the separator.
+   */
+  private static String path(String first, String... rest) {
+    return Join.join(File.separator, first, (Object[]) rest);
+  }
+
+  /**
+   * Constructs a native absolute pathname consisting of the specified
+   * components.
+   */
+  private static String absPath(String first, String... rest) {
+    return File.separator + path(first, rest);
+  }
+
   public void testGetRoot() throws Exception {
     assertEquals("/", fs.getRoot().getName());
   }
 
   public String getTmpDir() {
-    return "/tmp";
+    String tmp = System.getProperty("java.io.tmpdir");
+    return tmp.endsWith(File.separator) ? tmp.substring(0, tmp.length() - 1) : tmp;
+  }
+
+  public String getJavaTestsDir() {
+    return path("java", "test", "");
   }
 
   public void testOpenInputStream() throws Exception {
     String systemFnam =
-        "java/test/com/google/gxp/compiler/fs/"
+        getJavaTestsDir()
+        + path("com", "google", "gxp", "compiler", "fs", "")
         + "SystemFileSystemTest-testOpenInputStream-input.txt";
     FileRef fnam = fs.parseFilename(systemFnam);
 
@@ -126,7 +150,7 @@ public class SystemFileSystemTest extends TestCase {
 
   public void testParseFilename() throws Exception {
     assertEquals(new File("foobar").getAbsolutePath(),
-                 fs.parseFilename("foobar").getName());
+                 fs.parseFilename("foobar").toFilename());
     try {
       fs.parseFilename(null);
       fail("null system filename should not be parseable");
@@ -136,22 +160,24 @@ public class SystemFileSystemTest extends TestCase {
   }
 
   public void testToFilename() throws Exception {
-    assertEquals("/foobar", fs.getRoot().join("foobar").toFilename());
+    assertEquals(absPath("foobar"), fs.getRoot().join("foobar").toFilename());
 
     // tests of proper % escaping
-    assertEquals("/foo%bar", fs.getRoot().join("foo%bar").toFilename());
-    assertEquals("/foo%%bar", fs.getRoot().join("foo%%bar").toFilename());
+    assertEquals(absPath("foo%bar"), fs.getRoot().join("foo%bar").toFilename());
+    assertEquals(absPath("foo%%bar"), fs.getRoot().join("foo%%bar").toFilename());
   }
 
   public void testToRelativeFilename() throws Exception {
     String oldUserDir = System.getProperty("user.dir");
     try {
-      System.setProperty("user.dir", "/x/y");
+      System.setProperty("user.dir", new File(absPath("x", "y")).getAbsolutePath());
 
-      assertEquals("/z",  fs.parseFilename("/z").toRelativeFilename());
-      assertEquals("a",   fs.parseFilename("/x/y/a").toRelativeFilename());
-      assertEquals("a/b", fs.parseFilename("/x/y/a/b").toRelativeFilename());
-      assertEquals("a/b", fs.parseFilename("a/b").toRelativeFilename());
+      assertEquals(new File(absPath("z")).getAbsolutePath(),
+                   fs.parseFilename(absPath("z")).toRelativeFilename());
+      assertEquals("a", fs.parseFilename(absPath("x", "y", "a")).toRelativeFilename());
+      assertEquals(path("a", "b"),
+                   fs.parseFilename(absPath("x", "y", "a", "b")).toRelativeFilename());
+      assertEquals(path("a", "b"), fs.parseFilename(path("a", "b")).toRelativeFilename());
     } finally {
       System.setProperty("user.dir", oldUserDir);
     }

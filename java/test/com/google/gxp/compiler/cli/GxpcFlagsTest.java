@@ -140,7 +140,7 @@ public class GxpcFlagsTest extends TestCase {
 
     // Sources specified, with source path.
     config = createConfig(
-        "--source", "src_dir_1:src_dir_2",
+        "--source", "src_dir_1" + COLON + "src_dir_2",
         "src_dir_1" + SLASH + "ford.gxp",
         "src_dir_1" + SLASH + "zaphod.gxp",
         "src_dir_2" + SLASH + "trillian.gxp");
