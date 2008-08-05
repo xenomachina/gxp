@@ -26,14 +26,16 @@ import com.google.gxp.compiler.schema.Schema;
 public class UnextractedMessage extends Expression {
   private final String meaning;
   private final String comment;
+  private final boolean hidden;
   private final Expression content;
 
   public UnextractedMessage(Node fromNode, Schema schema,
-                            String meaning, String comment,
+                            String meaning, String comment, boolean hidden,
                             Expression content) {
     super(fromNode, schema);
     this.meaning = meaning;
     this.comment = comment;
+    this.hidden = hidden;
     this.content = Objects.nonNull(content);
   }
 
@@ -50,6 +52,10 @@ public class UnextractedMessage extends Expression {
     return comment;
   }
 
+  public boolean isHidden() {
+    return hidden;
+  }
+
   public Expression getContent() {
     return content;
   }
@@ -57,14 +63,14 @@ public class UnextractedMessage extends Expression {
   public UnextractedMessage withContent(Expression newContent) {
     return newContent.equals(content)
         ? this
-        : new UnextractedMessage(this, getSchema(), meaning, comment, newContent);
+        : new UnextractedMessage(this, getSchema(), meaning, comment, hidden, newContent);
   }
 
   public UnextractedMessage withContentAndSchema(Expression newContent,
                                                  Schema newSchema) {
     return (newContent.equals(content) && Objects.equal(newSchema, getSchema()))
         ? this
-        : new UnextractedMessage(this, newSchema, meaning, comment, newContent);
+        : new UnextractedMessage(this, newSchema, meaning, comment, hidden, newContent);
   }
 
   @Override
@@ -78,6 +84,7 @@ public class UnextractedMessage extends Expression {
     return equalsExpression(that)
         && Objects.equal(getMeaning(), that.getMeaning())
         && Objects.equal(getComment(), that.getComment())
+        && Objects.equal(isHidden(),   that.isHidden())
         && Objects.equal(getContent(), that.getContent());
   }
 
@@ -87,6 +94,7 @@ public class UnextractedMessage extends Expression {
         expressionHashCode(),
         getMeaning(),
         getComment(),
+        isHidden(),
         getContent());
   }
 }

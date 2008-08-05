@@ -202,6 +202,11 @@ public class MessageExtractor implements Function<I18nCheckedTree, MessageExtrac
         tcMessageBuilder.setMeaning(msg.getMeaning());
       }
 
+      // mark this message as hidden if indicated
+      if (msg.isHidden()) {
+        tcMessageBuilder.setHidden(true);
+      }
+
       // - Comments are notes for translators
       if (null != msg.getComment()) {
         tcMessageBuilder.setDescription(msg.getComment());

@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.reparent;
 
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
+import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
 import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
@@ -90,6 +91,22 @@ public class AttributeMapTest extends GxpcTestCase {
   public void testOptionalFound() throws Exception {
     attrMap.add(attr(NullNamespace.INSTANCE, "foo", str("quux")));
     assertEquals("quux", attrMap.getOptional("foo", "bar"));
+    attrMap.reportUnusedAttributes();
+  }
+
+  public void testBooleanAttribute() throws Exception {
+    attrMap.add(attr(NullNamespace.INSTANCE, "foo", str("true")));
+    attrMap.add(attr(NullNamespace.INSTANCE, "bar", str("false")));
+    Attribute badAttr = attr(NullNamespace.INSTANCE, "baz", str("xxxx"));
+    attrMap.add(badAttr);
+
+    assertEquals(true,  attrMap.getBooleanValue("foo"));
+    assertEquals(false, attrMap.getBooleanValue("bar"));
+    assertEquals(false, attrMap.getBooleanValue("baz"));
+    assertEquals(false, attrMap.getBooleanValue("buz"));
+
+    expectedAlerts.add(new InvalidAttributeValueError(badAttr));
+
     attrMap.reportUnusedAttributes();
   }
 }

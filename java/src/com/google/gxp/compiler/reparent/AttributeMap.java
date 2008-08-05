@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gxp.compiler.alerts.AlertSink;
+import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
 import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
@@ -248,6 +249,23 @@ class AttributeMap {
       }
     }
     return new MultiLanguageAttrValue(map, getOptional(name, null));
+  }
+
+  /**
+   * Get a boolean value for an attribute that can take the value "true"
+   * or "false" (anything else causes an alert). Returns false if the
+   * attribute is not present.
+   */
+  public boolean getBooleanValue(String name) {
+    String str = getOptional(name, null);
+    if (str == null || str.equals("false")) {
+      return false;
+    } else if (str.equals("true")) {
+      return true;
+    } else {
+      alertSink.add(new InvalidAttributeValueError(getAttribute(name)));
+      return false;
+    }
   }
 
   /**

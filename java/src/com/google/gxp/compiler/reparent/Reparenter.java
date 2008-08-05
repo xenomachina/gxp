@@ -200,7 +200,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
           public Attribute visitMsgNamespace(MsgNamespace ns) {
             Expression str = new StringConstant(parsedAttr, null, parsedAttr.getValue());
-            Expression msg = new UnextractedMessage(parsedAttr, null, null, null, str);
+            Expression msg = new UnextractedMessage(parsedAttr, null, null, null, false, str);
             return new Attribute(parsedAttr, NullNamespace.INSTANCE, parsedAttr.getName(),
                                  new ConvertibleToContent(msg),
                                  null, null);
@@ -752,14 +752,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
       if (type.takesDefaultParam()) {
         defaultValue = attrMap.getOptionalExprValue("default", null);
-        String hasDefaultStr = attrMap.getOptional("has-default", null);
-        if (hasDefaultStr != null) {
-          if (hasDefaultStr.equals("true")) {
-            hasDefaultFlag = true;
-          } else if (!hasDefaultStr.equals("false")) {
-            alertSink.add(new InvalidAttributeValueError(attrMap.getAttribute("has-default")));
-          }
-        }
+        hasDefaultFlag = attrMap.getBooleanValue("has-default");
       }
 
       if (type.takesRegexParam()) {
@@ -777,15 +770,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
       if (type.takesConstructorParam()) {
         constructor = attrMap.getOptionalExprValue("constructor", null);
-        String hasConstructorStr = attrMap.getOptional("has-constructor", null);
-        if (hasConstructorStr != null) {
-          if (hasConstructorStr.equals("true")) {
-            hasConstructorFlag = true;
-          } else if (!hasConstructorStr.equals("false")) {
-            alertSink.add(new InvalidAttributeValueError(
-                              attrMap.getAttribute("has-constructor")));
-          }
-        }
+        hasConstructorFlag = attrMap.getBooleanValue("has-constructor");
       }
 
       SpaceOperatorSet spaceOperators = getSpaceOperators(attrMap);
@@ -910,13 +895,14 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
       AttributeMap attrMap = nodeParts.getAttributes();
       String meaning = attrMap.getOptional("meaning", null);
       String comment = attrMap.getOptional("comment", null);
+      boolean hidden = attrMap.getBooleanValue("hidden");
       // TODO(laurence): coerce content to HTML
       Expression content = getCollapsableContent(attrMap);
 
       ContentType contentType = createContentType(node, null);
       Schema schema = (contentType == null) ? null : contentType.getSchema();
 
-      output.accumulate(new UnextractedMessage(node, schema, meaning, comment, content));
+      output.accumulate(new UnextractedMessage(node, schema, meaning, comment, hidden, content));
       return null;
     }
 

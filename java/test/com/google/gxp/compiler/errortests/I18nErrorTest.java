@@ -150,6 +150,12 @@ public class I18nErrorTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
   }
 
+  public void testMsg_badHiddenAttribute() throws Exception {
+    compile("<gxp:msg hidden='no'>foo</gxp:msg>");
+    assertAlert(new InvalidAttributeValueError(pos(2,1), "'hidden' attribute"));
+    assertNoUnexpectedAlerts();
+  }
+
   public void testNoMsg_insideMsg() throws Exception {
     compile("<gxp:msg><gxp:nomsg>foo</gxp:nomsg></gxp:msg>");
     assertAlert(new BadNodePlacementError(pos(2, 10), "<gxp:nomsg>",
