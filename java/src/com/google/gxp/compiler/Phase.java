@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.gxp.compiler.cli;
+package com.google.gxp.compiler;
 
-import com.google.gxp.compiler.CompilationUnit;
 import com.google.gxp.compiler.base.Forest;
 import com.google.gxp.compiler.base.Node;
 

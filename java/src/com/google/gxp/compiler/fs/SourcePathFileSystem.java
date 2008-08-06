@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -48,13 +49,14 @@ public class SourcePathFileSystem implements FileSystem {
   private final FileSystem wrappedFs;
 
   public SourcePathFileSystem(FileSystem wrappedFs,
-                              List<FileRef> sourcePath,
-                              List<FileRef> sourceFiles,
+                              Iterable<FileRef> sourcePath,
+                              Iterable<FileRef> sourceFiles,
                               FileRef outDir) {
     this.outDir = outDir;
     this.wrappedFs = wrappedFs;
+    List<FileRef> sortedSourcePath = Lists.sortedCopy(sourcePath, FILEREF_LENGTH_COMPARATOR);
     for (FileRef sourceFile : sourceFiles) {
-      FileRef baseDir = findBaseDir(sourceFile, sourcePath);
+      FileRef baseDir = findBaseDir(sourceFile, sortedSourcePath);
       if (baseDir == null) {
         throw new IllegalArgumentException(sourceFile.toFilename() + " not in source path");
       } else {
@@ -71,6 +73,14 @@ public class SourcePathFileSystem implements FileSystem {
     }
     return null;
   }
+
+  private static final Comparator<FileRef> FILEREF_LENGTH_COMPARATOR = new Comparator<FileRef>() {
+    public int compare(FileRef f1, FileRef f2) {
+      int len1 = f1.getName().length();
+      int len2 = f2.getName().length();
+      return (len1 > len2) ? -1 : (len1 == len2 ? 0 : 1);
+    }
+  };
 
   private FileRef chop(FileRef ancestor, FileRef descendant) {
     return new FileRef(store, descendant.getName().substring(ancestor.getName().length()));

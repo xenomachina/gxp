@@ -18,6 +18,8 @@ package com.google.gxp.compiler.cli;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.gxp.compiler.Configuration;
+import com.google.gxp.compiler.Phase;
 import com.google.gxp.compiler.alerts.Alert.Severity;
 import com.google.gxp.compiler.alerts.Alert;
 import com.google.gxp.compiler.alerts.AlertPolicy;
@@ -55,12 +57,12 @@ public class GxpcFlagsTest extends TestCase {
   private static final String COLON = File.pathSeparator;
   private static final String SLASH = File.separator;
 
-  private GxpcConfiguration createConfig(FileRef defaultDir, String... args)
+  private GxpcFlags createConfig(FileRef defaultDir, String... args)
       throws Exception {
-    return new GxpcFlags(sysFs, new StringBuilder(), defaultDir, args);
+    return new GxpcFlags(sysFs, defaultDir, args);
   }
 
-  private GxpcConfiguration createConfig(String... args) throws Exception {
+  private GxpcFlags createConfig(String... args) throws Exception {
     return createConfig(getCwd(), args);
   }
 
@@ -92,6 +94,11 @@ public class GxpcFlagsTest extends TestCase {
     }
   }
 
+  public void testHelp() throws Exception {
+    GxpcFlags flags = createConfig("--help");
+    assertTrue(flags.showHelp());
+  }
+
   private FileRef getCwd() {
     return sysFs.parseFilename(System.getProperty("user.dir"));
   }
@@ -113,7 +120,7 @@ public class GxpcFlagsTest extends TestCase {
 
   public void testGetSourceFiles() throws Exception {
     // No sources specified.
-    GxpcConfiguration config = createConfig();
+    Configuration config = createConfig();
     assertTrue(config.getSourceFiles().isEmpty());
 
     // Sources specified, but no source path.
@@ -181,7 +188,7 @@ public class GxpcFlagsTest extends TestCase {
   }
 
   public void testGetOutputLanguages() throws Exception {
-    GxpcConfiguration config = createConfig();
+    Configuration config = createConfig();
     assertContentsAnyOrder(config.getOutputLanguages());
 
     config = createConfig("--output_language", "java");
@@ -195,7 +202,7 @@ public class GxpcFlagsTest extends TestCase {
   }
 
   public void testGetAllowedOutputFilenames() throws Exception {
-    GxpcConfiguration config = createConfig();
+    Configuration config = createConfig();
     assertTrue(config.getAllowedOutputFileRefs().isEmpty());
     FileSystem fs;
 
@@ -230,7 +237,7 @@ public class GxpcFlagsTest extends TestCase {
   }
 
   public void testGetDotPhases() throws Exception {
-    GxpcConfiguration config;
+    Configuration config;
 
     // Base case.
     config = createConfig();
@@ -266,13 +273,13 @@ public class GxpcFlagsTest extends TestCase {
   }
 
   public void testGetNamespaces() throws Exception {
-    GxpcConfiguration config = createConfig();
+    Configuration config = createConfig();
     // TODO(harryh): test creation of non-standard namespaces
     // assertSame(namespaces, config.getNamespaces());
   }
 
   public void testGetCodeGeneratorFactory() throws Exception {
-    GxpcConfiguration config = createConfig();
+    Configuration config = createConfig();
     assertMessageSourceEquals(null, config);
     assertDynamicModeEnabledEquals(false, config);
 
@@ -291,21 +298,21 @@ public class GxpcFlagsTest extends TestCase {
   }
 
   private void assertMessageSourceEquals(String expected,
-                                         GxpcConfiguration config) {
+                                         Configuration config) {
     DefaultCodeGeneratorFactory codeGenFactory =
         (DefaultCodeGeneratorFactory) config.getCodeGeneratorFactory();
     assertEquals(expected, codeGenFactory.getRuntimeMessageSource());
   }
 
   private void assertDynamicModeEnabledEquals(boolean expected,
-                                              GxpcConfiguration config) {
+                                              Configuration config) {
     DefaultCodeGeneratorFactory codeGenFactory =
         (DefaultCodeGeneratorFactory) config.getCodeGeneratorFactory();
     assertEquals(expected, codeGenFactory.isDynamicModeEnabled());
   }
 
   public void testGetDependencyFile() throws Exception {
-    GxpcConfiguration config = createConfig();
+    Configuration config = createConfig();
     assertNull(config.getDependencyFile());
 
     config = createConfig(
@@ -322,7 +329,7 @@ public class GxpcFlagsTest extends TestCase {
   }
 
   public void testGetPropertiesFile() throws Exception {
-    GxpcConfiguration config = createConfig();
+    Configuration config = createConfig();
     assertNull(config.getPropertiesFile());
 
     config = createConfig(
@@ -341,7 +348,7 @@ public class GxpcFlagsTest extends TestCase {
   }
 
   public void testIsVerboseEnabled() throws Exception {
-    GxpcConfiguration config = createConfig();
+    Configuration config = createConfig();
     assertFalse(config.isVerboseEnabled());
 
     config = createConfig("--verbose");
@@ -349,7 +356,7 @@ public class GxpcFlagsTest extends TestCase {
   }
 
   public void testIsDebugEnabled() throws Exception {
-    GxpcConfiguration config = createConfig();
+    Configuration config = createConfig();
     assertFalse(config.isDebugEnabled());
 
     config = createConfig("--g");

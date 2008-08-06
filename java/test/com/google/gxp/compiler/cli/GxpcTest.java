@@ -47,7 +47,7 @@ public class GxpcTest extends TestCase {
 
   public void testBase() throws Exception {
     assertEquals(1, Gxpc.main(fs, actualStderr, fs.getRoot()));
-    expectedStderr.append("No input files\n");
+    expectedStderr.append("gxpc: no input files\n");
   }
 
   public void testBadFlag() throws Exception {

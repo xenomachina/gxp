@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.gxp.compiler.cli;
+package com.google.gxp.compiler;
 
 import com.google.gxp.compiler.alerts.AlertPolicy;
 import com.google.gxp.compiler.base.OutputLanguage;
@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.SortedSet;
 
 /**
- * Configuration for Gxpc.
+ * Configuration for the GXP Compiler.
  */
-public interface GxpcConfiguration {
+public interface Configuration {
   /**
    * @return the set of source files to compile.
    */

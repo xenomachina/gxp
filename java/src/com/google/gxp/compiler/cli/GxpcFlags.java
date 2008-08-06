@@ -16,12 +16,12 @@
 
 package com.google.gxp.compiler.cli;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gxp.compiler.Configuration;
+import com.google.gxp.compiler.Phase;
 import com.google.gxp.compiler.alerts.Alert.Severity;
 import com.google.gxp.compiler.alerts.AlertPolicy;
 import com.google.gxp.compiler.alerts.ConfigurableAlertPolicy;
@@ -48,14 +48,20 @@ import org.kohsuke.args4j.Option;
  * The GXP compiler, "gxpc". The command line interface for generating code and
  * XMB files from GXP files.
  */
-class GxpcFlags implements GxpcConfiguration {
-  private final FileSystem fs;
-  private final SourcePathFileSystem sourcePathFs;
-  private final Set<FileRef> inputFiles;
-  private final Set<FileRef> schemaFiles;
-  private final FileRef outputDir;
-  private final List<FileRef> sourcePaths;
-  private final SortedSet<Phase> dotPhases;
+class GxpcFlags implements Configuration {
+  private final CommandLine commandLine;
+  private final ImmutableSet<FileRef> sourceFiles;
+  private final ImmutableSet<FileRef> schemaFiles;
+  private final ImmutableSet<OutputLanguage> outputLanguages;
+  private final DefaultCodeGeneratorFactory codeGeneratorFactory;
+  private final ImmutableSet<FileRef> allowedOutputFileRefs;
+  private final FileRef dependencyFile;
+  private final FileRef propertiesFile;
+  private final boolean isVerboseEnabled;
+  private final boolean isDebugEnabled;
+  private final AlertPolicy alertPolicy;
+  private final ImmutableSortedSet<Phase> dotPhases;
+  private final SourceEntityResolver sourceEntityResolver;
 
   /**
    * Creates an instance of the compiler based on command-line arguments.
@@ -68,153 +74,110 @@ class GxpcFlags implements GxpcConfiguration {
    * @throws Flags.UsageError if there is an error parsing the command line
    * arguments
    */
-  GxpcFlags(FileSystem fs, Appendable stderr, FileRef defaultDir, String... args)
-      throws CmdLineException {
-    this.fs = fs;
+  GxpcFlags(FileSystem fs, FileRef defaultDir, String... args)
+      throws CmdLineException, IOException {
 
-    List<String> trailingArgs = CommandLine.init(stderr, args);
+    commandLine = new CommandLine(args);
 
-    List<FileRef> underlyingInputFiles = Lists.newArrayList();
-    for (String arg : trailingArgs) {
-      underlyingInputFiles.add(fs.parseFilename(arg));
-    }
+    Set<FileRef> underlyingInputFiles = getFileRefs(fs, commandLine.trailingArgs);
 
-    Set<FileRef> tmpSchemaFiles = Sets.newHashSet();
-    for (String schema : CommandLine.FLAG_schema) {
-      tmpSchemaFiles.add(fs.parseFilename(schema));
-    }
-    schemaFiles = ImmutableSet.copyOf(tmpSchemaFiles);
+    FileRef outputDir = (commandLine.FLAG_dir == null)
+        ? defaultDir : fs.parseFilename(commandLine.FLAG_dir);
 
-    outputDir = (CommandLine.FLAG_dir == null)
-        ? defaultDir : fs.parseFilename(CommandLine.FLAG_dir);
-
-    sourcePaths = ImmutableList.copyOf((CommandLine.FLAG_source == null)
+    List<FileRef> sourcePaths = (commandLine.FLAG_source == null)
         ? Collections.singletonList(defaultDir)
-        : sourcePath(fs, CommandLine.FLAG_source));
+        : fs.parseFilenameList(commandLine.FLAG_source);
 
-    sourcePathFs = new SourcePathFileSystem(fs,
-                                            sourcePaths,
-                                            underlyingInputFiles,
-                                            outputDir);
+    SourcePathFileSystem sourcePathFs = new SourcePathFileSystem(fs,
+                                                                 sourcePaths,
+                                                                 underlyingInputFiles,
+                                                                 outputDir);
 
-    dotPhases = computeDotPhases(CommandLine.FLAG_dot);
+    sourceFiles = ImmutableSet.copyOf(sourcePathFs.getSourceFileRefs());
+    schemaFiles = getFileRefs(fs, commandLine.FLAG_schema);
 
-    inputFiles = ImmutableSet.copyOf(sourcePathFs.getSourceFileRefs());
-  }
-
-  /**
-   * @return source path, with longest elements first.
-   */
-  private static List<FileRef> sourcePath(FileSystem fs, String sourceFlag) {
-    List<FileRef> result = Lists.newArrayList();
-    for (FileRef sourceName : fs.parseFilenameList(sourceFlag)) {
-      result.add(sourceName);
+    // Compute Output Languages
+    Set<OutputLanguage> tmpOutputLanguages = EnumSet.noneOf(OutputLanguage.class);
+    for (String outputLanguage : commandLine.FLAG_output_language) {
+      tmpOutputLanguages.add(OutputLanguage.valueOf(outputLanguage.toUpperCase()));
     }
-    sortByDecreasingLength(result);
+    outputLanguages = ImmutableSet.copyOf(tmpOutputLanguages);
 
-    return result;
-  }
+    allowedOutputFileRefs = getFileRefs(sourcePathFs, commandLine.FLAG_output);
 
-  private static void sortByDecreasingLength(List<FileRef> list) {
-    Collections.sort(list,
-        new Comparator<FileRef>() {
-          public int compare(FileRef f1, FileRef f2) {
-            int len1 = f1.getName().length();
-            int len2 = f2.getName().length();
-            return (len1 > len2) ? -1 : (len1 == len2 ? 0 : 1);
-          }
-        });
-  }
+    alertPolicy = computeAlertPolicy(commandLine.FLAG_warn);
 
-  public Set<FileRef> getSourceFiles() {
-    return inputFiles;
-  }
+    // Compute Dependency File
+    dependencyFile = (commandLine.FLAG_depend == null)
+        ? null : fs.parseFilename(commandLine.FLAG_depend);
 
-  public Set<FileRef> getSchemaFiles() {
-    return schemaFiles;
-  }
-
-  public Set<OutputLanguage> getOutputLanguages() {
-    Set<OutputLanguage> result = EnumSet.noneOf(OutputLanguage.class);
-    for (String outputLanguage : CommandLine.FLAG_output_language) {
-      result.add(OutputLanguage.valueOf(outputLanguage.toUpperCase()));
-    }
-
-    return Collections.unmodifiableSet(result);
-  }
-
-  public CodeGeneratorFactory getCodeGeneratorFactory() {
-    DefaultCodeGeneratorFactory result =  new DefaultCodeGeneratorFactory();
-    result.setRuntimeMessageSource(CommandLine.FLAG_message_source);
-    result.setDynamicModeEnabled(CommandLine.FLAG_dynamic);
-    result.setSourceFiles(inputFiles);
-    result.setSchemaFiles(schemaFiles);
-    result.setSourcePaths(sourcePaths);
-    result.setAlertPolicy(getAlertPolicy());
-    return result;
-  }
-
-  public Set<FileRef> getAllowedOutputFileRefs() {
-    Set<FileRef> result = Sets.newHashSet();
-    for (String outputFlag : CommandLine.FLAG_output) {
-      FileRef fnam = sourcePathFs.parseFilename(outputFlag);
-      result.add(fnam);
-    }
-    return Collections.unmodifiableSet(result);
-  }
-
-  public FileRef getDependencyFile() {
-    return (CommandLine.FLAG_depend == null)
-        ? null : fs.parseFilename(CommandLine.FLAG_depend);
-  }
-
-  public FileRef getPropertiesFile() {
-    return (CommandLine.FLAG_output_properties && CommandLine.FLAG_message_source != null)
+    // Compute Properties File
+    propertiesFile = (commandLine.FLAG_output_properties
+                      && commandLine.FLAG_message_source != null)
         ? outputDir.join(
-            "/" + CommandLine.FLAG_message_source.replace(".", "/") + "_en.properties")
+            "/" + commandLine.FLAG_message_source.replace(".", "/") + "_en.properties")
         : null;
-  }
 
-  public boolean isVerboseEnabled() {
-    return CommandLine.FLAG_verbose;
-  }
+    isVerboseEnabled = commandLine.FLAG_verbose;
+    isDebugEnabled = commandLine.FLAG_g;
 
-  public boolean isDebugEnabled() {
-    return CommandLine.FLAG_g;
-  }
+    // Compute Dot Phases
+    dotPhases = computeDotPhases(commandLine.FLAG_dot);
 
-  public AlertPolicy getAlertPolicy() {
-    return alertPolicySupplier.get();
-  }
-
-  public SourceEntityResolver getEntityResolver() {
+    // Compute SourceEntityResolver
     // use the sourcePathFs so that gxp:///foo/bar is resolved in a way that
     // includes both source files and genfiles
-    return new FileSystemEntityResolver(sourcePathFs);
+    sourceEntityResolver = new FileSystemEntityResolver(sourcePathFs);
+
+    // Compute CodeGeneratorFactory (Always do this last)
+    codeGeneratorFactory = new DefaultCodeGeneratorFactory();
+    codeGeneratorFactory.setRuntimeMessageSource(commandLine.FLAG_message_source);
+    codeGeneratorFactory.setDynamicModeEnabled(commandLine.FLAG_dynamic);
+    codeGeneratorFactory.setSourceFiles(getSourceFiles());
+    codeGeneratorFactory.setSchemaFiles(getSchemaFiles());
+    codeGeneratorFactory.setSourcePaths(sourcePaths);
+    codeGeneratorFactory.setAlertPolicy(getAlertPolicy());
+  }
+
+  public boolean showHelp() {
+    return commandLine.FLAG_help;
+  }
+
+  public void printHelp(Appendable out) throws IOException {
+    out.append(commandLine.getUsage());
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Supplemental Computation Functions
+  ////////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Iterate over an {@code Iterable} of flags treating each as a filename in the
+   * supplied {@link FileSystem}.
+   *
+   * @return an {@link ImmutableSet} of the results.
+   */
+  private static ImmutableSet<FileRef> getFileRefs(FileSystem fs, Iterable<String> filenames) {
+    Set<FileRef> result = Sets.newHashSet();
+    for (String filename : filenames) {
+      result.add(fs.parseFilename(filename));
+    }
+    return ImmutableSet.copyOf(result);
   }
 
   // TODO(laurence): add more general support for AlertPolicy configuration
-  private final Supplier<AlertPolicy> alertPolicySupplier =
-      Suppliers.memoize(new Supplier<AlertPolicy>() {
-        public AlertPolicy get() {
-          ConfigurableAlertPolicy result = new ConfigurableAlertPolicy();
-          Set<String> warnFlags = Sets.newHashSet(CommandLine.FLAG_warn);
-          if (warnFlags.contains("i18n")) {
-            result.setSeverity(UnextractableContentAlert.class,
-                               Severity.WARNING);
-          }
-          if (warnFlags.contains("error")) {
-            result.setTreatWarningsAsErrors(true);
-          }
-          return result;
-        }
-      });
-
-  public SortedSet<Phase> getDotPhases() {
-    return dotPhases;
+  private static final AlertPolicy computeAlertPolicy(List<String> warnFlags) {
+    ConfigurableAlertPolicy result = new ConfigurableAlertPolicy();
+    if (warnFlags.contains("i18n")) {
+      result.setSeverity(UnextractableContentAlert.class, Severity.WARNING);
+    }
+    if (warnFlags.contains("error")) {
+      result.setTreatWarningsAsErrors(true);
+    }
+    return result;
   }
 
-  private static SortedSet<Phase> computeDotPhases(List<String> phaseNames)
+  private static ImmutableSortedSet<Phase> computeDotPhases(List<String> phaseNames)
       throws CmdLineException {
     SortedSet<Phase> result = Sets.newTreeSet();
     if (phaseNames.contains("*")) {
@@ -235,119 +198,147 @@ class GxpcFlags implements GxpcConfiguration {
         }
       }
     }
-    return Collections.unmodifiableSortedSet(result);
+    return ImmutableSortedSet.copyOfSorted(result);
   }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Configuration Implementation
+  ////////////////////////////////////////////////////////////////////////////////
+
+  public Set<FileRef> getSourceFiles() {
+    return sourceFiles;
+  }
+
+  public Set<FileRef> getSchemaFiles() {
+    return schemaFiles;
+  }
+
+  public Set<OutputLanguage> getOutputLanguages() {
+    return outputLanguages;
+  }
+
+  public CodeGeneratorFactory getCodeGeneratorFactory() {
+    return codeGeneratorFactory;
+  }
+
+  public Set<FileRef> getAllowedOutputFileRefs() {
+    return allowedOutputFileRefs;
+  }
+
+  public FileRef getDependencyFile() {
+    return dependencyFile;
+  }
+
+  public FileRef getPropertiesFile() {
+    return propertiesFile;
+  }
+
+  public boolean isVerboseEnabled() {
+    return isVerboseEnabled;
+  }
+
+  public boolean isDebugEnabled() {
+    return isDebugEnabled;
+  }
+
+  public AlertPolicy getAlertPolicy() {
+    return alertPolicy;
+  }
+
+  public SortedSet<Phase> getDotPhases() {
+    return dotPhases;
+  }
+
+  public SourceEntityResolver getEntityResolver() {
+    return sourceEntityResolver;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Command Line
+  ////////////////////////////////////////////////////////////////////////////////
 
   /**
    * Bucket for holding the output of flags parsing. It doesn't do any fancy
    * processing of the flags.
    */
   private static class CommandLine {
-    private CommandLine() {
-    }
+    private final CmdLineParser parser;
 
-    public static List<String> init(Appendable stderr, String[] args) throws CmdLineException {
-      resetFlags();
-      CmdLineParser parser = new CmdLineParser(new CommandLine());
+    private CommandLine(String[] args) throws CmdLineException {
+      parser = new CmdLineParser(this);
       parser.parseArgument(args);
-
-      if (FLAG_help) {
-        // TODO(harryh): really shouldn't use System.exit at this level of the code
-        StringWriter sw = new StringWriter();
-        parser.printUsage(sw, null);
-        try {
-          stderr.append("Usage: gxpc [flags...] [args...]\n");
-          stderr.append(sw.toString());
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-        System.exit(0);
-      }
-
-      return trailingArgs;
     }
 
-    private static void resetFlags() {
-      trailingArgs = Lists.newArrayList();
-      FLAG_help = false;
-      FLAG_dir = null;
-      FLAG_schema = Lists.newArrayList();
-      FLAG_output_language = Lists.newArrayList();
-      FLAG_output = Lists.newArrayList();
-      FLAG_warn = Lists.newArrayList();
-      FLAG_source = null;
-      FLAG_dynamic = false;
-      FLAG_output_properties = false;
-      FLAG_message_source = null;
-      FLAG_depend = null;
-      FLAG_verbose = false;
-      FLAG_g = false;
-      FLAG_dot = Lists.newArrayList();
+    public String getUsage() {
+      StringWriter sw = new StringWriter();
+      sw.append("Usage: gxpc [flags...] [args...]\n");
+      parser.printUsage(sw, null);
+      return sw.toString();
     }
 
     @Argument
-    private static List<String> trailingArgs;
+    public List<String> trailingArgs = Lists.newArrayList();
 
     @Option(name = "--help",
             usage = "display this help message")
-    private static boolean FLAG_help;
+    public boolean FLAG_help = false;
 
     @Option(name = "--dir",
             usage = "output directory")
-    public static String FLAG_dir;
+    public String FLAG_dir = null;
 
     @Option(name = "--schema",
             usage = "a schema file used for compilation; can be repeated.")
-    public static List<String> FLAG_schema;
+    public List<String> FLAG_schema = Lists.newArrayList();
 
     @Option(name = "--output_language",
             usage = "output files for this language; can be repeated.")
-    public static List<String> FLAG_output_language;
+    public List<String> FLAG_output_language = Lists.newArrayList();
 
     @Option(name = "--output",
             usage = "output this file; can be repeated. If not specified,\n"
                   + "all files will be output.")
-    public static List<String> FLAG_output;
+    public List<String> FLAG_output = Lists.newArrayList();
 
     @Option(name = "--warn",
             usage = "Sets warning options. VAL can be one of:\n"
                   + "i18n (enable i18n warnings),\n"
-                  + "errors (warnings are errors)")
-    public static List<String> FLAG_warn;
+                  + "error (warnings are errors)")
+    public List<String> FLAG_warn = Lists.newArrayList();
 
     @Option(name = "--source",
             usage = "base directory for source")
-    public static String FLAG_source;
+    public String FLAG_source = null;
 
     @Option(name = "--dynamic",
             usage = "indicate dynamic mode")
-    public static boolean FLAG_dynamic;
+    public boolean FLAG_dynamic = false;
 
     @Option(name = "--output_properties",
             usage = "indicates that gxpc should output a properties file")
-    public static boolean FLAG_output_properties;
-    
+    public boolean FLAG_output_properties = false;
+
     @Option(name = "--message_source",
             usage = "Message source for retrieving messages at runtime.\n"
                   + "eg: com.google.foo.bar_messages")
-    public static String FLAG_message_source;
+    public String FLAG_message_source = null;
 
     @Option(name = "--depend",
             usage = "location of dependency info file; enables dependency\n"
                   + "checking")
-    public static String FLAG_depend;
+    public String FLAG_depend = null;
 
     @Option(name = "--verbose",
             usage = "enable verbose mode")
-    public static boolean FLAG_verbose;
+    public boolean FLAG_verbose = false;
 
     @Option(name = "--g",
             usage = "include debugging comments in HTML output")
-    public static boolean FLAG_g;
+    public boolean FLAG_g = false;
 
     @Option(name = "--dot",
             usage = "phase to produce graphviz \"dot\" output for;\n"
                   + "can be repeated (useful for debugging compiler)")
-    public static List<String> FLAG_dot;
+    public List<String> FLAG_dot = Lists.newArrayList();
   }
 }

@@ -16,17 +16,20 @@
 
 package com.google.gxp.compiler.ant;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gxp.compiler.Configuration;
+import com.google.gxp.compiler.Compiler;
+import com.google.gxp.compiler.Phase;
+import com.google.gxp.compiler.InvalidConfigException;
 import com.google.gxp.compiler.alerts.Alert.Severity;
 import com.google.gxp.compiler.alerts.AlertPolicy;
+import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.ConfigurableAlertPolicy;
+import com.google.gxp.compiler.alerts.PrintingAlertSink;
 import com.google.gxp.compiler.base.OutputLanguage;
-import com.google.gxp.compiler.cli.Gxpc;
-import com.google.gxp.compiler.cli.GxpcConfiguration;
-import com.google.gxp.compiler.cli.Phase;
 import com.google.gxp.compiler.codegen.CodeGeneratorFactory;
 import com.google.gxp.compiler.codegen.DefaultCodeGeneratorFactory;
 import com.google.gxp.compiler.fs.FileRef;
@@ -37,12 +40,13 @@ import com.google.gxp.compiler.i18ncheck.UnextractableContentAlert;
 import com.google.gxp.compiler.parser.FileSystemEntityResolver;
 import com.google.gxp.compiler.parser.SourceEntityResolver;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.*;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.FileScanner;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
 /**
@@ -52,7 +56,7 @@ import org.apache.tools.ant.Task;
  * release.  It's not used internally at Google, and probably could use
  * some love.
  */
-public class GxpcTask extends Task implements GxpcConfiguration {
+public class GxpcTask extends Task implements Configuration {
   private static final String[] DEFAULT_INCLUDES = { "**/*.gxp" };
 
   private final FileSystem fs = SystemFileSystem.INSTANCE;
@@ -61,22 +65,42 @@ public class GxpcTask extends Task implements GxpcConfiguration {
   private Set<FileRef> schemaFiles = Sets.newHashSet();
   private List<FileRef> sourcePaths;
   private FileRef outputDir;
-  private SortedSet<Phase> dotPhases;
+  private AlertPolicy alertPolicy;
+  private ImmutableSortedSet<Phase> dotPhases;
 
   private final FileScanner fileScanner = new DirectoryScanner();
   private String srcpaths;
   private String destdir;
   private String target;
   private boolean dynamic = false;
-  private boolean i18nwarn = true;
+  private boolean i18nwarn = false;
 
   public GxpcTask() {
     fileScanner.setIncludes(DEFAULT_INCLUDES);
   }
 
   public void execute() throws BuildException {
+    configure();
+
+    AlertSink alertSink =  new PrintingAlertSink(getAlertPolicy(),
+                                                 isVerboseEnabled(),
+                                                 System.err);
+    try {
+      new Compiler(this).call(alertSink);
+    } catch (InvalidConfigException e) {
+      throw new BuildException(e);
+    }
+  }
+
+  public void configure() {
     fileScanner.scan();
-    String baseDir = fileScanner.getBasedir().getPath() + "/";
+
+    if (fileScanner.getBasedir() == null) {
+      log("Attribute 'srcdir' was not set.", Project.MSG_ERR);
+      return;
+    }
+
+    String baseDir = fileScanner.getBasedir().getPath() + File.separator;
 
     List<FileRef> underlyingInputFiles = Lists.newArrayList();
     for (String includedFile : fileScanner.getIncludedFiles()) {
@@ -84,29 +108,23 @@ public class GxpcTask extends Task implements GxpcConfiguration {
     }
 
     if (destdir == null) {
+      log("Attribute 'destdir' was not set, the current working directory will be used.",
+          Project.MSG_WARN);
       destdir = System.getProperty("user.dir");
     }
     outputDir = fs.parseFilename(destdir);
 
     sourcePaths = Lists.newArrayList();
-    for (FileRef sourcePath : fs.parseFilenameList(srcpaths)) {
-      sourcePaths.add(sourcePath);
-    }
-    Collections.sort(sourcePaths, FILEREF_LENGTH_COMPARATOR);
+    sourcePaths.addAll(fs.parseFilenameList(srcpaths));
 
     sourcePathFs = new SourcePathFileSystem(fs,
                                             sourcePaths,
                                             underlyingInputFiles,
                                             outputDir);
+    alertPolicy = computeAlertPolicy();
     dotPhases = computeDotPhases();
 
-    sourceFiles = Collections.unmodifiableSet(sourcePathFs.getSourceFileRefs());
-
-    try {
-      Gxpc.main(this, System.err);
-    } catch (IOException e) {
-      throw new BuildException(e);
-    }
+    sourceFiles = ImmutableSet.copyOf(sourcePathFs.getSourceFileRefs());
   }
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +170,7 @@ public class GxpcTask extends Task implements GxpcConfiguration {
   }
 
   ////////////////////////////////////////////////////////////////////////////////
-  // Getters (GxpcConfiguration implementation)
+  // Getters (Configuration implementation)
   ////////////////////////////////////////////////////////////////////////////////
 
   public Set<FileRef> getSourceFiles() {
@@ -203,7 +221,7 @@ public class GxpcTask extends Task implements GxpcConfiguration {
   }
 
   public AlertPolicy getAlertPolicy() {
-    return alertPolicySupplier.get();
+    return alertPolicy;
   }
 
   public SortedSet<Phase> getDotPhases() {
@@ -219,31 +237,16 @@ public class GxpcTask extends Task implements GxpcConfiguration {
   ////////////////////////////////////////////////////////////////////////////////
 
   // TODO(laurence): add more general support for AlertPolicy configuration
-  private final Supplier<AlertPolicy> alertPolicySupplier =
-      Suppliers.memoize(new Supplier<AlertPolicy>() {
-        public AlertPolicy get() {
-          ConfigurableAlertPolicy result = new ConfigurableAlertPolicy();
-          if (i18nwarn) {
-            result.setSeverity(UnextractableContentAlert.class,
-                               Severity.WARNING);
-          }
-          if (true) {
-            result.setTreatWarningsAsErrors(true);
-          }
-          return result;
-        }
-      });
-
-  private static SortedSet<Phase> computeDotPhases() {
-    SortedSet<Phase> result = Sets.newTreeSet();
-    return Collections.unmodifiableSortedSet(result);
+  private AlertPolicy computeAlertPolicy() {
+    ConfigurableAlertPolicy result = new ConfigurableAlertPolicy();
+    if (i18nwarn) {
+      result.setSeverity(UnextractableContentAlert.class, Severity.WARNING);
+    }
+    result.setTreatWarningsAsErrors(true);
+    return result;
   }
 
-  private static final Comparator<FileRef> FILEREF_LENGTH_COMPARATOR = new Comparator<FileRef>() {
-    public int compare(FileRef f1, FileRef f2) {
-      int len1 = f1.getName().length();
-      int len2 = f2.getName().length();
-      return (len1 > len2) ? -1 : (len1 == len2 ? 0 : 1);
-    }
-  };
+  private static ImmutableSortedSet<Phase> computeDotPhases() {
+    return ImmutableSortedSet.<Phase>of();
+  }
 }
