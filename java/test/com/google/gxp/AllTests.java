@@ -59,6 +59,7 @@ public class AllTests extends TestCase {
     suite.addTestSuite(com.google.gxp.compiler.alerts.AlertSetTest.class);
     suite.addTestSuite(com.google.gxp.compiler.alerts.SourcePositionTest.class);
     suite.addTestSuite(com.google.gxp.compiler.alerts.UniquifyingAlertSinkTest.class);
+    suite.addTestSuite(com.google.gxp.compiler.ant.GxpcTaskTest.class);
     suite.addTestSuite(com.google.gxp.compiler.cli.GxpcFlagsTest.class);
     suite.addTestSuite(com.google.gxp.compiler.cli.GxpcTest.class);
     suite.addTestSuite(com.google.gxp.compiler.collapse.SpaceCollapserTest.class);

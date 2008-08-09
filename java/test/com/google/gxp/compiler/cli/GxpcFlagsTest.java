@@ -348,7 +348,7 @@ public class GxpcFlagsTest extends TestCase {
   }
 
   public void testIsVerboseEnabled() throws Exception {
-    Configuration config = createConfig();
+    GxpcFlags config = createConfig();
     assertFalse(config.isVerboseEnabled());
 
     config = createConfig("--verbose");

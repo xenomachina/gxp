@@ -16,6 +16,7 @@
 
 package com.google.gxp.compiler.ant;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
@@ -25,10 +26,10 @@ import com.google.gxp.compiler.Compiler;
 import com.google.gxp.compiler.Phase;
 import com.google.gxp.compiler.InvalidConfigException;
 import com.google.gxp.compiler.alerts.Alert.Severity;
+import com.google.gxp.compiler.alerts.AlertCounter;
 import com.google.gxp.compiler.alerts.AlertPolicy;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.ConfigurableAlertPolicy;
-import com.google.gxp.compiler.alerts.PrintingAlertSink;
 import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.codegen.CodeGeneratorFactory;
 import com.google.gxp.compiler.codegen.DefaultCodeGeneratorFactory;
@@ -41,7 +42,9 @@ import com.google.gxp.compiler.parser.FileSystemEntityResolver;
 import com.google.gxp.compiler.parser.SourceEntityResolver;
 
 import java.io.File;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -51,54 +54,65 @@ import org.apache.tools.ant.Task;
 
 /**
  * An Ant Task that can be used to invoke gxpc.
- *
- * NOTE(harryh): this was just kind of hacked together for the Open Source
- * release.  It's not used internally at Google, and probably could use
- * some love.
  */
 public class GxpcTask extends Task implements Configuration {
   private static final String[] DEFAULT_INCLUDES = { "**/*.gxp" };
 
-  private final FileSystem fs = SystemFileSystem.INSTANCE;
-  private SourcePathFileSystem sourcePathFs;
-  private Set<FileRef> sourceFiles;
-  private Set<FileRef> schemaFiles = Sets.newHashSet();
-  private List<FileRef> sourcePaths;
-  private FileRef outputDir;
+  private final FileSystem fs;
+  private final FileRef cwd;
+  // TODO(harryh): replace this with something that scans fs so
+  //               we can write some real tests
+  private final FileScanner fileScanner = new DirectoryScanner();
+
+  private ImmutableSet<FileRef> sourceFiles;
+  private ImmutableSet<FileRef> schemaFiles;
+  private ImmutableSet<OutputLanguage> outputLanguages;
+  private DefaultCodeGeneratorFactory codeGeneratorFactory;
+  private FileRef propertiesFile;
   private AlertPolicy alertPolicy;
   private ImmutableSortedSet<Phase> dotPhases;
+  private SourceEntityResolver sourceEntityResolver;
 
-  private final FileScanner fileScanner = new DirectoryScanner();
   private String srcpaths;
+  private String schemas = null;
   private String destdir;
   private String target;
   private boolean dynamic = false;
   private boolean i18nwarn = false;
 
-  public GxpcTask() {
+  public GxpcTask(FileSystem fs, FileRef cwd) {
+    this.fs = Objects.nonNull(fs);
+    this.cwd = Objects.nonNull(cwd);
     fileScanner.setIncludes(DEFAULT_INCLUDES);
+  }
+
+  public GxpcTask() {
+    this(SystemFileSystem.INSTANCE,
+         SystemFileSystem.INSTANCE.parseFilename(System.getProperty("user.dir")));
   }
 
   public void execute() throws BuildException {
     configure();
+    AlertSink alertSink = new LoggingAlertSink(getAlertPolicy(), this);
+    AlertCounter counter = new AlertCounter(alertSink, getAlertPolicy());
 
-    AlertSink alertSink =  new PrintingAlertSink(getAlertPolicy(),
-                                                 isVerboseEnabled(),
-                                                 System.err);
     try {
-      new Compiler(this).call(alertSink);
+      new Compiler(this).call(counter);
     } catch (InvalidConfigException e) {
       throw new BuildException(e);
     }
+
+    if (counter.getErrorCount() > 0) {
+      throw new BuildException("Compile failed; see the compiler error output for details.");
+    }
   }
 
-  public void configure() {
-    fileScanner.scan();
-
+  public void configure() throws BuildException {
     if (fileScanner.getBasedir() == null) {
-      log("Attribute 'srcdir' was not set.", Project.MSG_ERR);
-      return;
+      throw new BuildException("Attribute 'srcdir' was not set.");
     }
+
+    fileScanner.scan();
 
     String baseDir = fileScanner.getBasedir().getPath() + File.separator;
 
@@ -110,21 +124,54 @@ public class GxpcTask extends Task implements Configuration {
     if (destdir == null) {
       log("Attribute 'destdir' was not set, the current working directory will be used.",
           Project.MSG_WARN);
-      destdir = System.getProperty("user.dir");
     }
-    outputDir = fs.parseFilename(destdir);
+    FileRef outputDir = (destdir == null)
+        ? cwd
+        : fs.parseFilename(destdir);
 
-    sourcePaths = Lists.newArrayList();
-    sourcePaths.addAll(fs.parseFilenameList(srcpaths));
+    Set<FileRef> sourcePaths = (srcpaths == null)
+        ? ImmutableSet.<FileRef>of()
+        : ImmutableSet.copyOf(fs.parseFilenameList(srcpaths));
 
-    sourcePathFs = new SourcePathFileSystem(fs,
-                                            sourcePaths,
-                                            underlyingInputFiles,
-                                            outputDir);
-    alertPolicy = computeAlertPolicy();
-    dotPhases = computeDotPhases();
+    SourcePathFileSystem sourcePathFs = new SourcePathFileSystem(fs,
+                                                                 sourcePaths,
+                                                                 underlyingInputFiles,
+                                                                 outputDir);
 
     sourceFiles = ImmutableSet.copyOf(sourcePathFs.getSourceFileRefs());
+
+    // Compute Schema Files
+    schemaFiles = (schemas == null)
+        ? ImmutableSet.<FileRef>of()
+        : ImmutableSet.copyOf(fs.parseFilenameList(schemas));
+
+    // Compute Output Languages
+    outputLanguages = ImmutableSet.of(OutputLanguage.JAVA);
+
+    // Compute Properties File
+    propertiesFile = (target != null)
+        ? outputDir.join("/" + target.replace(".", "/") + "_en.properties")
+        : null;
+
+    // Compute Alert Policy
+    alertPolicy = computeAlertPolicy();
+
+    // Compute Dot Phases
+    dotPhases = computeDotPhases();
+
+    // Compute SourceEntityResolver
+    // use the sourcePathFs so that gxp:///foo/bar is resolved in a way that
+    // includes both source files and genfiles
+    sourceEntityResolver = new FileSystemEntityResolver(sourcePathFs);
+
+    // Compute CodeGeneratorFactory (Always do this last)
+    codeGeneratorFactory = new DefaultCodeGeneratorFactory();
+    codeGeneratorFactory.setRuntimeMessageSource(target);
+    codeGeneratorFactory.setDynamicModeEnabled(dynamic);
+    codeGeneratorFactory.setSourceFiles(getSourceFiles());
+    codeGeneratorFactory.setSchemaFiles(getSchemaFiles());
+    codeGeneratorFactory.setSourcePaths(sourcePaths);
+    codeGeneratorFactory.setAlertPolicy(getAlertPolicy());
   }
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -152,9 +199,7 @@ public class GxpcTask extends Task implements Configuration {
   }
 
   public void setSchemas(String schemas) {
-    for (String schema : schemas.split(",")) {
-      schemaFiles.add(fs.parseFilename(schema));
-    }
+    this.schemas = schemas;
   }
 
   public void setTarget(String target) {
@@ -182,24 +227,15 @@ public class GxpcTask extends Task implements Configuration {
   }
 
   public Set<OutputLanguage> getOutputLanguages() {
-    Set<OutputLanguage> result = EnumSet.noneOf(OutputLanguage.class);
-    result.add(OutputLanguage.JAVA);
-    return Collections.unmodifiableSet(result);
+    return outputLanguages;
   }
 
   public CodeGeneratorFactory getCodeGeneratorFactory() {
-    DefaultCodeGeneratorFactory result =  new DefaultCodeGeneratorFactory();
-    result.setRuntimeMessageSource(target);
-    result.setDynamicModeEnabled(dynamic);
-    result.setSourceFiles(getSourceFiles());
-    result.setSchemaFiles(getSchemaFiles());
-    result.setSourcePaths(sourcePaths);
-    return result;
+    return codeGeneratorFactory;
   }
 
   public Set<FileRef> getAllowedOutputFileRefs() {
-    Set<FileRef> result = Sets.newHashSet();
-    return Collections.unmodifiableSet(result);
+    return ImmutableSet.<FileRef>of();
   }
 
   public FileRef getDependencyFile() {
@@ -207,13 +243,7 @@ public class GxpcTask extends Task implements Configuration {
   }
 
   public FileRef getPropertiesFile() {
-    return (target != null)
-        ? outputDir.join("/" + target.replace(".", "/") + "_en.properties")
-        : null;
-  }
-
-  public boolean isVerboseEnabled() {
-    return false;
+    return propertiesFile;
   }
 
   public boolean isDebugEnabled() {
@@ -229,7 +259,7 @@ public class GxpcTask extends Task implements Configuration {
   }
 
   public SourceEntityResolver getEntityResolver() {
-    return new FileSystemEntityResolver(sourcePathFs);
+    return sourceEntityResolver;
   }
 
   ////////////////////////////////////////////////////////////////////////////////

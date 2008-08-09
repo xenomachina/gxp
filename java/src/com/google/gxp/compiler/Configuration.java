@@ -69,11 +69,6 @@ public interface Configuration {
   FileRef getPropertiesFile();
 
   /**
-   * @return whether verbose output should be generated.
-   */
-  boolean isVerboseEnabled();
-
-  /**
    * @return whether generated code should emit comments.
    */
   boolean isDebugEnabled();

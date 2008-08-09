@@ -92,7 +92,7 @@ public class Attribute extends AbstractNode {
    */
   public Attribute(Node fromNode, String name, Expression value, Expression condition) {
     this(fromNode.getSourcePosition(),
-         fromNode.getDisplayName() + "(" + name + ")",
+         "'" + name + "' attribute",
          NullNamespace.INSTANCE, name, value, condition, null);
   }
 

@@ -91,20 +91,26 @@ public class OutputElementErrorTest extends BaseTestCase {
   public void testOutputElement_unknownAttr() throws Exception {
     // no namespace
     compile("<div foo='bar'></div>");
-    assertAlert(new UnknownAttributeError("<div>", pos(2,1),
-                                          "'foo' attribute"));
+    assertAlert(new UnknownAttributeError("<div>", pos(2,1), "'foo' attribute"));
     assertNoUnexpectedAlerts();
 
     // gxp: namespace
     compile("<div gxp:foo='bar'></div>");
-    assertAlert(new UnknownAttributeError("<div>", pos(2,1),
-                                          "'gxp:foo' attribute"));
+    assertAlert(new UnknownAttributeError("<div>", pos(2,1), "'gxp:foo' attribute"));
     assertNoUnexpectedAlerts();
 
     // expr: namespace
     compile("<div expr:foo='bar'></div>");
-    assertAlert(new UnknownAttributeError("<div>", pos(2,1),
-                                          "'expr:foo' attribute"));
+    assertAlert(new UnknownAttributeError("<div>", pos(2,1), "'expr:foo' attribute"));
+    assertNoUnexpectedAlerts();
+
+    // <gxp:attr>
+    compile("<div>",
+            "  <gxp:attr name='foo'>",
+            "    bar",
+            "  </gxp:attr>",
+            "</div>");
+    assertAlert(new UnknownAttributeError("<div>", pos(3,3), "'foo' attribute"));
     assertNoUnexpectedAlerts();
   }
 }

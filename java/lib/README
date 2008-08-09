@@ -1,6 +1,9 @@
 GXP relies on the following JARs in one way or another.  A copy of the jar is
 included for convenience.
 
+ant.jar - A snapshot of the ant build tool jar (only used by tests).
+See http://ant.apache.org/.
+
 args4j-2.0.9.jar - A snapshot of the args4j command line processing library.
 See https://args4j.dev.java.net/.
 

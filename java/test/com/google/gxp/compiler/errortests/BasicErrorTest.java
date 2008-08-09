@@ -158,8 +158,7 @@ public class BasicErrorTest extends BaseTestCase {
             "    </gxp:attr>",
             "  </gxp:if>",
             "</div>");
-    assertAlert(new UnknownAttributeError("<gxp:if>", pos(4,5),
-                                          "<gxp:attr>(style)"));
+    assertAlert(new UnknownAttributeError("<gxp:if>", pos(4,5), "'style' attribute"));
     assertNoUnexpectedAlerts();
   }
 

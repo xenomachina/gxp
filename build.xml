@@ -12,6 +12,7 @@
   <property name="version" value="snapshot"/>
 
   <path id="classpath.jars">
+    <pathelement location="${lib.dir}/ant.jar" />
     <pathelement location="${lib.dir}/args4j-2.0.9.jar" />
     <pathelement location="${lib.dir}/easymock.jar" />
     <pathelement location="${lib.dir}/json.jar" />
