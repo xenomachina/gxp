@@ -51,6 +51,9 @@ public interface ParsedElementVisitor<T> {
   // OutputNamespace elements
   T visitParsedOutputElement(OutputNamespace.ParsedOutputElement node);
 
+  // CppNamespace elements
+  T visitCppIncludeElement(CppNamespace.CppElement node);
+
   // JavaNamespace elements
   T visitJavaAnnotateElement(JavaNamespace.JavaElement node);
 

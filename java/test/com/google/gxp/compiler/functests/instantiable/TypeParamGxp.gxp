@@ -16,19 +16,22 @@
 -->
 <gxp:template name='com.google.gxp.compiler.functests.instantiable.TypeParamGxp'
               xmlns='http://www.w3.org/1999/xhtml'
+              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:java='http://google.com/2001/gxp/code/java'>
 
 <gxp:import class="java.util.List" />
+<cpp:include library="list" />
 
 <gxp:implements java:interface='TypeParamInterface{E}' />
 
+<gxp:typeparam name="E" extends="Object" />
+
 <gxp:constructor>
-  <gxp:param name="l1" type="List{E}" />
+  <gxp:param name="l1" cpp:type='list{E}' java:type="List{E}" />
 </gxp:constructor>
 
-<gxp:typeparam name="E" extends="Object" />
-<gxp:param name="l2" type="List{E}" />
+<gxp:param name="l2" cpp:type='list{E}' java:type="List{E}" />
 
 <gxp:loop var="v1" type="E" iterable="l1">
   <gxp:eval expr="v1"/>

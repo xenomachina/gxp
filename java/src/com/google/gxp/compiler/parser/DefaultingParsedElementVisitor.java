@@ -122,6 +122,11 @@ public abstract class DefaultingParsedElementVisitor<T>
     return defaultVisitElement(node);
   }
 
+  // CppNamespace elements
+  public T visitCppIncludeElement(CppNamespace.CppElement node) {
+    return defaultVisitElement(node);
+  }
+
   // JavaNamespace elements
   public T visitJavaAnnotateElement(JavaNamespace.JavaElement node) {
     return defaultVisitElement(node);

@@ -24,4 +24,8 @@ package com.google.gxp.compiler.base;
 public interface ImportVisitor<T> {
   T visitClassImport(ClassImport imp);
   T visitPackageImport(PackageImport imp);
+
+  // C++
+  T visitCppFileImport(CppFileImport imp);
+  T visitCppLibraryImport(CppLibraryImport imp);
 }

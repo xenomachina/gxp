@@ -16,11 +16,14 @@
 -->
 <gxp:template name="com.google.gxp.compiler.functests.PrettyGenericsGxp"
               xmlns="http://www.w3.org/1999/xhtml"
-              xmlns:gxp="http://google.com/2001/gxp">
+              xmlns:cpp="http://google.com/2001/gxp/code/cpp"
+              xmlns:gxp="http://google.com/2001/gxp"
+              xmlns:java="http://google.com/2001/gxp/code/java">
 
-<gxp:import class='java.util.List'/>
+<gxp:import class='java.util.List' />
+<cpp:include library='list' />
 
-<gxp:param name='list1' type='List{List{Integer}}' />
+<gxp:param name='list1' cpp:type='list{list{int}}' java:type='List{List{Integer}}' />
 
 <gxp:abbr type='List{List{Integer}}' name='list2' expr='list1'>
   <gxp:loop type='List{Integer}' var='sublist' iterable='list2'>

@@ -16,6 +16,7 @@
 
 package com.google.gxp.compiler.parser;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.OutputLanguage;
@@ -23,8 +24,7 @@ import com.google.gxp.compiler.base.OutputLanguage;
 import java.util.*;
 
 /**
- * The http://google.com/2001/gxp/cpp (aka "cpp:") namespace. Can only
- * be used for attributes, not elements.
+ * The http://google.com/2001/gxp/cpp (aka "cpp:") namespace.
  */
 public class CppNamespace implements OutputLanguageNamespace {
   private CppNamespace(){}
@@ -41,8 +41,58 @@ public class CppNamespace implements OutputLanguageNamespace {
                                      String tagName,
                                      List<ParsedAttribute> attrs,
                                      List<ParsedElement> children) {
-    alertSink.add(new UnknownElementError(sourcePosition, this, displayName));
-    return null;
+    ElementType type = ELEMENTS.get(tagName);
+    if (type == null) {
+      alertSink.add(new UnknownElementError(sourcePosition, this, displayName));
+      return null;
+    } else {
+      return new CppElement(sourcePosition, displayName, attrs, children, type);
+    }
+  }
+
+  public static class CppElement extends ParsedElement {
+    private final ElementType elementType;
+
+    public CppElement(SourcePosition sourcePostion,
+                      String displayName,
+                      List<ParsedAttribute> attrs,
+                      List<? extends ParsedElement> children,
+                      ElementType elementType) {
+      super(sourcePostion, displayName, attrs, children);
+      this.elementType = elementType;
+    }
+
+    @Override
+    public <T> T acceptVisitor(ParsedElementVisitor<T> visitor) {
+      return elementType.acceptVisitor(visitor, this);
+    }
+
+    @Override
+    protected CppElement withChildrenImpl(List<ParsedElement> children) {
+      return new CppElement(getSourcePosition(), getDisplayName(),
+                            getAttributes(), children, elementType);
+    }
+  }
+
+  private static enum ElementType {
+    INCLUDE {
+      @Override
+      <T> T acceptVisitor(ParsedElementVisitor<T> visitor, CppElement element) {
+        return visitor.visitCppIncludeElement(element);
+      }
+    };
+
+    abstract <T> T acceptVisitor(ParsedElementVisitor<T> visitor, CppElement element);
+  }
+
+  private static final Map<String, ElementType> ELEMENTS = initElements();
+
+  private static Map<String, ElementType> initElements() {
+    ImmutableMap.Builder<String, ElementType> builder = ImmutableMap.builder();
+    for (ElementType type : ElementType.values()) {
+      builder.put(type.name().toLowerCase(), type);
+    }
+    return builder.build();
   }
 
   public <T> T acceptVisitor(NamespaceVisitor<T> visitor) {

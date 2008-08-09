@@ -16,10 +16,13 @@
 
 package com.google.gxp.compiler.cpp;
 
+import com.google.common.base.Function;
 import com.google.common.base.Join;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
+import com.google.gxp.compiler.base.Callable;
 import com.google.gxp.compiler.base.Constructor;
 import com.google.gxp.compiler.base.Parameter;
 import com.google.gxp.compiler.base.Interface;
@@ -29,24 +32,41 @@ import com.google.gxp.compiler.msgextract.MessageExtractedTree;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * C++ Header {@code CodeGenerator}.
  */
 public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtractedTree> {
-  public CppHeaderCodeGenerator(MessageExtractedTree tree) {
+  private final ImmutableSet<TemplateName> extraIncludess;
+
+  public CppHeaderCodeGenerator(MessageExtractedTree tree, Set<Callable> requirements) {
     super(tree);
+
+    // unlike java, you have to include the header file for anything you depend on,
+    // you can't just fully qualify the class name, so build up a list of extra includes
+    this.extraIncludess = ImmutableSet.copyOf(
+        Iterables.transform(requirements,
+                            new Function<Callable, TemplateName>() {
+                              public TemplateName apply(Callable requirement) {
+                                return requirement.getName();
+                              }
+                            }));
   }
 
   protected InterfaceWorker createInterfaceWorker(Appendable out,
                                                   AlertSink alertSink,
                                                   Interface iface) {
-    return new InterfaceWorker(out, alertSink, iface);
+    return new InterfaceWorker(out, alertSink, iface, extraIncludess);
   }
 
   private static class InterfaceWorker extends BaseCppCodeGenerator.InterfaceWorker {
-    public InterfaceWorker(Appendable out, AlertSink alertSink, Interface iface) {
+    private final ImmutableSet<TemplateName> extraIncludess;
+
+    public InterfaceWorker(Appendable out, AlertSink alertSink, Interface iface,
+                           Set<TemplateName> extraIncludess) {
       super(out, alertSink, iface);
+      this.extraIncludess = ImmutableSet.copyOf(extraIncludess);
     }
 
     protected void appendClass() {
@@ -55,11 +75,13 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
       appendIfdefGuardStart(iface);
       appendLine();
       appendLine("#include \"gxp/base/base.h\"");
-      appendImports(iface);
+      appendImports(iface, extraIncludess);
       appendLine();
+      appendNamespacesOpen(ifaceName);
       formatLine(iface.getSourcePosition(), "class %s {", getClassName(ifaceName));
       appendLine("public:");
       appendLine("};");
+      appendNamespacesClose(ifaceName);
       appendLine();
       appendIfdefGuardEnd(iface);
     }
@@ -69,12 +91,16 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
   protected TemplateWorker createTemplateWorker(Appendable out,
                                                 AlertSink alertSink,
                                                 Template template) {
-    return new TemplateWorker(out, alertSink, template);
+    return new TemplateWorker(out, alertSink, template, extraIncludess);
   }
 
   private static class TemplateWorker extends BaseCppCodeGenerator.TemplateWorker {
-    public TemplateWorker(Appendable out, AlertSink alertSink, Template template) {
+    private final ImmutableSet<TemplateName> extraIncludess;
+
+    public TemplateWorker(Appendable out, AlertSink alertSink, Template template,
+                          Set<TemplateName> extraIncludess) {
       super(out, alertSink, template);
+      this.extraIncludess = ImmutableSet.copyOf(extraIncludess);
     }
 
     protected void appendClass() {
@@ -84,11 +110,13 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
       appendIfdefGuardStart(template);
       appendLine();
       appendLine("#include \"gxp/base/base.h\"");
-      appendImports(template);
+      appendImports(template, extraIncludess);
       appendLine();
+      appendNamespacesOpen(templateName);
       formatLine(pos, "class %s : public GxpTemplate {", getClassName(templateName));
       appendLine("public:");
       appendLine(pos, getWriteMethodSignature(false, true) + ";");
+      appendLine();
       appendLine(pos, getGetGxpClosureMethodSignature(false, true) + ";");
       appendLine();
       appendExtraWriteMethods(true);
@@ -97,6 +125,7 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
       appendLine();
       appendInstance();
       appendLine("};");
+      appendNamespacesClose(templateName);
       appendLine();
       appendIfdefGuardEnd(template);
     }
@@ -127,7 +156,8 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
       appendLine("//");
       appendLine("// Interface that defines a strategy for writing this GXP");
       appendLine("//");
-      appendLine(pos, "class Interface {");
+      appendCppFormalTypeParameters(true, template.getFormalTypeParameters());
+      appendLine("class Interface {");
       appendLine("public:");
       appendLine(pos, "virtual ~Interface() {}");
       appendLine(pos, "virtual " + getWriteMethodSignature(false, false) + " = 0;");
@@ -146,7 +176,11 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
       appendLine("//");
       appendLine("// Instantiable instance of this GXP");
       appendLine("//");
-      appendLine(pos, "class Instance : public Interface {");
+      appendCppFormalTypeParameters(true, template.getFormalTypeParameters());
+      sb = new StringBuilder("class Instance : public Interface");
+      appendCppFormalTypeParameters(sb, false, template.getFormalTypeParameters());
+      sb.append(" {");
+      appendLine(pos, sb);
       appendLine("public:");
       sb = new StringBuilder("Instance(");
       Join.join(sb, ", ", Iterables.transform(cParams, parameterToCallName));

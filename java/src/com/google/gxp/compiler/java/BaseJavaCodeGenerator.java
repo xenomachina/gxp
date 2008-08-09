@@ -31,6 +31,7 @@ import com.google.gxp.compiler.base.BundleType;
 import com.google.gxp.compiler.base.ClassImport;
 import com.google.gxp.compiler.base.Constructor;
 import com.google.gxp.compiler.base.ContentType;
+import com.google.gxp.compiler.base.DefaultingImportVisitor;
 import com.google.gxp.compiler.base.FormalParameter;
 import com.google.gxp.compiler.base.FormalTypeParameter;
 import com.google.gxp.compiler.base.Implementable;
@@ -133,15 +134,21 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
       formatLine((SourcePosition)null, HEADER_FORMAT, sourceName, packageName);
     }
 
-    private static final ImportVisitor<String> IMPORT_VISITOR =
-        new ImportVisitor<String>(){
-          public String visitClassImport(ClassImport imp) {
-            TemplateName.FullyQualified fqName = imp.getClassName();
-            return fqName.toString();
+    private final ImportVisitor<Void> IMPORT_VISITOR =
+        new DefaultingImportVisitor<Void>(){
+          public Void defaultVisitImport(Import imp) {
+            // do nothing
+            return null;
           }
 
-          public String visitPackageImport(PackageImport imp) {
-            return imp.getPackageName() + ".*";
+          public Void visitClassImport(ClassImport imp) {
+            formatLine(imp.getSourcePosition(), "import %s;", imp.getClassName().toString());
+            return null;
+          }
+
+          public Void visitPackageImport(PackageImport imp) {
+            formatLine(imp.getSourcePosition(), "import %s.*;", imp.getPackageName());
+            return null;
           }
         };
 
@@ -150,9 +157,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
         appendLine(root.getSourcePosition(), "import " + imp + ";");
       }
       for (Import imp : root.getImports()) {
-        appendLine(imp.getSourcePosition(),
-                   String.format("import %s;",
-                                 imp.acceptVisitor(IMPORT_VISITOR)));
+        imp.acceptVisitor(IMPORT_VISITOR);
       }
     }
 

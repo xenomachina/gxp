@@ -38,6 +38,8 @@ import com.google.gxp.compiler.base.Conditional;
 import com.google.gxp.compiler.base.Constructor;
 import com.google.gxp.compiler.base.ContentType;
 import com.google.gxp.compiler.base.ConvertibleToContent;
+import com.google.gxp.compiler.base.CppFileImport;
+import com.google.gxp.compiler.base.CppLibraryImport;
 import com.google.gxp.compiler.base.Expression;
 import com.google.gxp.compiler.base.FormalParameter;
 import com.google.gxp.compiler.base.FormalTypeParameter;
@@ -1049,6 +1051,35 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
       return null;
     }
 
+    // CppNamespace elements
+    public Void visitCppIncludeElement(CppNamespace.CppElement node) {
+      AttributeMap attrMap = nodeParts.getAttributes();
+
+      String libraryName = attrMap.getOptional("library", null);
+      String fileName = attrMap.getOptional("file", null);
+
+      if (libraryName == null && fileName == null) {
+        alertSink.add(new MissingAttributesError(node, "library", "file"));
+        return null;
+      }
+
+      if (libraryName != null && fileName != null) {
+        alertSink.add(new ConflictingAttributesError(
+                          node,
+                          attrMap.getAttribute(NullNamespace.INSTANCE, "library"),
+                          attrMap.getAttribute(NullNamespace.INSTANCE, "file")));
+        return null;
+      }
+
+      if (libraryName != null) {
+        output.accumulate(new CppLibraryImport(node, libraryName));
+      } else if (fileName != null) {
+        output.accumulate(new CppFileImport(node, fileName));
+      }
+
+      return null;
+    }
+
     // JavaNamespace elements
     public Void visitJavaAnnotateElement(JavaNamespace.JavaElement node) {
       AttributeMap attrMap = nodeParts.getAttributes();
@@ -1163,7 +1194,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
   private static final Pattern VARIABLE_NAME_PATTERN =
       Pattern.compile("[a-zA-Z](_?[a-zA-Z0-9])*");
 
-  // "this" is reserved for use with gxp:inerface
+  // "this" is reserved for use with gxp:interface
   // "gxp_" prefix is reserved for internal use (gxp_context, gxp_locale)
   private static final Pattern ILLEGAL_NAME_PATTERN =
       Pattern.compile("this|gxp_(.)*");

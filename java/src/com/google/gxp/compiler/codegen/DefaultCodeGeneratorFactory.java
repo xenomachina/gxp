@@ -120,7 +120,8 @@ public class DefaultCodeGeneratorFactory implements CodeGeneratorFactory {
           }
 
           public CodeGenerator visitCppHeader(CompilationUnit cUnit) {
-            return new CppHeaderCodeGenerator(cUnit.getMessageExtractedTree());
+            return new CppHeaderCodeGenerator(cUnit.getMessageExtractedTree(),
+                                              cUnit.getBoundTree().getRequirements());
           }
 
           public CodeGenerator visitJava(CompilationUnit cUnit) {

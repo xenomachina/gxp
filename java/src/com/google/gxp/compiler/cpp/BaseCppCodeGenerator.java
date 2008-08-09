@@ -21,12 +21,19 @@ import com.google.common.base.Join;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.NothingToCompileError;
 import com.google.gxp.compiler.base.BooleanType;
 import com.google.gxp.compiler.base.BundleType;
 import com.google.gxp.compiler.base.ContentType;
+import com.google.gxp.compiler.base.CppFileImport;
+import com.google.gxp.compiler.base.CppLibraryImport;
+import com.google.gxp.compiler.base.DefaultingImportVisitor;
+import com.google.gxp.compiler.base.FormalTypeParameter;
 import com.google.gxp.compiler.base.Parameter;
+import com.google.gxp.compiler.base.Import;
+import com.google.gxp.compiler.base.ImportVisitor;
 import com.google.gxp.compiler.base.InstanceType;
 import com.google.gxp.compiler.base.Interface;
 import com.google.gxp.compiler.base.NativeType;
@@ -44,6 +51,7 @@ import com.google.gxp.compiler.codegen.BracesCodeGenerator;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Base class for C++ {@code CodeGenerator}s.
@@ -84,6 +92,10 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
       return name.getBaseName();
     }
 
+    protected String getQualifiedClassName(TemplateName name) {
+      return Join.join("::", name.toString().split("\\."));
+    }
+
     private String getIfdefGuard(TemplateName templateName) {
       return templateName.toString().replace('.', '_').toUpperCase() + "_H__";
     }
@@ -98,9 +110,50 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
       formatLine("#endif  // %s", getIfdefGuard(root.getName()));
     }
 
+    private final ImportVisitor<Void> IMPORT_VISITOR =
+        new DefaultingImportVisitor<Void>(){
+          public Void defaultVisitImport(Import imp) {
+            // do nothing
+            return null;
+          }
+
+          public Void visitCppFileImport(CppFileImport imp) {
+            formatLine(imp.getSourcePosition(), "#include %s", imp.getTarget());
+            return null;
+          }
+
+          public Void visitCppLibraryImport(CppLibraryImport imp) {
+            formatLine(imp.getSourcePosition(), "#include %s", imp.getTarget());
+            return null;
+          }
+        };
+
     protected void appendImports(Root root) {
       for (String imp : root.getSchema().getCppImports()) {
         formatLine(root.getSourcePosition(), "#include \"%s\"", imp);
+      }
+
+      for (Import imp : root.getImports()) {
+        imp.acceptVisitor(IMPORT_VISITOR);
+      }
+    }
+
+    protected void appendImports(Root root, Set<TemplateName> extraIncludes) {
+      appendImports(root);
+      for (TemplateName extraInclude : extraIncludes) {
+        formatLine("#include \"%s.h\"", extraInclude.toString().replace('.', '/'));
+      }
+    }
+
+    protected void appendNamespacesOpen(TemplateName templateName) {
+      for (String part : templateName.getPackageName().split("\\.")) {
+        formatLine("namespace %s {", part);
+      }
+    }
+
+    protected void appendNamespacesClose(TemplateName templateName) {
+      for (String part : templateName.getPackageName().split("\\.")) {
+        appendLine("}");
       }
     }
 
@@ -182,6 +235,38 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
         }
       };
 
+    protected List<String> toBoundedTypeDecls(boolean isDeclaration,
+                                              Iterable<FormalTypeParameter> formalTypeParameters) {
+      List<String> result = Lists.newArrayList();
+      for (FormalTypeParameter formalTypeParameter : formalTypeParameters) {
+        if (isDeclaration) {
+          result.add("typename " + formalTypeParameter.getName());
+        } else {
+          result.add(formalTypeParameter.getName());
+        }
+      }
+      return result;
+    }
+
+    protected void appendCppFormalTypeParameters(StringBuilder sb, boolean isDeclaration,
+                                                 List<FormalTypeParameter> formalTypeParameters) {
+      if (!formalTypeParameters.isEmpty()) {
+        if (isDeclaration) {
+          sb.append("template");
+        }
+        sb.append("<");
+        Join.join(sb, ", ", toBoundedTypeDecls(isDeclaration, formalTypeParameters));
+        sb.append(">");
+      }
+    }
+
+    protected void appendCppFormalTypeParameters(boolean isDeclaration,
+                                                 List<FormalTypeParameter> formalTypeParameters) {
+      StringBuilder sb = new StringBuilder();
+      appendCppFormalTypeParameters(sb, isDeclaration, formalTypeParameters);
+      appendLine(sb.toString());
+    }
+
     protected Function<Parameter, String> parameterToInitializer =
       new Function<Parameter, String>() {
         public String apply(Parameter param) {
@@ -235,23 +320,29 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
       appendFooter();
     }
 
-    protected String getWriteMethodSignature(boolean includeClassName, boolean isStatic) {
-      return getWriteMethodSignature(DEFAULT_GXP_OUT_TYPE, includeClassName, isStatic);
+    protected String getWriteMethodSignature(boolean outsideClass, boolean isStatic) {
+      return getWriteMethodSignature(DEFAULT_GXP_OUT_TYPE, outsideClass, isStatic);
     }
 
-    protected String getWriteMethodSignature(String outType, boolean includeClassName,
+    protected String getWriteMethodSignature(String outType, boolean outsideClass,
                                              boolean isStatic) {
       Iterable<Parameter> params = isStatic
           ? template.getAllParameters()
           : template.getParameters();
 
       StringBuilder sb = new StringBuilder();
-      if (!includeClassName && isStatic) {
-        sb.append("static ");
+      if (isStatic) {
+        if (!template.getFormalTypeParameters().isEmpty()) {
+          appendCppFormalTypeParameters(sb, true, template.getFormalTypeParameters());
+          sb.append("\n");
+        }
+        if (!outsideClass) {
+          sb.append("static ");
+        }
       }
       sb.append("void ");
-      if (includeClassName) {
-        sb.append(getClassName(template.getName()));
+      if (outsideClass) {
+        sb.append(getQualifiedClassName(template.getName()));
         sb.append("::");
       }
       sb.append("Write(");
@@ -263,19 +354,25 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
     }
 
     // TODO(harryh): combine this with getWriteMethodSignature() in some way?
-    protected String getGetGxpClosureMethodSignature(boolean includeClassName, boolean isStatic) {
+    protected String getGetGxpClosureMethodSignature(boolean outsideClass, boolean isStatic) {
       Iterable<Parameter> params = isStatic
           ? template.getAllParameters()
           : template.getParameters();
 
       StringBuilder sb = new StringBuilder();
-      if (!includeClassName && isStatic) {
-        sb.append("static ");
+      if (isStatic) {
+        if (!template.getFormalTypeParameters().isEmpty()) {
+          appendCppFormalTypeParameters(sb, true, template.getFormalTypeParameters());
+          sb.append("\n");
+        }
+        if (!outsideClass) {
+          sb.append("static ");
+        }
       }
       sb.append(toCppType(new ContentType(template.getSchema())));
       sb.append(" ");
-      if (includeClassName) {
-        sb.append(getClassName(template.getName()));
+      if (outsideClass) {
+        sb.append(getQualifiedClassName(template.getName()));
         sb.append("::");
       }
       sb.append("GetGxpClosure(");

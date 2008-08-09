@@ -16,11 +16,15 @@
 -->
 <gxp:template name='com.google.gxp.compiler.functests.IterableLoopGxp'
               xmlns='http://www.w3.org/1999/xhtml'
-              xmlns:gxp='http://google.com/2001/gxp'
               xmlns:call='http://google.com/2001/gxp/call'
-              xmlns:expr='http://google.com/2001/gxp/expressions'>
+              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
+              xmlns:expr='http://google.com/2001/gxp/expressions'
+              xmlns:gxp='http://google.com/2001/gxp'
+              xmlns:java='http://google.com/2001/gxp/code/java'>
 
-<gxp:param name='items' type='Iterable{String}' />
+<cpp:include library='list' />
+
+<gxp:param name='items' cpp:type='list{string}*' java:type='Iterable{String}' />
 
 <ul>
   <gxp:loop type='String' var='item' iterable='items'>

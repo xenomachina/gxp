@@ -25,9 +25,9 @@ import com.google.common.collect.Sets;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.base.Callable;
 import com.google.gxp.compiler.base.ClassImport;
+import com.google.gxp.compiler.base.DefaultingImportVisitor;
 import com.google.gxp.compiler.base.Implementable;
 import com.google.gxp.compiler.base.Import;
-import com.google.gxp.compiler.base.ImportVisitor;
 import com.google.gxp.compiler.base.InstanceCallable;
 import com.google.gxp.compiler.base.PackageImport;
 import com.google.gxp.compiler.base.TemplateName;
@@ -100,7 +100,7 @@ public class ScopedServiceDirectory implements ServiceDirectory {
    * @return an ImportVisitor that, upon visiting an import, validates it and
    * populates either classImports or packageImports as appropriate.
    */
-  private static class ImportProcessor implements ImportVisitor<Void> {
+  private static class ImportProcessor extends DefaultingImportVisitor<Void> {
     private final AlertSink alertSink;
     private final Set<String> packageImports = Sets.newHashSet();
     private final Map<String, TemplateName> classImports = Maps.newHashMap();
@@ -118,6 +118,13 @@ public class ScopedServiceDirectory implements ServiceDirectory {
       return classImports;
     }
 
+    @Override
+    public Void defaultVisitImport(Import imp) {
+      // do nothing
+      return null;
+    }
+
+    @Override
     public Void visitClassImport(ClassImport imp) {
       TemplateName className = imp.getClassName();
       String baseName = className.getBaseName();
@@ -130,6 +137,7 @@ public class ScopedServiceDirectory implements ServiceDirectory {
       return null;
     }
 
+    @Override
     public Void visitPackageImport(PackageImport imp) {
       packageImports.add(imp.getPackageName());
       return null;

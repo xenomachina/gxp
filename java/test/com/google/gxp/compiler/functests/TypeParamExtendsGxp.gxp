@@ -16,14 +16,18 @@
 -->
 <gxp:template name='com.google.gxp.compiler.functests.TypeParamExtendsGxp'
               xmlns='http://www.w3.org/1999/xhtml'
-              xmlns:gxp='http://google.com/2001/gxp'>
+              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
+              xmlns:gxp='http://google.com/2001/gxp'
+              xmlns:java='http://google.com/2001/gxp/code/java'>
 
 <gxp:import class='java.io.Serializable' />
+<gxp:import class='java.util.List' />
+<cpp:include library='list' />
 
 <gxp:typeparam name='E' extends='Comparable{E} &amp; Serializable' />
 
 <gxp:param name='specialItem' type='E' />
-<gxp:param name='items' type='java.util.List{E}' />
+<gxp:param name='items'       cpp:type='list{E}' java:type='List{E}' />
 
 <gxp:loop var='i' type='E' iterator='items.iterator()'>
   <gxp:if cond='i.compareTo(specialItem) == 0'>

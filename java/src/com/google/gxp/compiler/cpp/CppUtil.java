@@ -51,7 +51,7 @@ public class CppUtil {
       return ret;
     }
 
-    ret = ret.trim();
+    ret = ret.replace("{", "< ").replace("}", " >").trim();
 
     return ret;
   }
