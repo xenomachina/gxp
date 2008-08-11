@@ -38,6 +38,7 @@ final class NamespaceSet {
       ExprNamespace.INSTANCE,
       CppNamespace.INSTANCE,
       JavaNamespace.INSTANCE,
+      JavaScriptNamespace.INSTANCE,
       MsgNamespace.INSTANCE,
       NoMsgNamespace.INSTANCE,
     }) {

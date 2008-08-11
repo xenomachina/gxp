@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.gxp.compiler.base;
+package com.google.gxp.compiler.js;
+
+import com.google.gxp.compiler.alerts.AlertSink;
+import com.google.gxp.compiler.codegen.BracesCodeGenerator;
+import com.google.gxp.compiler.msgextract.MessageExtractedTree;
 
 /**
- * Visitor for {@link OutputLanguage}s. This interface deviates from the
- * typical visitor interface in that the visit methods take a parameter other
- * than the visited object. (the visited object is implied by the method)
- *
- * @param <K> parameter type for visitor
- * @param <V> return type of visitor
+ * {@code CodeGenerator} which generates JavaScript code.
  */
-public interface OutputLanguageVisitor<K, V> {
-  V visitCpp(K arg);
-  V visitCppHeader(K arg);
-  V visitJava(K arg);
-  V visitDynamicImplJava(K arg);
-  V visitJavaScript(K arg);
-  V visitXmb(K arg);
+public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtractedTree> {
+  public JavaScriptCodeGenerator(MessageExtractedTree tree) {
+    super(tree);
+  }
+
+  public void generateCode(final Appendable appendable, final AlertSink alertSink) {
+    // TODO: some actual code here
+  }
 }

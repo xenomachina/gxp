@@ -48,6 +48,13 @@ public enum OutputLanguage {
     }
   },
 
+  JAVASCRIPT("JavaScript", ".js") {
+    @Override
+    public <K,V> V acceptVisitor(OutputLanguageVisitor<K,V> visitor, K arg) {
+      return visitor.visitJavaScript(arg);
+    }
+  },
+
   XMB("Xmb", ".xmb") {
     @Override
     public <K,V> V acceptVisitor(OutputLanguageVisitor<K,V> visitor, K arg) {

@@ -27,6 +27,7 @@ public interface NamespaceVisitor<T> {
   T visitExprNamespace(ExprNamespace ns);
   T visitGxpNamespace(GxpNamespace ns);
   T visitJavaNamespace(JavaNamespace ns);
+  T visitJavaScriptNamespace(JavaScriptNamespace ns);
   T visitMsgNamespace(MsgNamespace ns);
   T visitNoMsgNamespace(NoMsgNamespace ns);
   T visitNullNamespace(NullNamespace ns);

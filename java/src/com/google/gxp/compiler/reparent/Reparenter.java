@@ -82,6 +82,7 @@ import com.google.gxp.compiler.parser.DefaultingParsedElementVisitor;
 import com.google.gxp.compiler.parser.ExprNamespace;
 import com.google.gxp.compiler.parser.GxpNamespace;
 import com.google.gxp.compiler.parser.JavaNamespace;
+import com.google.gxp.compiler.parser.JavaScriptNamespace;
 import com.google.gxp.compiler.parser.MsgNamespace;
 import com.google.gxp.compiler.parser.Namespace;
 import com.google.gxp.compiler.parser.NamespaceVisitor;
@@ -194,6 +195,13 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
           }
 
           public Attribute visitJavaNamespace(JavaNamespace ns) {
+            return new Attribute(parsedAttr, ns, parsedAttr.getName(),
+                                 new StringConstant(parsedAttr, null,
+                                                    parsedAttr.getValue()),
+                                 null, null);
+          }
+
+          public Attribute visitJavaScriptNamespace(JavaScriptNamespace ns) {
             return new Attribute(parsedAttr, ns, parsedAttr.getName(),
                                  new StringConstant(parsedAttr, null,
                                                     parsedAttr.getValue()),
