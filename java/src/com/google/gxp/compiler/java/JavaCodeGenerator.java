@@ -99,7 +99,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
     private int varCounter = 0;
     private final String runtimeMessageSource;
 
-    protected final Set<Schema> anonymousSchemas = Sets.newHashSet();
+    protected final Set<Schema> anonymousSchemas = Sets.newTreeSet();
 
     TemplateWorker(Appendable appendable, AlertSink alertSink,
                    Template template, String runtimeMessageSource) {

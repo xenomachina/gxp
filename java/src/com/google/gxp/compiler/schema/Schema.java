@@ -44,7 +44,7 @@ import java.util.*;
  * investigate to see if someone has already written one for the same language.
  */
 @SuppressWarnings("serial") // let java pick the SerialVersionUID
-public final class Schema extends SerializableAbstractNode {
+public final class Schema extends SerializableAbstractNode implements Comparable<Schema> {
   private final String name;
   private final String namespaceUri;
   private final String contentType;
@@ -250,6 +250,11 @@ public final class Schema extends SerializableAbstractNode {
 
   public ElementValidator getElementValidator(String tagName) {
     return validatorMap.get(tagName);
+  }
+
+  @Override
+  public int compareTo(Schema that) {
+    return getCanonicalContentType().compareTo(that.getCanonicalContentType());
   }
 
   @Override
