@@ -21,6 +21,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Characters;
 import com.google.common.io.Bytes;
 import com.google.gxp.base.GxpTemplate;
 import com.google.gxp.compiler.CompilationSet;
@@ -66,6 +67,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Base class for all GxpTemplates that compile their source .gxp at runtime.
@@ -123,22 +126,18 @@ public class StubGxpTemplate extends GxpTemplate {
     }
   }
 
-  protected static Map<String, Method> compileGxp(final List<FileRef> srcGxps,
-                                                  final List<FileRef> srcSchemas,
-                                                  final List<FileRef> srcPaths,
-                                                  final String javaBase,
-                                                  final String classBase,
-                                                  final long compilationVersion,
-                                                  final AlertPolicy alertPolicy)
+  protected static FileRef compileGxp(InMemoryFileSystem outFs,
+                                      final List<FileRef> srcGxps,
+                                      final List<FileRef> srcSchemas,
+                                      final List<FileRef> srcPaths,
+                                      final String javaBase,
+                                      final long compilationVersion,
+                                      final AlertPolicy alertPolicy)
       throws GxpCompilationException {
-
-    // This is the InMemoryFileSystem where we will write all output
-    // from both gxpc and javac
-    InMemoryFileSystem memFs = new InMemoryFileSystem();
 
     // build gxp source file filesystem
     SourcePathFileSystem sourcePathFs = new SourcePathFileSystem(
-        systemFS, srcPaths, srcGxps, memFs.getRoot());
+        systemFS, srcPaths, srcGxps, outFs.getRoot());
 
     // create alert sink
     AlertSetBuilder alertSetBuilder = new AlertSetBuilder();
@@ -166,8 +165,7 @@ public class StubGxpTemplate extends GxpTemplate {
       }
     };
 
-    set.compile(alertSetBuilder, alertPolicy, OUTPUT_LANGUAGES,
-                shouldCompileFilePredicate);
+    set.compile(alertSetBuilder, alertPolicy, OUTPUT_LANGUAGES, shouldCompileFilePredicate);
 
     // check for gxp compilation errors
     AlertSet aset = alertSetBuilder.buildAndClear();
@@ -175,6 +173,12 @@ public class StubGxpTemplate extends GxpTemplate {
       throw new GxpCompilationException.Gxp(alertPolicy, aset);
     }
 
+    return outFs.parseFilename(javaFile);
+  }
+
+  protected static Map<String, Method> compileJava(InMemoryFileSystem outFs,
+                                                   String classBase,
+                                                   final long compilationVersion) {
     // compile java
     DiagnosticCollector<JavaFileObject> diagnosticCollector
         = new DiagnosticCollector<JavaFileObject>();
@@ -183,7 +187,7 @@ public class StubGxpTemplate extends GxpTemplate {
         = new JavaFileManagerImpl(javaCompiler.getStandardFileManager(diagnosticCollector,
                                                                       Locale.US,
                                                                       Charsets.US_ASCII),
-                                  memFs);
+                                  outFs);
     String className = classBase + compilationVersion;
 
     try {
@@ -203,7 +207,7 @@ public class StubGxpTemplate extends GxpTemplate {
       }
 
       List<byte[]> classFiles = Lists.newArrayList();
-      for (FileRef fileRef : memFs.getManifest()) {
+      for (FileRef fileRef : outFs.getManifest()) {
         if (fileRef.getKind().equals(JavaFileObject.Kind.CLASS)) {
           String outputClassName = javaFileManager.inferBinaryName(StandardLocation.CLASS_OUTPUT,
                                                                    new JavaFileRef(fileRef));
@@ -341,6 +345,52 @@ public class StubGxpTemplate extends GxpTemplate {
       return (Class) DEFINE_CLASS.invoke(ClassLoader.getSystemClassLoader(), args);
     } catch (InvocationTargetException e) {
       throw e.getCause();
+    }
+  }
+
+  /**
+   * The pattern for a line directive; 1->file 2->line 3->col.
+   */
+  private final static Pattern LINE_DIRECTIVE = Pattern.compile("^.* // (.*): L(\\d*), C(\\d*)$");
+
+  /**
+   * Examine each element of the stack trace that belongs to this throwable
+   * looking for a filename that matches the source file for this template.
+   * If we find a match, rewrite the filename and line number. The line number
+   * is based on line # comments in the source file.
+   */
+  protected static void rewriteStackTraceElements(Throwable throwable, FileRef sourceFile) {
+    try {
+      if (sourceFile != null) {
+        String sourceFileName = sourceFile.getName().substring(1).replace('/', '.');
+        StackTraceElement[] stackTrace = throwable.getStackTrace();
+        for (int i = 0; i < stackTrace.length; i++) {
+          if (sourceFileName.equals(stackTrace[i].getFileName())) {
+            // get source name
+            String[] parts = sourceFileName.split("[\\.\\$]");
+            String sourceName = parts[parts.length-3] + ".gxp";
+
+            // get source line
+            String line = Characters
+                .readLines(sourceFile.openReader(Charsets.UTF_8))
+                .get(stackTrace[i].getLineNumber() - 1);
+            Matcher m = LINE_DIRECTIVE.matcher(line);
+            int sourceLine = m.find() ? Integer.valueOf(m.group(2)) : -1;
+
+            // fix class name
+            String className = stackTrace[i].getClassName().split("\\$")[0];
+
+            stackTrace[i] = new StackTraceElement(className,
+                                                  stackTrace[i].getMethodName(),
+                                                  sourceName,
+                                                  sourceLine);
+            throwable.setStackTrace(stackTrace);
+            return;
+          }
+        }
+      }
+    } catch (Exception e) {
+      throw new AssertionError(e);
     }
   }
 }

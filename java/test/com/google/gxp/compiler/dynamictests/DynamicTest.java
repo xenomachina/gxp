@@ -131,4 +131,40 @@ public class DynamicTest extends BaseRunningTestCase {
     createFile("PackagePrivateGxp", "<gxp:eval expr='new PackagePrivateClosure()' />");
     assertOutputEquals("private data");
   }
+
+  public void testStackTraceRewriting() throws Throwable {
+    FileRef gxp = createFile("ThrowerGxp", "<gxp:throws exception='BarException' />");
+    compileAndLoad(gxp);
+
+    // do a runtime edit to make it throw an exception
+    advanceClock();
+    createFile("ThrowerGxp",
+               "<gxp:throws exception='BarException' />",
+               "<gxp:eval expr='BarException.throwOne()' />");
+    try {
+      assertOutputEquals("");
+      fail("should throw BarException");
+    } catch (BarException e) {
+      StackTraceElement ste = e.getStackTrace()[1];
+      assertEquals("ThrowerGxp.gxp", ste.getFileName());
+      assertEquals(3, ste.getLineNumber());
+      assertEquals("com.google.gxp.compiler.dynamictests.ThrowerGxp", ste.getClassName());
+    }
+
+    // move the exception to a different line #
+    advanceClock();
+    createFile("ThrowerGxp",
+               "<gxp:throws exception='BarException' />",
+               "",
+               "<gxp:eval expr='BarException.throwOne()' />");
+    try {
+      assertOutputEquals("");
+      fail("should throw BarException");
+    } catch (BarException e) {
+      StackTraceElement ste = e.getStackTrace()[1];
+      assertEquals("ThrowerGxp.gxp", ste.getFileName());
+      assertEquals(4, ste.getLineNumber());
+      assertEquals("com.google.gxp.compiler.dynamictests.ThrowerGxp", ste.getClassName());
+    }
+  }
 }

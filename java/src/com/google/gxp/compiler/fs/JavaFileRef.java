@@ -47,4 +47,10 @@ public class JavaFileRef extends ForwardingFileObject<FileRef> implements JavaFi
 
     return filename.equals(simpleName + kind.extension);
   }
+
+  public String toString() {
+    // we replace /s with .s so that in stack traces we get the full
+    // path.  required for accurate stack trace rewriting
+    return fileObject.getName().replace('/', '.').substring(1);
+  }
 }

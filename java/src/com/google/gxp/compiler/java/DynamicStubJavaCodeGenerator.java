@@ -194,6 +194,9 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
       appendStaticFileRefList("SRC$PATHS",   sourcePaths);
 
       appendLine();
+      appendLine("private static com.google.gxp.compiler.fs.FileRef JAVA$FILE = null;");
+
+      appendLine();
       appendLine("private static java.util.Map<String, java.lang.reflect.Method> METHODS$ =");
       formatLine("  getMethodMap(%s.class);",
                  innerWorker.getClassName(template.getName()));
@@ -220,8 +223,11 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
       appendLine("long LAST$MODIFIED = SRC$GXP.getLastModified();");
       appendLine("if ((LAST$MODIFIED != 0 && LAST$MODIFIED != COMPILATION$TIME)");
       appendLine("    || METHODS$ == null) {");
-      appendLine("METHODS$ = compileGxp(SRC$GXPS, SRC$SCHEMAS, SRC$PATHS, JAVA$BASE,");
-      appendLine("                      CLASS$BASE, COMPILATION$VERSION, ALERT$POLICY);");
+      appendLine("com.google.gxp.compiler.fs.InMemoryFileSystem MEM$FS =");
+      appendLine("    new com.google.gxp.compiler.fs.InMemoryFileSystem();");
+      appendLine("JAVA$FILE = compileGxp(MEM$FS, SRC$GXPS, SRC$SCHEMAS, SRC$PATHS,");
+      appendLine("                       JAVA$BASE, COMPILATION$VERSION, ALERT$POLICY);");
+      appendLine("METHODS$ = compileJava(MEM$FS, CLASS$BASE, COMPILATION$VERSION);");
       appendLine("COMPILATION$TIME = LAST$MODIFIED;");
       appendLine("COMPILATION$VERSION++;");
       appendLine("}");
@@ -305,12 +311,11 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
     protected void appendWriteImplMethod() {
       // built a set of throws types
       List<String> throwsTypes = Lists.newArrayList();
-      throwsTypes.add("java.io.IOException");
-      throwsTypes.add("java.lang.RuntimeException");
-      for (ThrowsDeclaration throwsDeclaration :
-               template.getThrowsDeclarations()) {
+      for (ThrowsDeclaration throwsDeclaration : template.getThrowsDeclarations()) {
         throwsTypes.add(throwsDeclaration.getExceptionType());
       }
+      throwsTypes.add("java.io.IOException");
+      throwsTypes.add("java.lang.RuntimeException");
 
       appendLine(getWriteMethodSignature(Access._private, true, "writeImpl") + " {");
       appendReload();
@@ -326,6 +331,7 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
       sb.append("});");
       appendLine(sb);
       appendLine("} catch (Throwable gxp$t) {");
+      appendLine("rewriteStackTraceElements(gxp$t, JAVA$FILE);");
       for (String throwType : throwsTypes) {
         formatLine("if (gxp$t instanceof %s) {", throwType);
         formatLine("throw (%s)gxp$t;", throwType);
