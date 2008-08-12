@@ -26,7 +26,7 @@ import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.ContentTypeExpectedAlert;
 import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
-import com.google.gxp.compiler.alerts.common.NoDefaultValueForConditionalArgumentError;
+import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.base.AbbrExpression;
 import com.google.gxp.compiler.base.BooleanConstant;
@@ -559,7 +559,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
           : delimiterAttr.getValue();
 
       if (delimiterAttr != null && delimiterAttr.getCondition() != null) {
-        alertSink.add(new NoDefaultValueForConditionalArgumentError(node, "delimiter"));
+        alertSink.add(new RequiredAttributeHasCondError(node, delimiterAttr));
       }
 
       Expression iterator = attrMap.getOptionalExprValue("iterator", null);
@@ -624,18 +624,6 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
               // TODO(harryh): make sure items in exclude list
               //               actually remove elements
               subAttrMap.remove(eItem.trim());
-            }
-          }
-
-          // make sure that bundle doesn't accept any required attributes
-          Iterator<Map.Entry<String, AttributeValidator>> iter
-              = subAttrMap.entrySet().iterator();
-          while (iter.hasNext()) {
-            Map.Entry<String, AttributeValidator> entry = iter.next();
-            if (entry.getValue().isFlagSet(AttributeValidator.Flag.REQUIRED)) {
-              alertSink.add(new RequiredAttrInBundleError(node,
-                                                          entry.getKey()));
-              iter.remove();
             }
           }
 

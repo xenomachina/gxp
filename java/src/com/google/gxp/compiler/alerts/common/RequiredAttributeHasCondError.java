@@ -19,20 +19,19 @@ package com.google.gxp.compiler.alerts.common;
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.Node;
+import com.google.gxp.compiler.reparent.Attribute;
 
 /**
- * {@link com.google.gxp.compiler.alerts.Alert} which indicates that a
+ * {@link com.google.gxp.compiler.alerts.Alert} which indicates that
  * the template uses <gxp:attr ... cond='...'> for a required parameter
  */
-public class NoDefaultValueForConditionalArgumentError extends ErrorAlert {
-  public NoDefaultValueForConditionalArgumentError(
-      SourcePosition sourcePosition, String displayName, String attrName) {
-    super(sourcePosition, "You cannot use a conditional attribute as a value for "
-          + attrName + " in " + displayName + ": " +
-          "that required parameter does not have a default value");
+public class RequiredAttributeHasCondError extends ErrorAlert {
+  public RequiredAttributeHasCondError(SourcePosition pos, String displayName, String attrName) {
+    super(pos, "The '" + attrName + "' attribute is required for " + displayName +
+          "; it cannot be conditional.");
   }
 
-  public NoDefaultValueForConditionalArgumentError(Node node, String attrName) {
-    this(node.getSourcePosition(), node.getDisplayName(), attrName);
+  public RequiredAttributeHasCondError(Node node, Attribute attribute) {
+    this(node.getSourcePosition(), node.getDisplayName(), attribute.getName());
   }
 }

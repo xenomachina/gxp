@@ -14,18 +14,13 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<gxp:template name="com.google.gxp.compiler.functests.CondAttrGxp"
-              xmlns="http://www.w3.org/1999/xhtml"
-              xmlns:expr="http://google.com/2001/gxp/expressions"
-              xmlns:gxp="http://google.com/2001/gxp">
+<gxp:template name='com.google.gxp.compiler.functests.bundle.CalleeWithRequiredAttrGxp'
+              xmlns='http://www.w3.org/1999/xhtml'
+              xmlns:gxp='http://google.com/2001/gxp'
+              xmlns:expr='http://google.com/2001/gxp/expressions'>
 
-<gxp:param name='lifeCount' type='int' />
+<gxp:param name='bundle' gxp:type='bundle' from-element='img' />
 
-<div>
-  <gxp:attr name="class" cond='lifeCount &gt;= 0'>
-    <gxp:eval expr='lifeCount'/>-lives
-  </gxp:attr>
-  You have <gxp:eval expr='lifeCount' /> lives left.
-</div>
+<img gxp:bundles='bundle' />
 
 </gxp:template>

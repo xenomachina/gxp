@@ -178,7 +178,7 @@ public class BasicErrorTest extends BaseTestCase {
   }
 
   public void testAttr_invalidCond() throws Exception {
-    assertIllegalExpressionDetected("<img><gxp:attr name='alt' cond='",
-                                    "'/></img>", 2, 6);
+    assertIllegalExpressionDetected("<div><gxp:attr name='id' cond='",
+                                    "'/></div>", 2, 6);
   }
 }

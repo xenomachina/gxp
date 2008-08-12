@@ -16,10 +16,11 @@
 
 package com.google.gxp.compiler.errortests;
 
+import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.fs.FileRef;
+import com.google.gxp.compiler.alerts.common.MissingAttributeError;
 import com.google.gxp.compiler.reparent.InvalidTypeError;
-import com.google.gxp.compiler.reparent.RequiredAttrInBundleError;
 import com.google.gxp.compiler.validate.DuplicateAttributeError;
 import com.google.gxp.compiler.validate.DuplicateParameterNameError;
 import com.google.gxp.compiler.validate.InvalidAttrBundleError;
@@ -61,8 +62,23 @@ public class AttributeBundleErrorTest extends BaseTestCase {
   }
 
   public void testBundle_requiredAttribute() throws Exception {
-    compile("<gxp:param name='bundle' gxp:type='bundle' from-element='img'/>");
-    assertAlert(new RequiredAttrInBundleError(pos(2,1), "alt"));
+    FileRef callee = createFile("callee",
+                                "<gxp:param name='bundle' gxp:type='bundle' from-element='img'/>");
+    FileRef caller = createFile("caller",
+                                "<call:callee />");
+    compileFiles(callee, caller);
+    assertAlert(new MissingAttributeError(pos(2, 1), "<call:callee>", "alt"));
+    assertNoUnexpectedAlerts();
+
+    // required attributes can't be conditional
+    caller = createFile("caller",
+                        "<call:callee>",
+                        "  <gxp:attr name='alt' cond='sometimes'>",
+                        "    text",
+                        "  </gxp:attr>",
+                        "</call:callee>");
+    compileFiles(callee, caller);
+    assertAlert(new RequiredAttributeHasCondError(pos(2, 1), "<call:callee>", "alt"));
     assertNoUnexpectedAlerts();
   }
 
@@ -77,8 +93,7 @@ public class AttributeBundleErrorTest extends BaseTestCase {
                                 "           from-element='div' />",
                                 "<call:callee id='x' gxp:bundles='bundle'/>");
     compileFiles(callee, caller);
-    assertAlert(new DuplicateAttributeError(pos(4, 1), "<call:callee>",
-                                            "bundle", "id"));
+    assertAlert(new DuplicateAttributeError(pos(4, 1), "<call:callee>", "bundle", "id"));
     assertNoUnexpectedAlerts();
 
     // test duplicate between gxp:attr and bundle
@@ -91,8 +106,7 @@ public class AttributeBundleErrorTest extends BaseTestCase {
                         "  </gxp:attr>",
                         "</call:callee>");
     compileFiles(callee, caller);
-    assertAlert(new DuplicateAttributeError(pos(4, 1), "<call:callee>",
-                                            "bundle", "id"));
+    assertAlert(new DuplicateAttributeError(pos(4, 1), "<call:callee>", "bundle", "id"));
     assertNoUnexpectedAlerts();
   }
 
@@ -105,8 +119,7 @@ public class AttributeBundleErrorTest extends BaseTestCase {
     FileRef caller = createFile("caller",
                                 "<call:callee gxp:bundles='bundle'/>");
     compileFiles(callee, caller);
-    assertAlert(new InvalidAttrBundleError(pos(2, 1), "<call:callee>",
-                                           "bundle"));
+    assertAlert(new InvalidAttrBundleError(pos(2, 1), "<call:callee>", "bundle"));
     assertNoUnexpectedAlerts();
 
     // test gxp:param with wrong type
@@ -114,8 +127,7 @@ public class AttributeBundleErrorTest extends BaseTestCase {
                         "<gxp:param name='bundle' type='String' />",
                         "<call:callee gxp:bundles='bundle'/>");
     compileFiles(callee, caller);
-    assertAlert(new InvalidAttrBundleError(pos(3, 1), "<call:callee>",
-                                           "bundle"));
+    assertAlert(new InvalidAttrBundleError(pos(3, 1), "<call:callee>", "bundle"));
     assertNoUnexpectedAlerts();
   }
 
@@ -222,8 +234,7 @@ public class AttributeBundleErrorTest extends BaseTestCase {
             "   exclude='abbr,axis,bgcolor,char,charoff,colspan,",
             "            headers,height,nowrap,rowspan,scope,valign,width' />",
             "<div gxp:bundles='bundle'/>");
-    assertAlert(new MismatchedAttributeValidatorsError(pos(5,1), "<div>",
-                                                       "align", "bundle"));
+    assertAlert(new MismatchedAttributeValidatorsError(pos(5,1), "<div>", "align", "bundle"));
     assertNoUnexpectedAlerts();
   }
 }

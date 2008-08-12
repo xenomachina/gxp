@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
-import com.google.gxp.compiler.alerts.common.NoDefaultValueForConditionalArgumentError;
+import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.base.AbbrExpression;
 import com.google.gxp.compiler.base.AttrBundleParam;
@@ -199,6 +199,8 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
         Map<String, AttributeValidator> validatorMap,
         Set<String> allowedAttributes) {
 
+      Set<String> foundAttributes = Sets.newHashSet();
+
       for (String attrBundle : attributeBundles) {
         Parameter parameter = template.getParameterByPrimary(attrBundle);
         if (parameter == null || !(parameter.getType() instanceof BundleType)) {
@@ -222,7 +224,18 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
           } else if (!validator.equals(attr.getValue())) {
             alertSink.add(new MismatchedAttributeValidatorsError(
                               node, attr.getKey(), parameter.getPrimaryName()));
+          } else {
+            foundAttributes.add(attr.getKey());
           }
+        }
+      }
+
+      // check to make sure that there are no remaining allowed attributes
+      // that are required.
+      for (Map.Entry<String, AttributeValidator> entry : validatorMap.entrySet()) {
+        if (entry.getValue().isFlagSet(AttributeValidator.Flag.REQUIRED)
+            && !foundAttributes.contains(entry.getKey())) {
+          alertSink.add(new MissingAttributeError(node, entry.getKey()));
         }
       }
     }
@@ -240,15 +253,9 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
       Set<String> allowedAttributes = ImmutableSet.copyOf(validatorMap.keySet());
 
       for (final Attribute attr : element.getAttributes()) {
-        validatorMap.remove(attr.getName());
-      }
-
-      // check to make sure that there are no remaining allowed attributes
-      // that are required.  bundles cannot contain required attributes
-      for (Map.Entry<String, AttributeValidator> entry :
-               validatorMap.entrySet()) {
-        if (entry.getValue().isFlagSet(AttributeValidator.Flag.REQUIRED)) {
-          alertSink.add(new MissingAttributeError(element, entry.getKey()));
+        AttributeValidator validator = validatorMap.remove(attr.getName());
+        if (attr.getCondition() != null && validator.isFlagSet(AttributeValidator.Flag.REQUIRED)) {
+          alertSink.add(new RequiredAttributeHasCondError(element, attr));
         }
       }
 
@@ -256,8 +263,7 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
         throw new AssertionError("found output element without a template");
       }
 
-      validateAttributeBundles(element, element.getAttrBundles(),
-                               validatorMap, allowedAttributes);
+      validateAttributeBundles(element, element.getAttrBundles(), validatorMap, allowedAttributes);
 
       return super.visitOutputElement(element);
     }
@@ -306,8 +312,12 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
         Expression actualArgument = param.getValue().getValue();
         if (actualArgument instanceof AttrBundleParam) {
           AttrBundleParam bundle = (AttrBundleParam) actualArgument;
-          for (AttributeValidator validator : bundle.getAttrs().keySet()) {
-            validatorMap.remove(validator.getName());
+          for (Map.Entry<AttributeValidator, Attribute> attr : bundle.getAttrs().entrySet()) {
+            validatorMap.remove(attr.getKey().getName());
+            if (attr.getValue().getCondition() != null
+                && attr.getKey().isFlagSet(AttributeValidator.Flag.REQUIRED)) {
+              alertSink.add(new RequiredAttributeHasCondError(call, attr.getValue()));
+            }
           }
         }
         newAttrBuilder.put(param.getKey(), visitAttribute(param.getValue()));
@@ -324,8 +334,7 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
           } else {
             Attribute fpAttribute = call.getAttributes().get(parameter.getPrimaryName());
             if (fpAttribute != null && fpAttribute.getCondition() != null) {
-              alertSink.add(new NoDefaultValueForConditionalArgumentError(
-                call, parameter.getPrimaryName()));
+              alertSink.add(new RequiredAttributeHasCondError(call, fpAttribute));
             }
           }
         }

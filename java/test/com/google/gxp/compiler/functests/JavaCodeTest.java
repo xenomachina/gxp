@@ -322,25 +322,21 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
 
   public void testBasicAttr() throws Exception {
     BasicAttrGxp.write(out, gxpContext, 0);
-    assertOutputEquals("<img src=\"0lives.png\""
-                       + " alt=\"You have 0 lives left.\">");
+    assertOutputEquals("<img src=\"0lives.png\" alt=\"You have 0 lives left.\">");
 
     BasicAttrGxp.write(out, gxpContext, 5);
-    assertOutputEquals("<img src=\"5lives.png\""
-                       + " alt=\"You have 5 lives left.\">");
+    assertOutputEquals("<img src=\"5lives.png\" alt=\"You have 5 lives left.\">");
   }
 
   public void testCondAttr() throws Exception {
     CondAttrGxp.write(out, gxpContext, 1);
-    assertOutputEquals("<img src=\"1lives.png\""
-                       + " alt=\"You have 1 lives left.\">");
+    assertOutputEquals("<div class=\"1-lives\">You have 1 lives left.</div>");
 
     CondAttrGxp.write(out, gxpContext, 0);
-    assertOutputEquals("<img src=\"0lives.png\""
-                       + " alt=\"You have 0 lives left.\">");
+    assertOutputEquals("<div class=\"0-lives\">You have 0 lives left.</div>");
 
     CondAttrGxp.write(out, gxpContext, -1);
-    assertOutputEquals("<img src=\"-1lives.png\">");
+    assertOutputEquals("<div>You have -1 lives left.</div>");
   }
 
   // Note: it's important to be specific about the exceptions declared here to

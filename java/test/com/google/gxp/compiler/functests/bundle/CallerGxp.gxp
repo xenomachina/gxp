@@ -55,4 +55,6 @@
   body
 </f:CallCalleeAGxp>
 
+<call:CalleeWithRequiredAttrGxp src="fluffy.gif" alt="fluffy the cat" />
+
 </gxp:template>

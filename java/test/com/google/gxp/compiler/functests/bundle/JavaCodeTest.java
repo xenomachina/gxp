@@ -43,8 +43,8 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
                        + "<option selected>body</option>\n"
                        + "<option selected>body</option>\n"
                        + "<option>body</option>\n"
-                       + "<div id=\"1\" class=\"theclass\" onclick=\"foo()\">"
-                       + "body</div>");
+                       + "<div id=\"1\" class=\"theclass\" onclick=\"foo()\">body</div>\n"
+                       + "<img alt=\"fluffy the cat\" src=\"fluffy.gif\">");
 
     // XML Mode
     CallerGxp.write(out, xmlGxpContext, 1);
@@ -54,7 +54,7 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
                        + "<option selected=\"selected\">body</option>\n"
                        + "<option selected=\"selected\">body</option>\n"
                        + "<option>body</option>\n"
-                       + "<div id=\"1\" class=\"theclass\" onclick=\"foo()\">"
-                       + "body</div>");
+                       + "<div id=\"1\" class=\"theclass\" onclick=\"foo()\">body</div>\n"
+                       + "<img alt=\"fluffy the cat\" src=\"fluffy.gif\" />");
   }
 }

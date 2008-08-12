@@ -20,7 +20,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.gxp.compiler.Configuration;
 import com.google.gxp.compiler.Compiler;
 import com.google.gxp.compiler.Phase;

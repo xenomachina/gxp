@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.errortests;
 
-import com.google.gxp.compiler.alerts.common.NoDefaultValueForConditionalArgumentError;
+import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
 import com.google.gxp.compiler.reparent.ConflictingAttributesError;
 import com.google.gxp.compiler.reparent.MissingAttributesError;
 
@@ -64,8 +64,7 @@ public class LoopErrorTest extends BaseTestCase {
             "  <gxp:attr name='delimiter' cond='false'>",
             "  </gxp:attr>",
             "</gxp:loop>");
-    assertAlert(new NoDefaultValueForConditionalArgumentError(pos(2,1), "<gxp:loop>",
-                                                              "delimiter"));
+    assertAlert(new RequiredAttributeHasCondError(pos(2,1), "<gxp:loop>", "delimiter"));
     assertNoUnexpectedAlerts();
   }
 }

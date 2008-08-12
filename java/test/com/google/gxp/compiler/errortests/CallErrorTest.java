@@ -21,7 +21,7 @@ import com.google.gxp.compiler.alerts.common.BadNodePlacementError;
 import com.google.gxp.compiler.alerts.common.InvalidNameError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
 import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
-import com.google.gxp.compiler.alerts.common.NoDefaultValueForConditionalArgumentError;
+import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
 import com.google.gxp.compiler.base.TemplateName;
 import com.google.gxp.compiler.bind.BadParameterError;
 import com.google.gxp.compiler.bind.CallableNotFoundError;
@@ -125,14 +125,14 @@ public class CallErrorTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
   }
 
-  public void testCall_noDefaultValueForConditionalArgument() throws Exception {
+  public void testCall_requiredAttributeHasConditional() throws Exception {
     String callee = "<gxp:param type='int' name='i'/>";
     String caller = "<my:" + getTemplateBaseName() + ">" +
         "<gxp:attr name='i' cond='1 > 0'><gxp:eval expr='42' /></gxp:attr>" +
         "</my:" + getTemplateBaseName() + ">";
     compile(callee, caller);
-    assertAlert(new NoDefaultValueForConditionalArgumentError(pos(3, 1),
-                "<my:" + getTemplateBaseName() + ">", "i"));
+    assertAlert(new RequiredAttributeHasCondError(pos(3, 1),
+                                                  "<my:" + getTemplateBaseName() + ">", "i"));
     assertNoUnexpectedAlerts();
   }
 

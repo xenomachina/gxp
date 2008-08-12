@@ -20,6 +20,7 @@ import com.google.gxp.compiler.alerts.common.BadNodePlacementError;
 import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
 import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
+import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.reparent.InvalidDoctypeError;
 
@@ -38,9 +39,7 @@ public class OutputElementErrorTest extends BaseTestCase {
   public void testOutputElement_attrHasMultipleValues() throws Exception {
     // test regular duplicate
     compile("<div id='foo' id='bar'></div>");
-    assertParseAlert(
-        pos(2,1),
-        "Attribute \"id\" was already specified for element \"div\".");
+    assertParseAlert(pos(2,1), "Attribute \"id\" was already specified for element \"div\".");
     assertNoUnexpectedAlerts();
 
     // test duplicate from gxp:attr
@@ -49,8 +48,7 @@ public class OutputElementErrorTest extends BaseTestCase {
             "    foo",
             "  </gxp:attr>",
             "</div>");
-    assertAlert(new MultiValueAttributeError(pos(3,3), "<div>",
-                                             "'id' attribute"));
+    assertAlert(new MultiValueAttributeError(pos(3,3), "<div>", "'id' attribute"));
     assertNoUnexpectedAlerts();
   }
 
@@ -79,6 +77,16 @@ public class OutputElementErrorTest extends BaseTestCase {
   public void testOutputElement_requiredAttrMissing() throws Exception {
     compile("<img src='foo.jpg'/>");
     assertAlert(new MissingAttributeError(pos(2,1), "<img>", "alt"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testOutputElement_requiredAttrHasConditional() throws Exception {
+    compile("<img src='foo.jpg'>",
+            "  <gxp:attr name='alt' cond='false'>",
+            "    foo",
+            "  </gxp:attr>",
+            "</img>");
+    assertAlert(new RequiredAttributeHasCondError(pos(2,1), "<img>", "alt"));
     assertNoUnexpectedAlerts();
   }
 
