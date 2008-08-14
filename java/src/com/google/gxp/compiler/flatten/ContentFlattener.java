@@ -22,6 +22,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.AlertSink;
+import com.google.gxp.compiler.base.AttrBundleReference;
 import com.google.gxp.compiler.base.Concatenation;
 import com.google.gxp.compiler.base.Conditional;
 import com.google.gxp.compiler.base.ConvertibleToContent;
@@ -31,7 +32,6 @@ import com.google.gxp.compiler.base.ExampleExpression;
 import com.google.gxp.compiler.base.ExhaustiveExpressionVisitor;
 import com.google.gxp.compiler.base.Expression;
 import com.google.gxp.compiler.base.IsXmlExpression;
-import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.OutputElement;
 import com.google.gxp.compiler.base.Root;
 import com.google.gxp.compiler.base.StringConstant;
@@ -178,11 +178,8 @@ public class ContentFlattener implements Function<ValidatedTree, ContentFlattene
       }
 
       for (String attrBundle : element.getAttrBundles()) {
-        // TODO(harryh): instead of doing this, consider creating
-        //               a new Expression: AttrBundleReference
-        values.add(new EscapeExpression(
-                       elementSchema,
-                       new NativeExpression(element, attrBundle, null, null)));
+        values.add(new EscapeExpression(elementSchema,
+                                        new AttrBundleReference(element, attrBundle)));
       }
 
       if (elementValidator.isFlagSet(ElementValidator.Flag.NOENDTAG)) {

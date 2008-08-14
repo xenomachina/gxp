@@ -54,6 +54,10 @@ public abstract class ExhaustiveExpressionVisitor
     return postProcess(bundle.transform(this));
   }
 
+  public Expression visitAttrBundleReference(AttrBundleReference value) {
+    return postProcess(value);
+  }
+
   public Expression visitExceptionExpression(ExceptionExpression value) {
     return postProcess(value);
   }

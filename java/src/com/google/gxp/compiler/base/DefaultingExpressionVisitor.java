@@ -45,6 +45,10 @@ public abstract class DefaultingExpressionVisitor<T>
     return defaultVisitExpression(value);
   }
 
+  public T visitAttrBundleReference(AttrBundleReference value) {
+    return defaultVisitExpression(value);
+  }
+
   public T visitBooleanConstant(BooleanConstant value) {
     return defaultVisitExpression(value);
   }

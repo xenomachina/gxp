@@ -24,6 +24,7 @@ import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.AbbrExpression;
 import com.google.gxp.compiler.base.AttrBundleParam;
+import com.google.gxp.compiler.base.AttrBundleReference;
 import com.google.gxp.compiler.base.BooleanConstant;
 import com.google.gxp.compiler.base.BoundCall;
 import com.google.gxp.compiler.base.Call;
@@ -603,6 +604,11 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
       @Override
       public String defaultVisitExpression(Expression value) {
         throw new UnexpectedNodeException(value);
+      }
+
+      @Override
+      public String visitAttrBundleReference(AttrBundleReference value) {
+        return value.getName();
       }
 
       @Override

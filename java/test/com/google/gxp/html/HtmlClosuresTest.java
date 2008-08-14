@@ -122,6 +122,28 @@ public class HtmlClosuresTest extends BaseFunctionalTestCase {
     tmpDir.delete();
   }
 
+  public void testFromReader() throws Exception {
+    String content = "foo < bar > baz & qux \" quux ' quuux";
+    Reader reader = new StringReader(content);
+
+    HtmlClosure closure = HtmlClosures.fromReader(reader);
+
+    // first call succeeds
+    closure.write(out, gxpContext);
+    assertOutputEquals(content);
+
+    // 2nd call resets back to the beginning
+    closure.write(out, gxpContext);
+    assertOutputEquals(content);
+
+    try {
+      HtmlClosures.fromReader(null);
+      fail("should have thrown NullPointerException");
+    } catch (NullPointerException e) {
+      // good
+    }
+  }
+
   private static final HtmlClosure[] CLOSURE_ARRAY = new HtmlClosure[0];
 
   public void testConcat_empty() throws Exception {

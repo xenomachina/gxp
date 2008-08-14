@@ -26,6 +26,7 @@ import com.google.common.base.Function;
 public interface ExpressionVisitor<T> extends Function<Expression, T> {
   T visitAbbrExpression(AbbrExpression value);
   T visitAttrBundleParam(AttrBundleParam value);
+  T visitAttrBundleReference(AttrBundleReference value);
   T visitBooleanConstant(BooleanConstant value);
   T visitCall(Call value);
   T visitCollapseExpression(CollapseExpression value);
