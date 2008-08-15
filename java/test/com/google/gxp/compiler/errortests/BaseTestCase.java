@@ -136,7 +136,6 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
   };
 
   private static String[] ILLEGAL_JAVA_NAMES = {
-    "for",
     "boolean",
     "true",
     "null",
@@ -178,6 +177,8 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
       assertNoUnexpectedAlerts();
     }
 
+    // TODO: update this code to better test how various names can be legal
+    //       in some OutputLanguages, but illegal in others
     for (String illegalName : ILLEGAL_JAVA_NAMES) {
       compile(prefix + CharEscapers.XML_ESCAPE.escape(illegalName) + suffix);
       SourcePosition errorPos = pos(2, 1);
