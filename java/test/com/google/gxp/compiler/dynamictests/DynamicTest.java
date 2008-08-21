@@ -18,7 +18,7 @@ package com.google.gxp.compiler.dynamictests;
 
 import com.google.gxp.compiler.codegen.DefaultCodeGeneratorFactory;
 import com.google.gxp.compiler.fs.FileRef;
-import com.google.gxp.testing.BaseRunningTestCase;
+import com.google.gxp.testing.dynamic.BaseRunningTestCase;
 
 /**
  * Tests of dynamic compiation in which the contents of the gxp are actually

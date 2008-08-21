@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.gxp.testing;
+package com.google.gxp.testing.dynamic;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
@@ -27,6 +27,7 @@ import com.google.gxp.compiler.codegen.DefaultCodeGeneratorFactory;
 import com.google.gxp.compiler.fs.FileRef;
 import com.google.gxp.compiler.fs.JavaFileManagerImpl;
 import com.google.gxp.compiler.fs.SystemFileSystem;
+import com.google.gxp.testing.BaseBuildingTestCase;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

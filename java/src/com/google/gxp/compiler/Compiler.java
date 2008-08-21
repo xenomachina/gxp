@@ -153,14 +153,8 @@ public class Compiler {
           manager = (CompilationManager) read;
         }
         ois.close();
-      } catch (ClassCastException cce) {
+      } catch (Exception e) {
         // use the default, fresh manager
-      } catch (ClassNotFoundException cnfe) {
-        // use the default, fresh manager
-      } catch (IOException ioe) {
-        // use the default, fresh manager
-      } catch (IllegalStateException ise) {
-        // sometimes happens when deserializing on NFS. use the default.
       }
     }
     return manager;
