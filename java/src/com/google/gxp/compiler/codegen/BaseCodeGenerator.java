@@ -19,6 +19,8 @@ package com.google.gxp.compiler.codegen;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.io.Characters;
+import com.google.gxp.compiler.base.FormalParameter;
+import com.google.gxp.compiler.base.Parameter;
 import com.google.gxp.compiler.base.Root;
 import com.google.gxp.compiler.base.Tree;
 
@@ -50,5 +52,16 @@ public abstract class BaseCodeGenerator<T extends Tree<Root>> implements CodeGen
       // If this happens then something is seriously broken.
       throw new RuntimeException(e);
     }
+  }
+
+  protected static String getDefaultMethodName(FormalParameter param) {
+    String s = param.getPrimaryName();
+    s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
+
+    return "getDefault" + s;
+  }
+
+  protected static String getDefaultMethodName(Parameter param) {
+    return getDefaultMethodName(param.getFormalParameter());
   }
 }

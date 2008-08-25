@@ -143,7 +143,8 @@ public class DefaultCodeGeneratorFactory implements CodeGeneratorFactory {
           }
 
           public CodeGenerator visitJavaScript(CompilationUnit cUnit) {
-            return new JavaScriptCodeGenerator(cUnit.getMessageExtractedTree());
+            return new JavaScriptCodeGenerator(cUnit.getMessageExtractedTree(),
+                                               cUnit.getBoundTree().getRequirements());
           }
 
           public CodeGenerator visitXmb(CompilationUnit cUnit) {

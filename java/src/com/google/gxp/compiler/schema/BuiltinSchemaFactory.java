@@ -50,7 +50,8 @@ public class BuiltinSchemaFactory extends FileBackedSchemaFactory {
                                                 "gxp/text/plaintext.h",
                                                 "com.google.gxp.text.PlaintextClosure",
                                                 "com.google.gxp.text.PlaintextAppender",
-                                                "com.google.gxp.text.*");
+                                                "com.google.gxp.text.*",
+                                                "goog.gxp.text.PlaintextClosure");
 
     addNonMarkupSchema("javascript", "text/javascript", plaintextSchema,
                        "JavascriptClosure",
@@ -58,7 +59,8 @@ public class BuiltinSchemaFactory extends FileBackedSchemaFactory {
                        "gxp/js/javascript.h",
                        "com.google.gxp.js.JavascriptClosure",
                        "com.google.gxp.js.JavascriptAppender",
-                       "com.google.gxp.js.*");
+                       "com.google.gxp.js.*",
+                       "goog.gxp.js.JavascriptClosure");
 
     addNonMarkupSchema("css", "text/css", plaintextSchema,
                        "CssClosure",
@@ -66,7 +68,8 @@ public class BuiltinSchemaFactory extends FileBackedSchemaFactory {
                        "gxp/css/css.h",
                        "com.google.gxp.css.CssClosure",
                        "com.google.gxp.css.CssAppender",
-                       "com.google.gxp.css.*");
+                       "com.google.gxp.css.*",
+                       "goog.gxp.css.CssClosure");
 
     FileSystem fs = new ResourceFileSystem();
 
@@ -83,11 +86,13 @@ public class BuiltinSchemaFactory extends FileBackedSchemaFactory {
 
   private Schema addNonMarkupSchema(String name, String contentType, Schema msgSchema,
                                     String cppType, String cppAppender, String cppImport,
-                                    String javaType, String javaAppender, String javaImport) {
+                                    String javaType, String javaAppender, String javaImport,
+                                    String javaScriptType) {
     Schema schema = new Schema(new SourcePosition(name), "<schema>",
                                name, "", contentType, false, contentType, null,
                                cppType, cppAppender, ImmutableList.of(cppImport),
                                javaType, javaAppender, ImmutableList.of(javaImport),
+                               javaScriptType,
                                Iterables.<ElementBuilder>emptyIterable(),
                                Collections.<SchemaRef>emptySet(),
                                msgSchema);

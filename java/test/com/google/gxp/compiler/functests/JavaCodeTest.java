@@ -108,6 +108,28 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
     }
   }
 
+  public void testStringExpr() throws Exception {
+    StringExprGxp.write(out, gxpContext, "abc123");
+    assertOutputEquals("click <a href=\"abc123\">here</a>.");
+
+    StringExprGxp.write(out, gxpContext, "  abc123  ");
+    assertOutputEquals("click <a href=\"  abc123  \">here</a>.");
+
+    StringExprGxp.write(out, gxpContext, "");
+    assertOutputEquals("click <a href=\"\">here</a>.");
+
+    String s = "xyz<>&\u4321\u00a0\"'123";
+    StringExprGxp.write(out, gxpContext, s);
+    assertOutputEquals("click <a href=\"xyz&lt;&gt;&amp;&#17185;&nbsp;&quot;&#39;123\">here</a>.");
+
+    try {
+      StringExprGxp.write(out, gxpContext, null);
+      fail("should throw NPE");
+    } catch (NullPointerException e) {
+      // good
+    }
+  }
+
   public void testSpacePreservation() throws Exception {
     SpacePreservationGxp.write(out, gxpContext);
     assertOutputEquals("foo\n"
@@ -141,28 +163,6 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
                        + "  var bar = \"bar\";\n"
                        + "</script>\n"
                        + "<div onclick=\"alert(&quot;foo \\x22 \\x27&quot;);\"></div>");
-  }
-
-  public void testStringExpr() throws Exception {
-    StringExprGxp.write(out, gxpContext, "abc123");
-    assertOutputEquals("click <a href=\"abc123\">here</a>.");
-
-    StringExprGxp.write(out, gxpContext, "  abc123  ");
-    assertOutputEquals("click <a href=\"  abc123  \">here</a>.");
-
-    StringExprGxp.write(out, gxpContext, "");
-    assertOutputEquals("click <a href=\"\">here</a>.");
-
-    String s = "xyz<>&\u4321\u00a0\"'123";
-    StringExprGxp.write(out, gxpContext, s);
-    assertOutputEquals("click <a href=\"xyz&lt;&gt;&amp;&#17185;&nbsp;&quot;&#39;123\">here</a>.");
-
-    try {
-      StringExprGxp.write(out, gxpContext, null);
-      fail("should throw NPE");
-    } catch (NullPointerException e) {
-      // good
-    }
   }
 
   public void testIfBasic() throws Exception {

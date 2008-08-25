@@ -191,17 +191,6 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
       return (name == null) ? null : name.getBaseName();
     }
 
-    protected String getDefaultMethodName(Parameter param) {
-      return getDefaultMethodName(param.getFormalParameter());
-    }
-
-    protected String getDefaultMethodName(FormalParameter param) {
-      String s = param.getPrimaryName();
-      s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
-
-      return "getDefault" + s;
-    }
-
     protected String getConstructorMethodName(Parameter param) {
       return getConstructorMethodName(param.getFormalParameter());
     }
