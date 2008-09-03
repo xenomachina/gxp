@@ -20,10 +20,10 @@
 
 <gxp:param name='x' type='int' />
 
-<gxp:abbr type="int" name="x2" expr='x * x'>
-  <gxp:abbr type="HtmlClosure" name="xs">
+<gxp:abbr name="x2" type="int" expr='x * x'>
+  <gxp:abbr name="xs" content-type="text/html">
     <gxp:attr name="expr">
-      &lt;<gxp:loop type='int' var='i' iterator='new IntIterator(x)'>
+      &lt;<gxp:loop type='int' var='i' iterable='new IntIterable(x)'>
         *
       </gxp:loop>&gt;
     </gxp:attr>

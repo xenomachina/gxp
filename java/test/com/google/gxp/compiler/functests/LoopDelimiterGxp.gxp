@@ -24,25 +24,25 @@
 <gxp:param name='count' type='int' />
 
 <b>
-  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' delimiter=''>
+  <gxp:loop type='int' var='i' iterable='new IntIterable(count)' delimiter=''>
     !
   </gxp:loop>
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' delimiter='&amp;'>
+  <gxp:loop type='int' var='i' iterable='new IntIterable(count)' delimiter='&amp;'>
     !
   </gxp:loop>
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' expr:delimiter='","'>
+  <gxp:loop type='int' var='i' iterable='new IntIterable(count)' expr:delimiter='","'>
     !
   </gxp:loop>
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterator='new IntIterator(count)'>
+  <gxp:loop type='int' var='i' iterable='new IntIterable(count)'>
     <gxp:attr name='delimiter'>
       <gxp:msg>,</gxp:msg>
     </gxp:attr>
@@ -51,13 +51,13 @@
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' msg:delimiter=','>
+  <gxp:loop type='int' var='i' iterable='new IntIterable(count)' msg:delimiter=','>
     !
   </gxp:loop>
 </b>
 
 <b>
-  <gxp:loop type='int' var='i' iterator='new IntIterator(count)' nomsg:delimiter=','>
+  <gxp:loop type='int' var='i' iterable='new IntIterable(count)' nomsg:delimiter=','>
     !
   </gxp:loop>
 </b>

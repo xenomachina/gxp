@@ -28,7 +28,7 @@
 <gxp:param name='specialItem' type='E' />
 <gxp:param name='items' cpp:type='list{E}' java:type='List{E}' />
 
-<gxp:loop var='i' type='E' iterator='items.iterator()'>
+<gxp:loop var='i' type='E' iterable='items'>
   <gxp:if cond='i.equals(specialItem)'>
     <b><gxp:eval expr='i'/></b>
   <gxp:else/>
