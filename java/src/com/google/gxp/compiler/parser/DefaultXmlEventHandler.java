@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.parser;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.Alert;
@@ -47,9 +47,9 @@ class DefaultXmlEventHandler implements XmlEventHandler {
 
   public DefaultXmlEventHandler(NamespaceSet namespaces, AlertSink alertSink,
                                 SourceEntityResolver entityResolver) {
-    this.namespaces = Objects.nonNull(namespaces);
-    this.alertSink = Objects.nonNull(alertSink);
-    this.entityResolver = Objects.nonNull(entityResolver);
+    this.namespaces = Preconditions.checkNotNull(namespaces);
+    this.alertSink = Preconditions.checkNotNull(alertSink);
+    this.entityResolver = Preconditions.checkNotNull(entityResolver);
   }
 
   /**
@@ -209,7 +209,7 @@ class DefaultXmlEventHandler implements XmlEventHandler {
      */
     public void addChild(ParsedElement child) {
       flushTextBuffer();
-      children.add(Objects.nonNull(child));
+      children.add(Preconditions.checkNotNull(child));
     }
 
     /**

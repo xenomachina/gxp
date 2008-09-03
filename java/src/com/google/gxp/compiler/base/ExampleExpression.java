@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * An {@code Expression} that has been decorated with an example suitable
@@ -28,8 +29,8 @@ public class ExampleExpression extends Expression {
 
   public ExampleExpression(Expression subexpression, String example) {
     super(subexpression);
-    this.subexpression = Objects.nonNull(subexpression);
-    this.example = Objects.nonNull(example);
+    this.subexpression = Preconditions.checkNotNull(subexpression);
+    this.example = Preconditions.checkNotNull(example);
   }
 
   public Expression withSubexpression(Expression newSubexpression) {

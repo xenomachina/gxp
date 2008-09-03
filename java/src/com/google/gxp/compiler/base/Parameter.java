@@ -18,6 +18,7 @@ package com.google.gxp.compiler.base;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collections;
@@ -42,13 +43,13 @@ public class Parameter extends AbstractNode {
                    Expression constructor, boolean hasConstructorFlag,
                    Expression comment) {
     super(formal);
-    this.formal = Objects.nonNull(formal);
+    this.formal = Preconditions.checkNotNull(formal);
     this.javaAnnotations = ImmutableList.copyOf(javaAnnotations);
     this.defaultValue = defaultValue;
     this.hasDefaultFlag = hasDefaultFlag;
     this.constructor = constructor;
     this.hasConstructorFlag = hasConstructorFlag;
-    this.comment = Objects.nonNull(comment);
+    this.comment = Preconditions.checkNotNull(comment);
   }
 
   public Parameter(FormalParameter formal) {
@@ -62,8 +63,8 @@ public class Parameter extends AbstractNode {
     if (Objects.equal(newDefaultValue, defaultValue)) {
       return this;
     } else {
-      Objects.nonNull(defaultValue);
-      Objects.nonNull(newDefaultValue);
+      Preconditions.checkNotNull(defaultValue);
+      Preconditions.checkNotNull(newDefaultValue);
       return new Parameter(formal, javaAnnotations, newDefaultValue, hasDefaultFlag,
                            constructor, hasConstructorFlag, comment);
     }

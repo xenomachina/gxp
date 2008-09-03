@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.schema;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import java.io.Serializable;
 
@@ -95,9 +96,9 @@ public final class DocType implements Serializable {
 
   public DocType(String name, String publicId, String systemId,
                  String sgmlPublicId, String sgmlSystemId) {
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
     this.publicId = publicId;
-    this.systemId = Objects.nonNull(systemId);
+    this.systemId = Preconditions.checkNotNull(systemId);
 
     // it doesn't make sense to have a public ID without a system ID.
     if (sgmlPublicId != null && sgmlSystemId == null) {
@@ -120,10 +121,10 @@ public final class DocType implements Serializable {
   private static String toMarkup(String rootElement, String publicId,
                                  String systemId) {
     return "<!DOCTYPE "
-        + Objects.nonNull(rootElement)
+        + Preconditions.checkNotNull(rootElement)
         + ((publicId == null)
            ? " SYSTEM" : (" PUBLIC \"" + publicId + "\""))
-        + " \"" + Objects.nonNull(systemId) + "\""
+        + " \"" + Preconditions.checkNotNull(systemId) + "\""
         + ">";
   }
 

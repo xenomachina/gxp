@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.servicedir;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -84,8 +84,8 @@ public class ScopedServiceDirectory implements ServiceDirectory {
                                 final ServiceDirectory baseServiceDirectory,
                                 String packageName,
                                 List<? extends Import> imports) {
-    this.baseServiceDirectory = Objects.nonNull(baseServiceDirectory);
-    this.packageName = Objects.nonNull(packageName);
+    this.baseServiceDirectory = Preconditions.checkNotNull(baseServiceDirectory);
+    this.packageName = Preconditions.checkNotNull(packageName);
 
     ImportProcessor visitor = new ImportProcessor(alertSink, packageName);
     for (Import imp : imports) {
@@ -106,7 +106,7 @@ public class ScopedServiceDirectory implements ServiceDirectory {
     private final Map<String, TemplateName> classImports = Maps.newHashMap();
 
     public ImportProcessor(AlertSink alertSink, String packageName) {
-      this.alertSink = Objects.nonNull(alertSink);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
       packageImports.add(packageName);
     }
 

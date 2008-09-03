@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.bind;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -76,8 +76,8 @@ public class Binder implements Function<ReparentedTree, BoundTree> {
   private final ServiceDirectory baseServiceDirectory;
 
   public Binder(SchemaFactory schemaFactory, ServiceDirectory baseServiceDirectory) {
-    this.schemaFactory = Objects.nonNull(schemaFactory);
-    this.baseServiceDirectory = Objects.nonNull(baseServiceDirectory);
+    this.schemaFactory = Preconditions.checkNotNull(schemaFactory);
+    this.baseServiceDirectory = Preconditions.checkNotNull(baseServiceDirectory);
   }
 
   public BoundTree apply(ReparentedTree reparentedTree) {
@@ -107,10 +107,10 @@ public class Binder implements Function<ReparentedTree, BoundTree> {
 
     Visitor(AlertSink alertSink, SchemaFactory schemaFactory, ServiceDirectory serviceDirectory,
             Set<Callable> requirements) {
-      this.alertSink = Objects.nonNull(alertSink);
-      this.schemaFactory = Objects.nonNull(schemaFactory);
-      this.serviceDirectory = Objects.nonNull(serviceDirectory);
-      this.requirements = Objects.nonNull(requirements);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
+      this.schemaFactory = Preconditions.checkNotNull(schemaFactory);
+      this.serviceDirectory = Preconditions.checkNotNull(serviceDirectory);
+      this.requirements = Preconditions.checkNotNull(requirements);
     }
 
     public Template visitTemplate(final Template template) {

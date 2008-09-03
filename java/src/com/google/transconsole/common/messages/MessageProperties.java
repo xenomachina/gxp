@@ -17,6 +17,7 @@
 package com.google.transconsole.common.messages;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
@@ -77,7 +78,7 @@ final class MessageProperties {
   }
 
   protected void setContentType(String contentType) {
-    this.contentType = Objects.nonNull(contentType);
+    this.contentType = Preconditions.checkNotNull(contentType);
   }
 
   public String getContentType() {
@@ -91,7 +92,7 @@ final class MessageProperties {
    * @param description of the message
    */
   protected void setDescription(String description) {
-    this.description = Objects.nonNull(description);
+    this.description = Preconditions.checkNotNull(description);
   }
 
   public String getDescription() {

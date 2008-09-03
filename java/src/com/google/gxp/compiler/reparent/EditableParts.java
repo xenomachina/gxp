@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.reparent;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.BadNodePlacementError;
@@ -70,8 +70,8 @@ class EditableParts implements Parts {
    * @param forNode the node that contains these parts.
    */
   EditableParts(AlertSink alertSink, Node forNode) {
-    this.alertSink = Objects.nonNull(alertSink);
-    this.forNode = Objects.nonNull(forNode);
+    this.alertSink = Preconditions.checkNotNull(alertSink);
+    this.forNode = Preconditions.checkNotNull(forNode);
     attrMap = new AttributeMap(alertSink, forNode);
   }
 
@@ -198,7 +198,7 @@ class EditableParts implements Parts {
    * Adds an {@code Attribute} to its appropriate part bucket.
    */
   void accumulate(Attribute attribute) {
-    attrMap.add(Objects.nonNull(attribute));
+    attrMap.add(Preconditions.checkNotNull(attribute));
   }
 
   /**
@@ -217,7 +217,7 @@ class EditableParts implements Parts {
     }
 
     public void add(T node) {
-      nodes.add(Objects.nonNull(node));
+      nodes.add(Preconditions.checkNotNull(node));
       used = false;
     }
 

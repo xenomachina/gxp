@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.msgextract;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.AlertSink;
@@ -76,8 +76,8 @@ public class MessageExtractor implements Function<I18nCheckedTree, MessageExtrac
     private final List<ExtractedMessage> messages;
 
     OutsideMessageVisitor(AlertSink alertSink, List<ExtractedMessage> messages) {
-      this.alertSink = Objects.nonNull(alertSink);
-      this.messages = Objects.nonNull(messages);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
+      this.messages = Preconditions.checkNotNull(messages);
     }
 
     public void addMessages(ExtractedMessage message) {
@@ -127,9 +127,9 @@ public class MessageExtractor implements Function<I18nCheckedTree, MessageExtrac
     InsideNoMessageVisitor(AlertSink alertSink,
                            NoMessage rootNoMsg,
                            OutsideMessageVisitor outsideMessageVisitor) {
-      this.alertSink = Objects.nonNull(alertSink);
-      this.rootNoMsg = Objects.nonNull(rootNoMsg);
-      this.outsideMessageVisitor = Objects.nonNull(outsideMessageVisitor);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
+      this.rootNoMsg = Preconditions.checkNotNull(rootNoMsg);
+      this.outsideMessageVisitor = Preconditions.checkNotNull(outsideMessageVisitor);
     }
 
     @Override
@@ -189,9 +189,9 @@ public class MessageExtractor implements Function<I18nCheckedTree, MessageExtrac
     InsideMessageVisitor(AlertSink alertSink,
                          OutsideMessageVisitor outsideMessageVisitor,
                          UnextractedMessage msg) {
-      this.alertSink = Objects.nonNull(alertSink);
-      this.outsideMessageVisitor = Objects.nonNull(outsideMessageVisitor);
-      this.msg = Objects.nonNull(msg);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
+      this.outsideMessageVisitor = Preconditions.checkNotNull(outsideMessageVisitor);
+      this.msg = Preconditions.checkNotNull(msg);
 
       // Populate the tcMessageBuilder with a content-type
       tcMessageBuilder.setContentType(msg.getSchema().getCanonicalContentType());
@@ -286,7 +286,7 @@ public class MessageExtractor implements Function<I18nCheckedTree, MessageExtrac
         subExpression =
             subExpression.acceptVisitor(outsideMessageVisitor);
         if (subExpression.hasStaticString()) {
-          String s = Objects.nonNull(subExpression.getStaticString(alertSink,
+          String s = Preconditions.checkNotNull(subExpression.getStaticString(alertSink,
                                                                    null));
           sb.append(s.replace("%", "%%"));
         } else {

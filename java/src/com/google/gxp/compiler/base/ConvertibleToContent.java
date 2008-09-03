@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Prior to the binding phase, indicates that an {@code Expression} can be
@@ -32,7 +33,7 @@ public class ConvertibleToContent extends Expression {
 
   public ConvertibleToContent(Expression subexpression) {
     super(subexpression);
-    this.subexpression = Objects.nonNull(subexpression);
+    this.subexpression = Preconditions.checkNotNull(subexpression);
   }
 
   public Expression getSubexpression() {

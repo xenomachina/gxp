@@ -16,7 +16,7 @@
 
 package com.google.gxp.base;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -43,7 +43,7 @@ public final class GxpContext {
    * @param useXmlSyntax flag indicating if gxp should generate XML (instead of SGML)
    */
   public GxpContext(Locale locale, boolean useXmlSyntax) {
-    this.locale = Objects.nonNull(locale);
+    this.locale = Preconditions.checkNotNull(locale);
     this.useXmlSyntax = useXmlSyntax;
   }
 

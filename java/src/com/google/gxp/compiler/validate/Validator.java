@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.validate;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -87,7 +87,7 @@ public class Validator implements Function<EscapedTree, ValidatedTree> {
     private Template template = null;
 
     Visitor(AlertSink alertSink) {
-      this.alertSink = Objects.nonNull(alertSink);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
     }
 
     /**

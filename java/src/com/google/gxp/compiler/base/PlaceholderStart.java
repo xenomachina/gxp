@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.schema.Schema;
 
 /**
@@ -31,7 +32,7 @@ public class PlaceholderStart extends Expression {
   public PlaceholderStart(Node fromNode, Schema schema,
                           String name, String example) {
     super(fromNode, schema);
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
     this.example = example;
   }
 

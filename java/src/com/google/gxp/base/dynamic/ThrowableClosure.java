@@ -17,7 +17,7 @@
 package com.google.gxp.base.dynamic;
 
 import com.google.common.base.CharEscapers;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.base.GxpContext;
 import com.google.gxp.html.HtmlClosure;
 
@@ -34,7 +34,7 @@ public class ThrowableClosure implements HtmlClosure {
   private final Throwable t;
 
   public ThrowableClosure(Throwable t) {
-    this.t = Objects.nonNull(t);
+    this.t = Preconditions.checkNotNull(t);
   }
 
   public void write(Appendable out, GxpContext gxpContext) throws IOException {

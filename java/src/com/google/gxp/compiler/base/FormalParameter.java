@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
 import java.util.Collections;
@@ -43,13 +44,13 @@ public class FormalParameter extends SerializableAbstractNode {
                          Expression constructor, boolean hasConstructorFlag,
                          SpaceOperatorSet spaceOperators) {
     super(sourcePosition, displayName);
-    this.primaryName = Objects.nonNull(primaryName);
+    this.primaryName = Preconditions.checkNotNull(primaryName);
     this.consumesContent = consumesContent;
-    this.type = Objects.nonNull(type);
+    this.type = Preconditions.checkNotNull(type);
     this.hasDefault = (defaultValue != null) || hasDefaultFlag;
     this.regex = regex;
     this.hasConstructor = (constructor != null) || hasConstructorFlag;
-    this.spaceOperators = Objects.nonNull(spaceOperators);
+    this.spaceOperators = Preconditions.checkNotNull(spaceOperators);
   }
 
   public FormalParameter(Node fromNode,

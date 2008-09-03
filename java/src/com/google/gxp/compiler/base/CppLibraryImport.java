@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.base;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * A C++ Library Import. The internal implementation of
@@ -28,7 +28,7 @@ public class CppLibraryImport extends Import {
 
   public CppLibraryImport(Node fromNode, String libraryName) {
     super(fromNode);
-    this.libraryName = Objects.nonNull(libraryName);
+    this.libraryName = Preconditions.checkNotNull(libraryName);
   }
 
   public String getLibraryName() {

@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.depend;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.gxp.compiler.base.Callable;
 import com.google.gxp.compiler.base.TemplateName;
@@ -37,7 +38,7 @@ public class DependencyNode implements Serializable {
   public DependencyNode(TemplateName.FullyQualified name,
                         long lastModified,
                         Set<Callable> requirements) {
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
     this.lastModified = lastModified;
     this.requirements = ImmutableSet.copyOf(requirements);
   }

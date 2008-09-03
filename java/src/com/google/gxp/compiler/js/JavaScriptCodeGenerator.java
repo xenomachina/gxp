@@ -19,7 +19,7 @@ package com.google.gxp.compiler.js;
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Function;
 import com.google.common.base.Join;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -132,7 +132,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
     public TemplateWorker(Appendable appendable, AlertSink alertSink, Template template,
                           Set<TemplateName> extraRequires) {
       super(appendable, alertSink);
-      this.template = Objects.nonNull(template);
+      this.template = Preconditions.checkNotNull(template);
       this.extraRequires = ImmutableSet.copyOf(extraRequires);
     }
 

@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.alerts.common;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.transconsole.common.messages.InvalidMessageException;
@@ -31,7 +31,7 @@ public class InvalidMessageError extends ErrorAlert {
   public InvalidMessageError(SourcePosition sourcePosition,
                              InvalidMessageException invalidMessageException) {
     super(sourcePosition, invalidMessageException.getMessage());
-    this.invalidMessageException = Objects.nonNull(invalidMessageException);
+    this.invalidMessageException = Preconditions.checkNotNull(invalidMessageException);
   }
 
   public InvalidMessageException getInvalidMessageException() {

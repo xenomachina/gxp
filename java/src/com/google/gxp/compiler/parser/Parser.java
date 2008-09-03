@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.parser;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.fs.FileRef;
@@ -40,10 +40,10 @@ public class Parser {
    */
   public Parser(SchemaFactory schemaFactory, XmlParser xmlParser,
                 SourceEntityResolver entityResolver) {
-    this.schemaFactory = Objects.nonNull(schemaFactory);
-    this.xmlParser = Objects.nonNull(xmlParser);
+    this.schemaFactory = Preconditions.checkNotNull(schemaFactory);
+    this.xmlParser = Preconditions.checkNotNull(xmlParser);
     this.namespaces = new NamespaceSet(schemaFactory);
-    this.entityResolver = Objects.nonNull(entityResolver);
+    this.entityResolver = Preconditions.checkNotNull(entityResolver);
   }
 
   public SchemaFactory getSchemaFactory() {

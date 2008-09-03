@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.codegen;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.Parameter;
@@ -43,7 +43,7 @@ public abstract class BracesCodeGenerator<T extends Tree<Root>> extends BaseCode
 
     protected Worker(Appendable out, AlertSink alertSink, String... halfIndentMarkers) {
       this.out = new CIndenter(out, halfIndentMarkers);
-      this.alertSink = Objects.nonNull(alertSink);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
     }
 
     protected SourcePosition getDefaultSourcePosition() {

@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.schema.Schema;
 
@@ -37,8 +38,8 @@ public class ExceptionExpression extends Expression {
                              Kind exceptionType,
                              String message) {
     super(sourcePosition, "exception", schema);
-    this.exceptionType = Objects.nonNull(exceptionType);
-    this.message = Objects.nonNull(message);
+    this.exceptionType = Preconditions.checkNotNull(exceptionType);
+    this.message = Preconditions.checkNotNull(message);
   }
 
   public Kind getKind() {

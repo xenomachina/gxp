@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.alerts.common.InvalidNameError;
@@ -58,7 +59,7 @@ public abstract class TemplateName implements Serializable {
    */
   private TemplateName(String packageName, String baseName) {
     this.packageName = packageName;
-    this.baseName = Objects.nonNull(baseName);
+    this.baseName = Preconditions.checkNotNull(baseName);
     this.isValid = isValidPackageName(packageName)
         && isValidBaseName(baseName);
   }
@@ -68,7 +69,7 @@ public abstract class TemplateName implements Serializable {
    */
   public static final class FullyQualified extends TemplateName {
     public FullyQualified(String packageName, String baseName) {
-      super(Objects.nonNull(packageName), baseName);
+      super(Preconditions.checkNotNull(packageName), baseName);
     }
 
     @Override

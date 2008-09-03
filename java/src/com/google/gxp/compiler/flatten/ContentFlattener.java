@@ -18,7 +18,7 @@ package com.google.gxp.compiler.flatten;
 
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.AlertSink;
@@ -74,7 +74,7 @@ public class ContentFlattener implements Function<ValidatedTree, ContentFlattene
     private final AlertSink alertSink;
 
     Visitor(AlertSink alertSink) {
-      this.alertSink = Objects.nonNull(alertSink);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
     }
 
     private Expression flattenDocType(OutputElement element, DocType docType) {

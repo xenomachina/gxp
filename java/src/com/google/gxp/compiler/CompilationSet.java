@@ -17,7 +17,7 @@
 package com.google.gxp.compiler;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
@@ -83,9 +83,9 @@ public class CompilationSet {
      */
     public Builder(Parser parser, CodeGeneratorFactory codeGeneratorFactory,
                    CompilationManager manager) {
-      this.parser = Objects.nonNull(parser);
-      this.codeGeneratorFactory = Objects.nonNull(codeGeneratorFactory);
-      this.manager = Objects.nonNull(manager);
+      this.parser = Preconditions.checkNotNull(parser);
+      this.codeGeneratorFactory = Preconditions.checkNotNull(codeGeneratorFactory);
+      this.manager = Preconditions.checkNotNull(manager);
     }
 
     /**

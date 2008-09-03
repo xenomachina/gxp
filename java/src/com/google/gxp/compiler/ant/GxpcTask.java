@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.ant;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
@@ -80,8 +80,8 @@ public class GxpcTask extends Task implements Configuration {
   private boolean i18nwarn = false;
 
   public GxpcTask(FileSystem fs, FileRef cwd) {
-    this.fs = Objects.nonNull(fs);
-    this.cwd = Objects.nonNull(cwd);
+    this.fs = Preconditions.checkNotNull(fs);
+    this.cwd = Preconditions.checkNotNull(cwd);
     fileScanner.setIncludes(DEFAULT_INCLUDES);
   }
 

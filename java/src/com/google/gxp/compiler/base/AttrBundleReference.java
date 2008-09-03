@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * An {@code Expression} representing a reference to an attribute bundle. The
@@ -27,7 +28,7 @@ public class AttrBundleReference extends Expression {
 
   public AttrBundleReference(Node fromNode, String name) {
     super(fromNode, null);
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
   }
 
   public String getName() {

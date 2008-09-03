@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.parser;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.AbstractNode;
 
@@ -55,14 +55,14 @@ public final class ParsedAttribute extends AbstractNode {
                          String qualifiedName) {
     super(sourcePosition, "'" + qualifiedName + "' attribute");
 
-    this.namespace = Objects.nonNull(namespace);
+    this.namespace = Preconditions.checkNotNull(namespace);
 
     if (name.length() < 1) {
       throw new IllegalArgumentException();
     }
     this.name = name;
 
-    this.value = Objects.nonNull(value);
+    this.value = Preconditions.checkNotNull(value);
 
     if (qualifiedName.length() < name.length()) {
       throw new IllegalArgumentException();

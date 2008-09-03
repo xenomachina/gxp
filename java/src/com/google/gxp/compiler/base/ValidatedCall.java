@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.reparent.Attribute;
@@ -36,18 +37,18 @@ public class ValidatedCall extends Call {
                        Callable callee,
                        Map<String, Attribute> attributes,
                        List<String> attrBundles) {
-    super(sourcePosition, displayName, Objects.nonNull(callee.getSchema()),
+    super(sourcePosition, displayName, Preconditions.checkNotNull(callee.getSchema()),
           attributes, attrBundles);
-    this.callee = Objects.nonNull(callee);
+    this.callee = Preconditions.checkNotNull(callee);
   }
 
   public ValidatedCall(Call fromCall,
                        Callable callee,
                        Map<String, Attribute> attributes) {
     super(fromCall.getSourcePosition(), fromCall.getDisplayName(),
-          Objects.nonNull(callee.getSchema()), attributes,
+          Preconditions.checkNotNull(callee.getSchema()), attributes,
           fromCall.getAttrBundles());
-    this.callee = Objects.nonNull(callee);
+    this.callee = Preconditions.checkNotNull(callee);
   }
 
   public ValidatedCall withParams(Map<String, Attribute> attributes) {

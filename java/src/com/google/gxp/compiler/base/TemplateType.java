@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
@@ -29,12 +30,12 @@ public class TemplateType extends Type {
 
   public TemplateType(Node fromNode, TemplateName templateName) {
     super(fromNode);
-    this.templateName = Objects.nonNull(templateName);
+    this.templateName = Preconditions.checkNotNull(templateName);
   }
 
   public TemplateType(SourcePosition pos, String displayName, TemplateName templateName) {
     super(pos, displayName);
-    this.templateName = Objects.nonNull(templateName);
+    this.templateName = Preconditions.checkNotNull(templateName);
   }
 
   public TemplateName getTemplateName() {

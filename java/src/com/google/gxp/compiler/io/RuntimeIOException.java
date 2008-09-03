@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.io;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
 
@@ -29,7 +29,7 @@ public class RuntimeIOException extends RuntimeException {
   private static final long serialVersionUID = -1;
 
   public RuntimeIOException(IOException cause) {
-    super(Objects.nonNull(cause));
+    super(Preconditions.checkNotNull(cause));
   }
 
   @Override

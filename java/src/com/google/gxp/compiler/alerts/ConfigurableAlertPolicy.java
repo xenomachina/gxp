@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.alerts;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.util.ClassMap;
 
 /**
@@ -28,7 +28,7 @@ public class ConfigurableAlertPolicy implements AlertPolicy {
   private boolean treatWarningsAsErrors = false;
 
   public void setSeverity(Class<? extends Alert> cls, Alert.Severity severity) {
-    map.put(cls, Objects.nonNull(severity));
+    map.put(cls, Preconditions.checkNotNull(severity));
   }
 
   /**

@@ -16,7 +16,7 @@
 
 package com.google.transconsole.common.messages;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -58,8 +58,8 @@ public abstract class Bundle <T extends BaseMessage> implements Iterable<T> {
    * @param languageId Translation Console ID of language (e.g. "en-US").
    */
   public Bundle(String projectId, String languageId) {
-    this.projectId = Objects.nonNull(projectId);
-    this.languageId = Objects.nonNull(languageId);
+    this.projectId = Preconditions.checkNotNull(projectId);
+    this.languageId = Preconditions.checkNotNull(languageId);
 
     messages = Maps.newTreeMap();
   }

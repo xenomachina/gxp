@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.i18ncheck;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.base.AbbrExpression;
@@ -84,7 +84,7 @@ public class I18nChecker {
     private boolean insideNoMsg = false;
 
     Visitor(AlertSink alertSink) {
-      this.alertSink = Objects.nonNull(alertSink);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
     }
 
     @Override

@@ -17,7 +17,7 @@
 package com.google.gxp.testing.dynamic;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.io.Bytes;
@@ -194,7 +194,7 @@ public abstract class BaseRunningTestCase extends BaseBuildingTestCase {
     private final JavaFileManager jfm;
 
     public JavaFileManagerClassLoader(JavaFileManager jfm) {
-      this.jfm = Objects.nonNull(jfm);
+      this.jfm = Preconditions.checkNotNull(jfm);
     }
 
     @Override
@@ -222,7 +222,7 @@ public abstract class BaseRunningTestCase extends BaseBuildingTestCase {
     private int compilationCount = 0;
 
     public CountingJavaCompiler(JavaCompiler delegate) {
-      this.delegate = Objects.nonNull(delegate);
+      this.delegate = Preconditions.checkNotNull(delegate);
     }
 
     public int getCompilationCount() {

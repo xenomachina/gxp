@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.alerts;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.fs.DummyFileSystem;
 import com.google.gxp.compiler.fs.FileRef;
 
@@ -40,7 +41,7 @@ public final class SourcePosition implements Serializable {
    * @param source the source file
    */
   public SourcePosition(FileRef source) {
-    this.source = Objects.nonNull(source);
+    this.source = Preconditions.checkNotNull(source);
     this.line = 0;
     this.column = 0;
   }
@@ -51,7 +52,7 @@ public final class SourcePosition implements Serializable {
    * @param column the column number
    */
   public SourcePosition(FileRef source, int line, int column) {
-    this.source = Objects.nonNull(source);
+    this.source = Preconditions.checkNotNull(source);
 
     if (line < 1) {
       throw new IllegalArgumentException("line must be >= 1");
@@ -69,7 +70,7 @@ public final class SourcePosition implements Serializable {
    * {@code FileRef}.
    */
   public SourcePosition(String sourceName) {
-    this(DummyFileSystem.INSTANCE.parseFilename(Objects.nonNull(sourceName)));
+    this(DummyFileSystem.INSTANCE.parseFilename(Preconditions.checkNotNull(sourceName)));
   }
 
   /**
@@ -77,7 +78,8 @@ public final class SourcePosition implements Serializable {
    * {@code FileRef}.
    */
   public SourcePosition(String sourceName, int line, int column) {
-    this(DummyFileSystem.INSTANCE.parseFilename(Objects.nonNull(sourceName)), line, column);
+    this(DummyFileSystem.INSTANCE.parseFilename(Preconditions.checkNotNull(sourceName)),
+                                                line, column);
   }
 
   public FileRef getSource() {

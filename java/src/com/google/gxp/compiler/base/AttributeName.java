@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.parser.Namespace;
 import com.google.gxp.compiler.parser.NullNamespace;
 
@@ -32,8 +33,8 @@ public class AttributeName {
   }
 
   public AttributeName(Namespace ns, String localName) {
-    this.ns = Objects.nonNull(ns);
-    this.localName = Objects.nonNull(localName);
+    this.ns = Preconditions.checkNotNull(ns);
+    this.localName = Preconditions.checkNotNull(localName);
   }
 
   public Namespace getNamespace() {

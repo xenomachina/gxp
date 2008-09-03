@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.alerts;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.fs.FileRef;
 
 /**
@@ -59,11 +60,11 @@ public abstract class Alert {
   // Package private, because all direct subclasses are in this package.
   public Alert(SourcePosition sourcePosition, Severity defaultSeverity,
                String message) {
-    this.sourcePosition = Objects.nonNull(
+    this.sourcePosition = Preconditions.checkNotNull(
         sourcePosition, "sourcePosition is null");
-    this.defaultSeverity = Objects.nonNull(
+    this.defaultSeverity = Preconditions.checkNotNull(
         defaultSeverity, "defaultSeverity is null");
-    this.message = Objects.nonNull(message, "alert message is null");
+    this.message = Preconditions.checkNotNull(message, "alert message is null");
   }
 
   /**

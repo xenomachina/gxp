@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.schema;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import java.io.Serializable;
 
@@ -28,7 +29,7 @@ public class SchemaRef implements Serializable {
   private final String contentType;
 
   public SchemaRef(String contentType) {
-    this.contentType = Objects.nonNull(contentType);
+    this.contentType = Preconditions.checkNotNull(contentType);
   }
 
   public String getContentType() {

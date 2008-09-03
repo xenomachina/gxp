@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
@@ -32,7 +33,7 @@ public class NativeType extends Type {
   public NativeType(SourcePosition sourcePosition, String displayName,
                     MultiLanguageAttrValue nativeType) {
     super(sourcePosition, displayName);
-    this.nativeType = Objects.nonNull(nativeType);
+    this.nativeType = Preconditions.checkNotNull(nativeType);
   }
 
   public NativeType(Node fromNode, MultiLanguageAttrValue nativeType) {

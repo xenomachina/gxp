@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.ant;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.Alert;
 import com.google.gxp.compiler.alerts.AlertPolicy;
 import com.google.gxp.compiler.alerts.AlertSet;
@@ -33,8 +33,8 @@ public class LoggingAlertSink implements AlertSink {
   private final Task task;
 
   public LoggingAlertSink(AlertPolicy alertPolicy, Task task) {
-    this.alertPolicy = Objects.nonNull(alertPolicy);
-    this.task = Objects.nonNull(task);
+    this.alertPolicy = Preconditions.checkNotNull(alertPolicy);
+    this.task = Preconditions.checkNotNull(task);
   }
 
   public void add(Alert alert) {

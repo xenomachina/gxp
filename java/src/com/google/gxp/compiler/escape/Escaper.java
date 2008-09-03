@@ -18,7 +18,7 @@ package com.google.gxp.compiler.escape;
 
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -87,7 +87,7 @@ public class Escaper implements Function<PlaceholderInsertedTree, EscapedTree> {
     private final AlertSink alertSink;
 
     Worker(AlertSink alertSink) {
-      this.alertSink = Objects.nonNull(alertSink);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
     }
 
     private final Map<Schema, Visitor> visitors = Maps.newHashMap();
@@ -117,7 +117,7 @@ public class Escaper implements Function<PlaceholderInsertedTree, EscapedTree> {
       private final Deque<Attribute> attrStack = new ArrayDeque<Attribute>();
 
       Visitor(Schema schema) {
-        this.schema = Objects.nonNull(schema);
+        this.schema = Preconditions.checkNotNull(schema);
       }
 
       @Override

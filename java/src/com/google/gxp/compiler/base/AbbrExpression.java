@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * A {@code Expression} that declares a variable ("abbreviation"). This is the
@@ -31,10 +32,10 @@ public class AbbrExpression extends Expression {
   public AbbrExpression(Node fromNode, Type type, String name,
                         Expression value, Expression content) {
     super(fromNode, content.getSchema());
-    this.type = Objects.nonNull(type);
-    this.name = Objects.nonNull(name);
-    this.value = Objects.nonNull(value);
-    this.content = Objects.nonNull(content);
+    this.type = Preconditions.checkNotNull(type);
+    this.name = Preconditions.checkNotNull(name);
+    this.value = Preconditions.checkNotNull(value);
+    this.content = Preconditions.checkNotNull(content);
   }
 
   public Type getType() {

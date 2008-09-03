@@ -17,7 +17,7 @@
 package com.google.gxp.compiler;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertCounter;
 import com.google.gxp.compiler.alerts.AlertPolicy;
 import com.google.gxp.compiler.alerts.AlertSink;
@@ -48,10 +48,10 @@ public final class CompilationTask {
                   CodeGeneratorFactory codeGeneratorFactory,
                   OutputLanguage language,
                   FileRef outputFileRef) {
-    this.compilationUnit = Objects.nonNull(compilationUnit);
-    this.codeGeneratorFactory = Objects.nonNull(codeGeneratorFactory);
-    this.language = Objects.nonNull(language);
-    this.outputFileRef = Objects.nonNull(outputFileRef);
+    this.compilationUnit = Preconditions.checkNotNull(compilationUnit);
+    this.codeGeneratorFactory = Preconditions.checkNotNull(codeGeneratorFactory);
+    this.language = Preconditions.checkNotNull(language);
+    this.outputFileRef = Preconditions.checkNotNull(outputFileRef);
   }
 
   public FileRef getOutputFileRef() {

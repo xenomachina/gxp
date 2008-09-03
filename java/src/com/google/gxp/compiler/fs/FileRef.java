@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.fs;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.io.Characters;
 
 import java.net.URI;
@@ -67,8 +68,8 @@ public final class FileRef implements FileObject {
       Pattern.compile("\\.(" + EXTENSION_CHARS + ")$");
 
   public FileRef(FileStore store, String name) {
-    this.store = Objects.nonNull(store);
-    this.name = normalize(Objects.nonNull(name));
+    this.store = Preconditions.checkNotNull(store);
+    this.name = normalize(Preconditions.checkNotNull(name));
   }
 
   public String getName() {

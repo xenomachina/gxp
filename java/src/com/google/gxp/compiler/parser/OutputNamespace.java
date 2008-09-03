@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.parser;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.schema.ElementValidator;
@@ -35,7 +35,7 @@ public class OutputNamespace implements Namespace {
   }
 
   public OutputNamespace(Schema schema) {
-    this.schema = Objects.nonNull(schema);
+    this.schema = Preconditions.checkNotNull(schema);
   }
 
   public ParsedElement createElement(AlertSink alertSink,

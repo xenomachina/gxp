@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.gxp.compiler.alerts.SourcePosition;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Represents a declaration that the enclosing template implements an
@@ -32,7 +32,7 @@ public class BoundImplementsDeclaration extends ImplementsDeclaration {
                                     SourcePosition sourcePosition,
                                     String displayName) {
     super(sourcePosition, displayName);
-    this.gxpInterface = Objects.nonNull(gxpInterface);
+    this.gxpInterface = Preconditions.checkNotNull(gxpInterface);
   }
 
   public BoundImplementsDeclaration(Implementable gxpInterface, Node node) {

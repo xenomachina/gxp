@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.alerts.common;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
@@ -29,7 +29,7 @@ public class InvalidNameError extends ErrorAlert {
 
   public InvalidNameError(SourcePosition sourcePosition, String name) {
     super(sourcePosition, "invalid name \"" + name + "\"");
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
   }
 
   public String getName() {

@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.fs;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
 
@@ -35,7 +35,7 @@ public class JavaFileManagerImpl extends ForwardingJavaFileManager<JavaFileManag
 
   public JavaFileManagerImpl(JavaFileManager javaFileManager, FileSystem fileSystem) {
     super(javaFileManager);
-    this.fileSystem = Objects.nonNull(fileSystem);
+    this.fileSystem = Preconditions.checkNotNull(fileSystem);
   }
 
   /**

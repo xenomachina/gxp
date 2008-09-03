@@ -18,6 +18,7 @@ package com.google.transconsole.common.messages;
 
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import java.util.List;
 
@@ -48,9 +49,9 @@ public final class Placeholder implements MessageFragment {
    *   (if the original is a variable)
    */
   public Placeholder(String original, String presentation, String example) {
-    this.original = Objects.nonNull(original);
-    this.presentation = Objects.nonNull(presentation);
-    this.example = Objects.nonNull(example);
+    this.original = Preconditions.checkNotNull(original);
+    this.presentation = Preconditions.checkNotNull(presentation);
+    this.example = Preconditions.checkNotNull(example);
   }
 
   /**
@@ -71,7 +72,7 @@ public final class Placeholder implements MessageFragment {
    */
   public Placeholder(String presentation) {
     this.original = null;
-    this.presentation = Objects.nonNull(presentation);
+    this.presentation = Preconditions.checkNotNull(presentation);
     this.example = null;
   }
 

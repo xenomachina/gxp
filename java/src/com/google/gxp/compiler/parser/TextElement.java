@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.parser;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
 import java.util.*;
@@ -32,7 +32,7 @@ public class TextElement extends ParsedElement {
     super(pos, "text",
           Collections.<ParsedAttribute>emptyList(),
           Collections.<ParsedElement>emptyList());
-    this.text = Objects.nonNull(text);
+    this.text = Preconditions.checkNotNull(text);
   }
 
   public <T> T acceptVisitor(ParsedElementVisitor<T> visitor) {

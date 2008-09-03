@@ -18,6 +18,7 @@ package com.google.gxp.compiler.base;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -48,8 +49,8 @@ public abstract class AbstractRoot<T extends AbstractRoot> extends AbstractNode 
                          List<Parameter> parameters,
                          List<FormalTypeParameter> formalTypeParameters) {
     super(pos, displayName);
-    this.name = Objects.nonNull(name);
-    this.schema = Objects.nonNull(schema);
+    this.name = Preconditions.checkNotNull(name);
+    this.schema = Preconditions.checkNotNull(schema);
     this.javaAnnotations = ImmutableList.copyOf(javaAnnotations);
     this.imports = ImmutableList.copyOf(imports);
     this.throwsDeclarations = ImmutableList.copyOf(throwsDeclarations);

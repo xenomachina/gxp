@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.parser;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.InfoAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
@@ -50,7 +50,7 @@ public class FileSystemEntityResolver implements SourceEntityResolver {
   private final FileSystem fileSystem;
 
   public FileSystemEntityResolver(FileSystem fileSystem) {
-    this.fileSystem = Objects.nonNull(fileSystem);
+    this.fileSystem = Preconditions.checkNotNull(fileSystem);
   }
 
   /**

@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.gxp.compiler.schema.Schema;
@@ -38,9 +39,9 @@ public abstract class AbstractCallable implements Callable {
 
   protected AbstractCallable(TemplateName.FullyQualified name, Schema schema,
                              List<Parameter> parameters) {
-    this.name = Objects.nonNull(name);
-    this.schema = Objects.nonNull(schema);
-    this.parameters = Util.map(Objects.nonNull(parameters), Parameter.GET_FORMAL);
+    this.name = Preconditions.checkNotNull(name);
+    this.schema = Preconditions.checkNotNull(schema);
+    this.parameters = Util.map(Preconditions.checkNotNull(parameters), Parameter.GET_FORMAL);
 
     // Construct maps from parameter names -> FormalParameter, and pull out
     // the content consuming parameter if one exists

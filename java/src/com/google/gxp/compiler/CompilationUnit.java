@@ -17,7 +17,7 @@
 package com.google.gxp.compiler;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.gxp.compiler.base.TemplateName;
@@ -63,9 +63,9 @@ public class CompilationUnit {
 
   CompilationUnit(ServiceDirectory serviceDirectory, Parser parser,
                   FileRef sourceFileRef, long compilationVersion) {
-    this.serviceDirectory = Objects.nonNull(serviceDirectory);
-    this.parser = Objects.nonNull(parser);
-    this.sourceFileRef = Objects.nonNull(sourceFileRef);
+    this.serviceDirectory = Preconditions.checkNotNull(serviceDirectory);
+    this.parser = Preconditions.checkNotNull(parser);
+    this.sourceFileRef = Preconditions.checkNotNull(sourceFileRef);
 
     String fileName = sourceFileRef.removeExtension().getName();
     this.className = fileName.substring(1).replace('/', '.');

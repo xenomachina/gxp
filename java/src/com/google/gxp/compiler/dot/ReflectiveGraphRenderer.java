@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.dot;
 
 import com.google.common.base.CharEscapers;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.gxp.compiler.base.Node;
 
@@ -37,7 +37,7 @@ public class ReflectiveGraphRenderer implements GraphRenderer<Object> {
   private final String graphName;
 
   public ReflectiveGraphRenderer(String graphName) {
-    this.graphName = Objects.nonNull(graphName);
+    this.graphName = Preconditions.checkNotNull(graphName);
   }
 
   public void renderGraph(GraphSink out, Iterable<?> objects) {
@@ -64,7 +64,7 @@ public class ReflectiveGraphRenderer implements GraphRenderer<Object> {
     private Map<Object, String> visited = new IdentityHashMap<Object, String>();
 
     Worker(GraphSink out) {
-      this.out = Objects.nonNull(out);
+      this.out = Preconditions.checkNotNull(out);
     }
 
     String renderSubgraph(Object object) {

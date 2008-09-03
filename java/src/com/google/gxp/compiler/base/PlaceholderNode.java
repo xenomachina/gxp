@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Internal representation of {@code <gxp:ph>}/{@code <gxp:eph>} pair. One is
@@ -32,9 +33,9 @@ public class PlaceholderNode extends Expression {
   public PlaceholderNode(Node fromNode, String name, String example,
                          Expression content) {
     super(fromNode, content.getSchema());
-    this.name = Objects.nonNull(name);
-    this.example = Objects.nonNull(example);
-    this.content = Objects.nonNull(content);
+    this.name = Preconditions.checkNotNull(name);
+    this.example = Preconditions.checkNotNull(example);
+    this.content = Preconditions.checkNotNull(content);
   }
 
   public String getName() {

@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.parser;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gxp.compiler.alerts.Alert.Severity;
@@ -102,8 +102,8 @@ public class SaxXmlParser implements XmlParser {
     private final Set<String> exceptionMessages = Sets.newHashSet();
 
     SaxEventAdapter(FileRef input, XmlEventHandler eventHandler) {
-      this.input = Objects.nonNull(input);
-      this.eventHandler = Objects.nonNull(eventHandler);
+      this.input = Preconditions.checkNotNull(input);
+      this.eventHandler = Preconditions.checkNotNull(eventHandler);
     }
 
     /** Implements {@code ContentHandler}. */

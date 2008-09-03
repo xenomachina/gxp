@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Internal representation of a &lt;gxp:throws&gt; element.
@@ -26,7 +27,7 @@ public class ThrowsDeclaration extends AbstractNode {
 
   public ThrowsDeclaration(Node fromNode, String exceptionType) {
     super(fromNode);
-    this.exceptionType = Objects.nonNull(exceptionType);
+    this.exceptionType = Preconditions.checkNotNull(exceptionType);
   }
 
   // TODO(laurence): Change this to a Type

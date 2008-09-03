@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.base;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -50,11 +50,11 @@ public final class Template extends AbstractRoot<Template> {
                   Expression content) {
     super(sourcePosition, displayName, name, schema, javaAnnotations,
           imports, throwsDeclarations, parameters, formalTypeParameters);
-    this.constructor = Objects.nonNull(constructor);
+    this.constructor = Preconditions.checkNotNull(constructor);
     this.allParameters = ImmutableList.copyOf(
         Iterables.concat(constructor.getParameters(), getParameters()));
     this.implementsDeclarations = ImmutableList.copyOf(implementsDeclarations);
-    this.content = Objects.nonNull(content);
+    this.content = Preconditions.checkNotNull(content);
 
     this.callable = new TemplateCallable(name, schema, getAllParameters());
 

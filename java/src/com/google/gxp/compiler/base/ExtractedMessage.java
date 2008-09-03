@@ -18,6 +18,7 @@ package com.google.gxp.compiler.base;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gxp.compiler.schema.Schema;
 import com.google.transconsole.common.messages.Message;
@@ -35,7 +36,7 @@ public class ExtractedMessage extends Expression {
   public ExtractedMessage(Node fromNode, Schema schema,
                           Message tcMessage, List<Expression> parameters) {
     super(fromNode, schema);
-    this.tcMessage = Objects.nonNull(tcMessage);
+    this.tcMessage = Preconditions.checkNotNull(tcMessage);
     this.parameters = ImmutableList.copyOf(parameters);
   }
 

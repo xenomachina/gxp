@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.reparent;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -120,8 +120,8 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
   private Schema rootSchema = null;
 
   public Reparenter(SchemaFactory schemaFactory, String className) {
-    this.schemaFactory = Objects.nonNull(schemaFactory);
-    this.className = Objects.nonNull(className);
+    this.schemaFactory = Preconditions.checkNotNull(schemaFactory);
+    this.className = Preconditions.checkNotNull(className);
   }
 
   public ReparentedTree apply(IfExpandedTree parseTree) {
@@ -281,9 +281,9 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
      * what we're building.
      */
     ElementVisitor(EditableParts output, Parts nodeParts, AlertSink alertSink) {
-      this.output = Objects.nonNull(output);
-      this.nodeParts = Objects.nonNull(nodeParts);
-      this.alertSink = Objects.nonNull(alertSink);
+      this.output = Preconditions.checkNotNull(output);
+      this.nodeParts = Preconditions.checkNotNull(nodeParts);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
     }
 
     private SpaceOperator parseSpaceOperator(AttributeMap attrMap,

@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.gxp.compiler.alerts.SourcePosition;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Represents a declaration that the enclosing template implements a native
@@ -30,7 +30,7 @@ public class NativeImplementsDeclaration extends ImplementsDeclaration {
                                      String displayName,
                                      NativeType nativeType) {
     super(sourcePosition, displayName);
-    this.nativeType = Objects.nonNull(nativeType);
+    this.nativeType = Preconditions.checkNotNull(nativeType);
   }
 
   public NativeImplementsDeclaration(Node fromNode, NativeType nativeType) {

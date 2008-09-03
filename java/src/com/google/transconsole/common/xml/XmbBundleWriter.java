@@ -16,7 +16,7 @@
 
 package com.google.transconsole.common.xml;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.transconsole.common.messages.Message;
 import com.google.transconsole.common.messages.MessageBundle;
 
@@ -42,7 +42,7 @@ public class XmbBundleWriter {
    * @param bundle MessageBundle to write
    */
   public XmbBundleWriter(MessageBundle bundle) {
-    this.bundle = Objects.nonNull(bundle);
+    this.bundle = Preconditions.checkNotNull(bundle);
   }
 
   /**

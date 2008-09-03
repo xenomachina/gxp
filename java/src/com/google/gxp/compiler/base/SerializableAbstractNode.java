@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
 import java.io.Serializable;
@@ -34,8 +35,8 @@ public class SerializableAbstractNode implements Node, Serializable {
    * @param displayName the display name of this {@code Node}
    */
   protected SerializableAbstractNode(SourcePosition sourcePosition, String displayName) {
-    this.sourcePosition = Objects.nonNull(sourcePosition);
-    this.displayName = Objects.nonNull(displayName);
+    this.sourcePosition = Preconditions.checkNotNull(sourcePosition);
+    this.displayName = Preconditions.checkNotNull(displayName);
   }
 
   /**

@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.gxp.compiler.alerts.SourcePosition;
@@ -71,13 +72,13 @@ public class OutputElement extends Expression {
                        Expression content) {
     super(sourcePosition, displayName, schema);
     this.innerSchema = innerSchema;
-    this.localName = Objects.nonNull(localName);
-    this.validator = Objects.nonNull(validator);
+    this.localName = Preconditions.checkNotNull(localName);
+    this.validator = Preconditions.checkNotNull(validator);
     this.docType = docType;
     this.attributes = ImmutableList.copyOf(attributes);
     this.attrBundles = ImmutableList.copyOf(attrBundles);
     this.phName = phName;
-    this.content = Objects.nonNull(content);
+    this.content = Preconditions.checkNotNull(content);
   }
 
   /**

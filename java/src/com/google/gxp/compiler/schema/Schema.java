@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.schema;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gxp.compiler.alerts.SourcePosition;
@@ -232,8 +233,8 @@ public final class Schema extends SerializableAbstractNode implements Comparable
                 Collection<SchemaRef> allowedSchemaRefs,
                 Schema msgSchema) {
     super(pos, displayName);
-    this.name = Objects.nonNull(name);
-    this.namespaceUri = Objects.nonNull(namespaceUri);
+    this.name = Preconditions.checkNotNull(name);
+    this.namespaceUri = Preconditions.checkNotNull(namespaceUri);
     this.contentType = contentType;
     this.defaultsToSgml = defaultsToSgml;
     this.sgmlContentType = sgmlContentType;
@@ -241,9 +242,9 @@ public final class Schema extends SerializableAbstractNode implements Comparable
     this.cppType = cppType;
     this.cppAppender = cppAppender;
     this.cppImports = ImmutableList.copyOf(cppImports);
-    this.javaType = Objects.nonNull(javaType);
+    this.javaType = Preconditions.checkNotNull(javaType);
     this.javaAppender = javaAppender;
-    this.javaImports = ImmutableList.copyOf(Objects.nonNull(javaImports));
+    this.javaImports = ImmutableList.copyOf(Preconditions.checkNotNull(javaImports));
     this.javaScriptType = javaScriptType;
     this.contentFamily = ContentFamily.fromContentTypeName(
         getCanonicalContentType());

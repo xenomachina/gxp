@@ -18,7 +18,7 @@ package com.google.gxp.compiler.cpp;
 
 import com.google.common.base.Function;
 import com.google.common.base.Join;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -174,8 +174,8 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
       private final String outWrapper;
 
       public ExtraOutType(String outType, String outWrapper) {
-        this.outType = Objects.nonNull(outType);
-        this.outWrapper = Objects.nonNull(outWrapper);
+        this.outType = Preconditions.checkNotNull(outType);
+        this.outWrapper = Preconditions.checkNotNull(outWrapper);
       }
 
       public String getOutType() {
@@ -284,7 +284,7 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
 
     protected InterfaceWorker(Appendable out, AlertSink alertSink, Interface iface) {
       super(out, alertSink);
-      this.iface = Objects.nonNull(iface);
+      this.iface = Preconditions.checkNotNull(iface);
     }
 
     protected abstract void appendClass();
@@ -307,7 +307,7 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
 
     protected TemplateWorker(Appendable out, AlertSink alertSink, Template template) {
       super(out, alertSink);
-      this.template = Objects.nonNull(template);
+      this.template = Preconditions.checkNotNull(template);
     }
 
     protected abstract void appendClass();

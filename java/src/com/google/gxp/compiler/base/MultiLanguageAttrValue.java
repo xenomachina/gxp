@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.Serializable;
@@ -38,7 +39,7 @@ public class MultiLanguageAttrValue implements Serializable {
   }
 
   public MultiLanguageAttrValue(String defaultValue) {
-    this(ImmutableMap.<OutputLanguage, String>of(), Objects.nonNull(defaultValue));
+    this(ImmutableMap.<OutputLanguage, String>of(), Preconditions.checkNotNull(defaultValue));
   }
 
   public String get(OutputLanguage outputLanguage) {

@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.base;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gxp.compiler.alerts.AlertSet;
 import com.google.gxp.compiler.alerts.SourcePosition;
@@ -42,7 +42,7 @@ public abstract class Forest<E extends Node> extends AbstractNode {
   protected Forest(SourcePosition sourcePosition, AlertSet alerts,
                    List<E> children) {
     super(sourcePosition, sourcePosition.getSourceName());
-    this.alerts = Objects.nonNull(alerts);
+    this.alerts = Preconditions.checkNotNull(alerts);
     this.children = ImmutableList.copyOf(children);
   }
 

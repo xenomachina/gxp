@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.servicedir;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.CompilationSet;
 import com.google.gxp.compiler.CompilationUnit;
 import com.google.gxp.compiler.base.Callable;
@@ -33,7 +33,7 @@ public class OnDemandServiceDirectory implements ServiceDirectory {
   private final CompilationSet compilationSet;
 
   public OnDemandServiceDirectory(CompilationSet compilationSet) {
-    this.compilationSet = Objects.nonNull(compilationSet);
+    this.compilationSet = Preconditions.checkNotNull(compilationSet);
   }
 
   /**

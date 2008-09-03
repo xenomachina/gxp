@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.schema.Schema;
 
 /**
@@ -26,8 +27,8 @@ public class EscapeExpression extends Expression {
   private final Expression subexpression;
 
   public EscapeExpression(Schema schema, Expression subexpression) {
-    super(subexpression, Objects.nonNull(schema));
-    this.subexpression = Objects.nonNull(subexpression);
+    super(subexpression, Preconditions.checkNotNull(schema));
+    this.subexpression = Preconditions.checkNotNull(subexpression);
   }
 
   public Expression getSubexpression() {

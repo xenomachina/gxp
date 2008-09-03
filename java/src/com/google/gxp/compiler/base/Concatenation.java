@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -118,7 +119,7 @@ public class Concatenation extends Expression {
                                            Node fromNode,
                                            StringBuilder sb) {
     for (Expression value : values) {
-      value = Objects.nonNull(value);
+      value = Preconditions.checkNotNull(value);
       if (value instanceof StringConstant) {
         if (fromNode == null) {
           fromNode = value;

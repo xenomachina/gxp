@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.io;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ public final class CIndenter {
   private int indentationLevel = 0;
 
   public CIndenter(Appendable out, String... halfIndentMarkers) {
-    this.out = Objects.nonNull(out);
+    this.out = Preconditions.checkNotNull(out);
     this.halfIndentMarkers = ImmutableList.of(halfIndentMarkers);
   }
 

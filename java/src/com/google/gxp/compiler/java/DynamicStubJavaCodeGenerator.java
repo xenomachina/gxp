@@ -18,7 +18,7 @@ package com.google.gxp.compiler.java;
 
 import com.google.common.base.Functions;
 import com.google.common.base.Join;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.PrimitiveArrays;
@@ -62,10 +62,10 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
                                       Collection<FileRef> sourcePaths,
                                       AlertPolicy alertPolicy) {
     super(tree, null);
-    this.sourceFiles = Objects.nonNull(sourceFiles);
-    this.schemaFiles = Objects.nonNull(schemaFiles);
-    this.sourcePaths = Objects.nonNull(sourcePaths);
-    this.alertPolicy = Objects.nonNull(alertPolicy);
+    this.sourceFiles = Preconditions.checkNotNull(sourceFiles);
+    this.schemaFiles = Preconditions.checkNotNull(schemaFiles);
+    this.sourcePaths = Preconditions.checkNotNull(sourcePaths);
+    this.alertPolicy = Preconditions.checkNotNull(alertPolicy);
   }
 
   @Override

@@ -18,6 +18,7 @@ package com.google.gxp.compiler.base;
 
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * A ConstructedConstant is a string that will be converted into an object
@@ -30,9 +31,9 @@ public class ConstructedConstant extends Expression {
 
   public ConstructedConstant(Node fromNode, String value, Callable callee, FormalParameter param) {
     super(fromNode, null);
-    this.value = Objects.nonNull(value);
-    this.callee = Objects.nonNull(callee);
-    this.param = Objects.nonNull(param);
+    this.value = Preconditions.checkNotNull(value);
+    this.callee = Preconditions.checkNotNull(callee);
+    this.param = Preconditions.checkNotNull(param);
   }
 
   public String getValue() {

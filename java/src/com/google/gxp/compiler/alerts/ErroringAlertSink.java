@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.alerts;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * An {@code AlertSink} that throws an {@code Error} if it recieves any
@@ -26,7 +26,7 @@ public class ErroringAlertSink implements AlertSink {
   private final AlertPolicy alertPolicy;
 
   public ErroringAlertSink(AlertPolicy alertPolicy) {
-    this.alertPolicy = Objects.nonNull(alertPolicy);
+    this.alertPolicy = Preconditions.checkNotNull(alertPolicy);
   }
 
   public void add(Alert alert) {

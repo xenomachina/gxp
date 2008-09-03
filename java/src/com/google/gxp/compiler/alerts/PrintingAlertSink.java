@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.alerts;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.io.RuntimeIOException;
 
 import java.io.IOException;
@@ -30,9 +30,9 @@ public class PrintingAlertSink implements AlertSink {
   private final Appendable out;
 
   public PrintingAlertSink(AlertPolicy alertPolicy, boolean verboseEnabled, Appendable out) {
-    this.alertPolicy = Objects.nonNull(alertPolicy);
+    this.alertPolicy = Preconditions.checkNotNull(alertPolicy);
     this.verboseEnabled = verboseEnabled;
-    this.out = Objects.nonNull(out);
+    this.out = Preconditions.checkNotNull(out);
   }
 
   public void add(Alert alert) {

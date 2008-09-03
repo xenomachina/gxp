@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
 /**
@@ -40,7 +41,7 @@ public class JavaAnnotation extends AbstractNode {
                         String with) {
     super(sourcePosition, displayName);
     this.element = element;
-    this.with = Objects.nonNull(with);
+    this.with = Preconditions.checkNotNull(with);
   }
 
   public JavaAnnotation(Node fromNode,

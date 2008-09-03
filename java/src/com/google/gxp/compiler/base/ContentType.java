@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.schema.Schema;
@@ -33,7 +34,7 @@ public class ContentType extends Type {
                      String displayName,
                      Schema schema) {
     super(sourcePosition, displayName);
-    this.schema = Objects.nonNull(schema);
+    this.schema = Preconditions.checkNotNull(schema);
   }
 
   public ContentType(Schema schema) {

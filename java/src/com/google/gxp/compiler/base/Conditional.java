@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.gxp.compiler.alerts.SourcePosition;
@@ -47,8 +48,8 @@ public class Conditional extends Expression {
     public Clause(SourcePosition sourcePosition, String displayName,
                   Expression predicate, Expression expression) {
       super(sourcePosition, displayName);
-      this.predicate = Objects.nonNull(predicate);
-      this.expression = Objects.nonNull(expression);
+      this.predicate = Preconditions.checkNotNull(predicate);
+      this.expression = Preconditions.checkNotNull(expression);
     }
 
     public Expression getPredicate() {
@@ -112,7 +113,7 @@ public class Conditional extends Expression {
       }
     }
     this.clauses = ImmutableList.copyOf(clauses);
-    this.elseExpression = Objects.nonNull(elseExpression);
+    this.elseExpression = Preconditions.checkNotNull(elseExpression);
   }
 
   public Conditional(Node fromNode, Schema schema,

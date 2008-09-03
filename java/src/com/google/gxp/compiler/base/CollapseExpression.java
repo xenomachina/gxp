@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * A value that indicates that its subexpression is eligible for space
@@ -33,8 +34,8 @@ public class CollapseExpression extends Expression {
   private CollapseExpression(Expression subexpression,
                              SpaceOperatorSet spaceOperators) {
     super(subexpression);
-    this.subexpression = Objects.nonNull(subexpression);
-    this.spaceOperators = Objects.nonNull(spaceOperators);
+    this.subexpression = Preconditions.checkNotNull(subexpression);
+    this.spaceOperators = Preconditions.checkNotNull(spaceOperators);
     if (subexpression instanceof CollapseExpression) {
       throw new IllegalArgumentException(
           "CollapseExpressions can't be directly nested");

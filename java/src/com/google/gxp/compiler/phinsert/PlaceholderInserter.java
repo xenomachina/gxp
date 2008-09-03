@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.phinsert;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
 import com.google.gxp.compiler.alerts.AlertSink;
@@ -53,7 +53,7 @@ public class PlaceholderInserter implements Function<SpaceCollapsedTree, Placeho
     private final AlertSink alertSink;
 
     Visitor(AlertSink alertSink) {
-      this.alertSink = Objects.nonNull(alertSink);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
     }
 
     @Override

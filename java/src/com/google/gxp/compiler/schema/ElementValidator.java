@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.schema;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -108,7 +109,7 @@ public final class ElementValidator implements Serializable {
                           Set<ElementValidator.Flag> flags,
                           String innerContentType, Iterable<DocType> docTypes,
                           Iterable<AttributeValidator> attrs) {
-    this.tagName = Objects.nonNull(tagName);
+    this.tagName = Preconditions.checkNotNull(tagName);
     this.flags = ImmutableSet.copyOf(flags);
     this.innerContentType = innerContentType;
 

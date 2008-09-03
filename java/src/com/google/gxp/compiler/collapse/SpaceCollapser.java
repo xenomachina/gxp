@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.collapse;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.AttrBundleParam;
@@ -92,7 +92,7 @@ public class SpaceCollapser implements Function<BoundTree,SpaceCollapsedTree> {
     }
 
     private SearchingVisitor(SpaceOperatorSet spaceOperators) {
-      this.spaceOperators = Objects.nonNull(spaceOperators);
+      this.spaceOperators = Preconditions.checkNotNull(spaceOperators);
     }
 
     public SearchingVisitor with(SpaceOperatorSet newSpaceOperators) {
@@ -192,7 +192,7 @@ public class SpaceCollapser implements Function<BoundTree,SpaceCollapsedTree> {
     private final SpaceOperatorSet spaceOperators;
 
     CollapsingVisitor(SpaceOperatorSet spaceOperators) {
-      this.spaceOperators = Objects.nonNull(spaceOperators);
+      this.spaceOperators = Preconditions.checkNotNull(spaceOperators);
     }
 
     @Override

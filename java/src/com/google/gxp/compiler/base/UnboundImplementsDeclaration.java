@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.gxp.compiler.alerts.SourcePosition;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Represents a declaration that the enclosing template implements an
@@ -33,7 +33,7 @@ public class UnboundImplementsDeclaration extends ImplementsDeclaration {
                                       String displayName,
                                       TemplateName templateName) {
     super(sourcePosition, displayName);
-    this.templateName = Objects.nonNull(templateName);
+    this.templateName = Preconditions.checkNotNull(templateName);
   }
 
   public UnboundImplementsDeclaration(Node fromNode, TemplateName templateName) {

@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.schema;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
 import java.io.Serializable;
@@ -83,7 +84,7 @@ public final class AttributeValidator implements Serializable {
   public AttributeValidator(String name, String contentType, Pattern pattern,
                             Set<AttributeValidator.Flag> flags,
                             String defaultValue, String example) {
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
     this.contentType = contentType;
     this.pattern = pattern;
     this.flags = ImmutableSet.copyOf(flags);

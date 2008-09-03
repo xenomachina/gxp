@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.base;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * A C++ File Import.  The internal implementation of
@@ -28,7 +28,7 @@ public class CppFileImport extends Import {
 
   public CppFileImport(Node fromNode, String fileName) {
     super(fromNode);
-    this.fileName = Objects.nonNull(fileName);
+    this.fileName = Preconditions.checkNotNull(fileName);
   }
 
   public String getFileName() {

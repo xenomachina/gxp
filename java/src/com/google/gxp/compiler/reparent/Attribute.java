@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.reparent;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.AbstractNode;
 import com.google.gxp.compiler.base.Expression;
@@ -54,14 +55,14 @@ public class Attribute extends AbstractNode {
                    Expression condition, Schema innerSchema) {
     super(sourcePosition, displayName);
 
-    this.namespace = Objects.nonNull(namespace);
+    this.namespace = Preconditions.checkNotNull(namespace);
 
     if (name.length() < 1) {
       throw new IllegalArgumentException();
     }
     this.name = name;
 
-    this.value = Objects.nonNull(value);
+    this.value = Preconditions.checkNotNull(value);
     this.condition = condition;
     this.innerSchema = innerSchema;
   }
@@ -148,7 +149,7 @@ public class Attribute extends AbstractNode {
    */
   public Attribute withInnerSchema(Schema innerSchema) {
     return new Attribute(this, getNamespace(), getName(), getValue(),
-                         getCondition(), Objects.nonNull(innerSchema));
+                         getCondition(), Preconditions.checkNotNull(innerSchema));
   }
 
   /**

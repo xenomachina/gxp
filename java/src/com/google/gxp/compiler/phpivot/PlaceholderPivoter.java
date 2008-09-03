@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.phpivot;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
@@ -63,7 +63,7 @@ public class PlaceholderPivoter implements Function<ContentFlattenedTree, Placeh
   private static class Worker {
     private final AlertSink alertSink;
     Worker(AlertSink alertSink) {
-      this.alertSink = Objects.nonNull(alertSink);
+      this.alertSink = Preconditions.checkNotNull(alertSink);
     }
 
     private final ExhaustiveExpressionVisitor defaultVisitor =
@@ -102,7 +102,7 @@ public class PlaceholderPivoter implements Function<ContentFlattenedTree, Placeh
       private final Concatenation concat;
 
       ConcatenationVisitor(Concatenation concat) {
-        this.concat = Objects.nonNull(concat);
+        this.concat = Preconditions.checkNotNull(concat);
       }
 
       public List<Expression> getValues() {

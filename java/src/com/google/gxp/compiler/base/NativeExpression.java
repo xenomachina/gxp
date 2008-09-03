@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.schema.Schema;
 
@@ -31,7 +32,7 @@ public class NativeExpression extends Expression {
   public NativeExpression(SourcePosition sourcePosition, String displayName,
                           String nativeCode, String example, String phName) {
     super(sourcePosition, displayName, null);
-    this.nativeCode = Objects.nonNull(nativeCode);
+    this.nativeCode = Preconditions.checkNotNull(nativeCode);
     this.example = example;
     this.phName = phName;
   }
@@ -39,14 +40,14 @@ public class NativeExpression extends Expression {
   public NativeExpression(Node fromNode, String nativeCode,
                           String example, String phName) {
     super(fromNode, null);
-    this.nativeCode = Objects.nonNull(nativeCode);
+    this.nativeCode = Preconditions.checkNotNull(nativeCode);
     this.example = example;
     this.phName = phName;
   }
 
   public NativeExpression(Node fromNode, String nativeCode, Schema schema) {
     super(fromNode, schema);
-    this.nativeCode = Objects.nonNull(nativeCode);
+    this.nativeCode = Preconditions.checkNotNull(nativeCode);
     this.example = null;
     this.phName = null;
   }

@@ -16,7 +16,7 @@
 
 package com.google.transconsole.common.messages;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * The {@code MessageBundle} class is a container for {@link Message} objects.
@@ -60,7 +60,7 @@ public class MessageBundle extends Bundle<Message> {
                                                 imx);
       }
     } else {
-      messages.put(id, Objects.nonNull(m));
+      messages.put(id, Preconditions.checkNotNull(m));
     }
   }
 }

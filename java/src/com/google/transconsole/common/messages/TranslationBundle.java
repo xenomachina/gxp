@@ -16,7 +16,7 @@
 
 package com.google.transconsole.common.messages;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * The {@code TranslationBundle} class is a container class for
@@ -52,7 +52,7 @@ public class TranslationBundle extends Bundle<Translation> {
     String id = t.getId();
 
     if (!messages.containsKey(id)) {
-      messages.put(id, Objects.nonNull(t));
+      messages.put(id, Preconditions.checkNotNull(t));
     }
   }
 }

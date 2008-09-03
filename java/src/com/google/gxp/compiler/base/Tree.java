@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.base;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.AlertSet;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
@@ -35,7 +35,7 @@ public abstract class Tree<E extends Root> extends Forest<E> {
    * @param root the only child of this {@code Tree}
    */
   protected Tree(SourcePosition sourcePosition, AlertSet alerts, E root) {
-    super(sourcePosition, alerts, Collections.singletonList(Objects.nonNull(root)));
+    super(sourcePosition, alerts, Collections.singletonList(Preconditions.checkNotNull(root)));
   }
 
   /**

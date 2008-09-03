@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.schema;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.MapConstraints;
@@ -46,7 +46,7 @@ public class FileBackedSchemaFactory implements SchemaFactory {
    */
   public FileBackedSchemaFactory(AlertSink alertSink,
                                  Iterable<FileRef> schemaRefs) {
-    this.alertSink = Objects.nonNull(alertSink);
+    this.alertSink = Preconditions.checkNotNull(alertSink);
     this.byNamespaceUri = createMap();
     this.byContentTypeName = createMap();
     for (FileRef ref : schemaRefs) {
@@ -105,13 +105,13 @@ public class FileBackedSchemaFactory implements SchemaFactory {
   }
 
   public Schema fromNamespaceUri(String nsUri) {
-    Supplier<Schema> supplier = byNamespaceUri.get(Objects.nonNull(nsUri));
+    Supplier<Schema> supplier = byNamespaceUri.get(Preconditions.checkNotNull(nsUri));
     return (supplier == null) ? null : supplier.get();
   }
 
   public Schema fromContentTypeName(String contentTypeName) {
     Supplier<Schema> supplier =
-        byContentTypeName.get(Objects.nonNull(contentTypeName));
+        byContentTypeName.get(Preconditions.checkNotNull(contentTypeName));
     return (supplier == null) ? null : supplier.get();
   }
 }

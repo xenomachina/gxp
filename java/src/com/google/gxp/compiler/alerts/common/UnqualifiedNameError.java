@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.alerts.common;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
@@ -30,7 +30,7 @@ public class UnqualifiedNameError extends ErrorAlert {
   public UnqualifiedNameError(SourcePosition sourcePosition, String name) {
     super(sourcePosition,
           "expected fully qualified name, got \"" + name + "\"");
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
   }
 
   public String getName() {

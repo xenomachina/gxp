@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.xmb;
 
 import com.google.common.base.CharEscaper;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
@@ -49,7 +49,7 @@ public class XmlCharsetEscaper extends CharEscaper {
    * Constructs an instance based on the specified {@code CharsetEncoder}.
    */
   public XmlCharsetEscaper(CharsetEncoder charsetEncoder) {
-    this.charsetEncoder = Objects.nonNull(charsetEncoder);
+    this.charsetEncoder = Preconditions.checkNotNull(charsetEncoder);
   }
 
   // Implements CharEscaper.

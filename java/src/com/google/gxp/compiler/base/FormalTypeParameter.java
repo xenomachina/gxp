@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * A GXP formal type parameter. Corresponds to a &lt;gxp:typeparam&gt; element.
@@ -28,7 +29,7 @@ public class FormalTypeParameter extends AbstractNode {
   public FormalTypeParameter(Node fromNode, String name,
                              NativeType extendsType) {
     super(fromNode);
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
     this.extendsType = extendsType;
   }
 

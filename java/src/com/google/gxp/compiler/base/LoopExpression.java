@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * A looping {@code Expression}. This is the internal representation of a
@@ -34,12 +35,12 @@ public class LoopExpression extends Expression {
                          Expression iterable, Expression iterator,
                          Expression subexpression, Expression delimiter) {
     super(fromNode, subexpression.getSchema());
-    this.type = Objects.nonNull(type);
-    this.var = Objects.nonNull(var);
+    this.type = Preconditions.checkNotNull(type);
+    this.var = Preconditions.checkNotNull(var);
     this.iterable = iterable;
     this.iterator = iterator;
-    this.subexpression = Objects.nonNull(subexpression);
-    this.delimiter = Objects.nonNull(delimiter);
+    this.subexpression = Preconditions.checkNotNull(subexpression);
+    this.delimiter = Preconditions.checkNotNull(delimiter);
   }
 
   public static LoopExpression createWithIterable(Node fromNode, Type type,
@@ -48,7 +49,7 @@ public class LoopExpression extends Expression {
                                                   Expression subexpression,
                                                   Expression delimiter) {
     return new LoopExpression(fromNode, type, var,
-                              Objects.nonNull(iterable), null, subexpression,
+                              Preconditions.checkNotNull(iterable), null, subexpression,
                               delimiter);
   }
 
@@ -58,7 +59,7 @@ public class LoopExpression extends Expression {
                                                   Expression subexpression,
                                                   Expression delimiter) {
     return new LoopExpression(fromNode, type, var,
-                              null, Objects.nonNull(iterator), subexpression,
+                              null, Preconditions.checkNotNull(iterator), subexpression,
                               delimiter);
   }
 

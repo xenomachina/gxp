@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.reparent;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -71,8 +71,8 @@ class AttributeMap {
    * is used as the position for {@code Alert}s about missing attributes.
    */
   public AttributeMap(AlertSink alertSink, Node forNode) {
-    this.alertSink = Objects.nonNull(alertSink);
-    this.forNode = Objects.nonNull(forNode);
+    this.alertSink = Preconditions.checkNotNull(alertSink);
+    this.forNode = Preconditions.checkNotNull(forNode);
   }
 
   /**

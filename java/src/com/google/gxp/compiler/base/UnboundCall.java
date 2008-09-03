@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.reparent.Attribute;
@@ -39,8 +40,8 @@ public class UnboundCall extends Call {
                      List<String> attrBundles,
                      Expression content) {
     super(sourcePosition, displayName, null /* no schema */, attributes, attrBundles);
-    this.callee = Objects.nonNull(callee);
-    this.content = Objects.nonNull(content);
+    this.callee = Preconditions.checkNotNull(callee);
+    this.content = Preconditions.checkNotNull(content);
   }
 
   public TemplateName getCallee() {

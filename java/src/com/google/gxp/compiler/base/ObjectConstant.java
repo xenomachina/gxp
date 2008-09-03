@@ -18,6 +18,7 @@ package com.google.gxp.compiler.base;
 
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * ObjectConstant is a constant String that will be converted into an object
@@ -37,7 +38,7 @@ public class ObjectConstant extends Expression {
 
   public ObjectConstant(Node fromNode, String value, Type type) {
     super(fromNode, null);
-    this.value = Objects.nonNull(value);
+    this.value = Preconditions.checkNotNull(value);
     this.type = type;
   }
 

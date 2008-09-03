@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.schema;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -65,7 +65,7 @@ public final class SchemaParser {
   public static Schema getSchema(FileRef input, AlertSink alertSink) {
     SourcePosition pos = new SourcePosition(input);
     try {
-      return Objects.nonNull(INSTANCE.parse(input));
+      return Preconditions.checkNotNull(INSTANCE.parse(input));
     } catch (SAXException saxException) {
       alertSink.add(new SaxAlert(pos, Severity.ERROR, saxException));
       return null;
@@ -102,7 +102,7 @@ public final class SchemaParser {
     private Map<String, ElementBuilder> elementBuilders = Maps.newHashMap();
 
     public SaxEventHandler(FileRef source) {
-      this.source = Objects.nonNull(source);
+      this.source = Preconditions.checkNotNull(source);
     }
 
     Schema getSchema() {

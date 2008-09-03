@@ -18,7 +18,7 @@ package com.google.gxp.compiler.java;
 
 import com.google.common.base.Function;
 import com.google.common.base.Join;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -281,7 +281,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
     protected InterfaceWorker(Appendable appendable, AlertSink alertSink,
                               Interface iface) {
       super(appendable, alertSink);
-      this.iface = Objects.nonNull(iface);
+      this.iface = Preconditions.checkNotNull(iface);
     }
 
     public void run() {
@@ -373,7 +373,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
     protected TemplateWorker(Appendable appendable, AlertSink alertSink,
                              Template template) {
       super(appendable, alertSink);
-      this.template = Objects.nonNull(template);
+      this.template = Preconditions.checkNotNull(template);
     }
 
     public void run() {

@@ -16,7 +16,7 @@
 
 package com.google.gxp.testing;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.base.Callable;
 import com.google.gxp.compiler.base.CallableVisitor;
 import com.google.gxp.compiler.base.FormalParameter;
@@ -32,7 +32,7 @@ public class StubCallable implements Callable {
   private final String name;
 
   public StubCallable(String name) {
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
   }
 
   public String toString() {

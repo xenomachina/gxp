@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.base;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 
 /**
@@ -29,12 +29,12 @@ public class PackageImport extends Import {
   public PackageImport(SourcePosition sourcePosition, String displayName,
                        String packageName) {
     super(sourcePosition, displayName);
-    this.packageName = Objects.nonNull(packageName);
+    this.packageName = Preconditions.checkNotNull(packageName);
   }
 
   public PackageImport(Node fromNode, String packageName) {
     super(fromNode);
-    this.packageName = Objects.nonNull(packageName);
+    this.packageName = Preconditions.checkNotNull(packageName);
   }
 
   public String getPackageName() {

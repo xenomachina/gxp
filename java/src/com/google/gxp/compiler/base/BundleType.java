@@ -18,6 +18,7 @@ package com.google.gxp.compiler.base;
 
 import com.google.common.base.Join;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
@@ -39,13 +40,13 @@ public class BundleType extends Type {
   public BundleType(SourcePosition pos, String displayName,
                     Schema schema, Map<String, AttributeValidator> attrMap) {
     super(pos, displayName);
-    this.schema = Objects.nonNull(schema);
+    this.schema = Preconditions.checkNotNull(schema);
     this.attrMap = ImmutableMap.copyOf(attrMap);
   }
 
   public BundleType(Node fromNode, Schema schema, Map<String, AttributeValidator> attrMap) {
     super(fromNode);
-    this.schema = Objects.nonNull(schema);
+    this.schema = Preconditions.checkNotNull(schema);
     this.attrMap = ImmutableMap.copyOf(attrMap);
   }
 

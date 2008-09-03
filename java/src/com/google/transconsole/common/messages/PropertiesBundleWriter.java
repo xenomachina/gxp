@@ -17,7 +17,7 @@
 package com.google.transconsole.common.messages;
 
 import com.google.common.base.CharEscaper;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class PropertiesBundleWriter {
   private final MessageBundle bundle;
 
   public PropertiesBundleWriter(MessageBundle bundle) {
-    this.bundle = Objects.nonNull(bundle);
+    this.bundle = Preconditions.checkNotNull(bundle);
   }
 
   /**

@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.codegen;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.io.Characters;
 import com.google.gxp.compiler.base.FormalParameter;
 import com.google.gxp.compiler.base.Parameter;
@@ -33,7 +33,7 @@ public abstract class BaseCodeGenerator<T extends Tree<Root>> implements CodeGen
   protected final T tree;
 
   public BaseCodeGenerator(T tree) {
-    this.tree = Objects.nonNull(tree);
+    this.tree = Preconditions.checkNotNull(tree);
   }
 
   /**

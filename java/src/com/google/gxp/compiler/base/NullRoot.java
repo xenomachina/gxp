@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.base;
 
-import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.schema.Schema;
 
 import java.util.Collections;
@@ -31,7 +31,7 @@ public class NullRoot extends AbstractNode implements Root {
 
   public NullRoot(Node fromNode, TemplateName.FullyQualified name) {
     super(fromNode);
-    this.name = Objects.nonNull(name);
+    this.name = Preconditions.checkNotNull(name);
   }
 
   public TemplateName.FullyQualified getName() {

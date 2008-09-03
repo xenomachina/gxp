@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.schema.Schema;
 
 /**
@@ -36,7 +37,7 @@ public class UnextractedMessage extends Expression {
     this.meaning = meaning;
     this.comment = comment;
     this.hidden = hidden;
-    this.content = Objects.nonNull(content);
+    this.content = Preconditions.checkNotNull(content);
   }
 
   @Override
