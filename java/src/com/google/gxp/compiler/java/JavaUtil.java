@@ -29,6 +29,8 @@ import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.Node;
 import com.google.gxp.compiler.base.OutputLanguage;
+import com.google.gxp.compiler.codegen.IllegalExpressionError;
+import com.google.gxp.compiler.codegen.MissingExpressionError;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -181,7 +183,7 @@ public class JavaUtil {
    * Add alerts to the sink if there are unclosed comments or literals
    */
   private static String removeCommentsAndLiterals(AlertSink alertSink, NativeExpression expr) {
-    String str = expr.getNativeCode();
+    String str = expr.getNativeCode(OutputLanguage.JAVA);
 
     StringBuilder sb = new StringBuilder();
     int start = 0;
@@ -193,17 +195,17 @@ public class JavaUtil {
       if (m.group(1) != null) {
         sb.append("'x'");
         if (m.group(2) == null) {
-          alertSink.add(new IllegalJavaExpressionError(expr));
+          alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
         }
       } else if (m.group(3) != null) {
         sb.append("\"\"");
         if (m.group(4) == null) {
-          alertSink.add(new IllegalJavaExpressionError(expr));
+          alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
         }
       } else if (m.group(5) != null && m.group(6) == null) {
-        alertSink.add(new IllegalJavaExpressionError(expr));
+        alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
       } else if (m.group(7) != null && m.group(8) == null) {
-        alertSink.add(new IllegalJavaExpressionError(expr));
+        alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
       }
     }
     sb.append(str.substring(start));
@@ -252,12 +254,18 @@ public class JavaUtil {
    * Validate the given NativeExpression and adds alerts to the sink if
    * necessary.
    */
-  public static void validateExpression(AlertSink alertSink, NativeExpression expr) {
+  public static String validateExpression(AlertSink alertSink, NativeExpression expr) {
+    String result = expr.getNativeCode(OutputLanguage.JAVA);
+    if (result == null) {
+      alertSink.add(new MissingExpressionError(expr, OutputLanguage.JAVA));
+      return "";
+    }
+
     String s = removeCommentsAndLiterals(alertSink, expr);
 
     Character c = findMismatches(s);
     if (c != null) {
-      alertSink.add(new IllegalJavaExpressionError(expr));
+      alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
     }
 
     Matcher m = OPS_FINDER.matcher(s);
@@ -266,6 +274,8 @@ public class JavaUtil {
         alertSink.add(new IllegalJavaOperatorError(expr, m.group()));
       }
     }
+
+    return CharEscapers.JAVA_STRING_UNICODE_ESCAPER.escape(result);
   }
 
   private static final Set<String> RESERVED_WORDS = ImmutableSet.of(

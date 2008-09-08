@@ -319,7 +319,7 @@ public class ReparenterTest extends GxpcTestCase {
     assertEquals("String",
                  ((NativeType) params.get(1).getType()).getNativeType(OutputLanguage.JAVA));
     Expression defValue = params.get(1).getDefaultValue();
-    assertEquals("\"xyzzy\"", ((NativeExpression) defValue).getNativeCode());
+    assertEquals("\"xyzzy\"", ((NativeExpression) defValue).getDefaultNativeCode());
     assertEmptyValue(root.getContent());
   }
 

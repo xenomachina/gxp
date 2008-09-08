@@ -167,68 +167,54 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
     Namespace namespace = parsedAttr.getNamespace();
     return namespace.acceptVisitor(
         new NamespaceVisitor<Attribute>() {
+          private Attribute defaultVisitNamespace(Namespace ns) {
+            return new Attribute(parsedAttr, ns, parsedAttr.getName(),
+                                 new StringConstant(parsedAttr, null, parsedAttr.getValue()));
+          }
+
           public Attribute visitCallNamespace(CallNamespace ns) {
             throw new Error("TODO(laurence): implement");
           }
 
           public Attribute visitCppNamespace(CppNamespace ns) {
-            return new Attribute(parsedAttr, ns, parsedAttr.getName(),
-                                 new StringConstant(parsedAttr, null,
-                                                    parsedAttr.getValue()),
-                                 null, null);
+            return defaultVisitNamespace(ns);
           }
 
           public Attribute visitExprNamespace(ExprNamespace ns) {
+            MultiLanguageAttrValue value = new MultiLanguageAttrValue(parsedAttr.getValue());
             return new Attribute(parsedAttr, NullNamespace.INSTANCE,
                                  parsedAttr.getName(),
-                                 new NativeExpression(parsedAttr,
-                                                      parsedAttr.getValue(),
-                                                      null, null),
-                                 null, null);
+                                 new NativeExpression(parsedAttr, value));
           }
 
           public Attribute visitGxpNamespace(GxpNamespace ns) {
-            return new Attribute(parsedAttr, ns, parsedAttr.getName(),
-                                 new StringConstant(parsedAttr, null,
-                                                    parsedAttr.getValue()),
-                                 null, null);
+            return defaultVisitNamespace(ns);
           }
 
           public Attribute visitJavaNamespace(JavaNamespace ns) {
-            return new Attribute(parsedAttr, ns, parsedAttr.getName(),
-                                 new StringConstant(parsedAttr, null,
-                                                    parsedAttr.getValue()),
-                                 null, null);
+            return defaultVisitNamespace(ns);
           }
 
           public Attribute visitJavaScriptNamespace(JavaScriptNamespace ns) {
-            return new Attribute(parsedAttr, ns, parsedAttr.getName(),
-                                 new StringConstant(parsedAttr, null,
-                                                    parsedAttr.getValue()),
-                                 null, null);
+            return defaultVisitNamespace(ns);
           }
 
           public Attribute visitMsgNamespace(MsgNamespace ns) {
             Expression str = new StringConstant(parsedAttr, null, parsedAttr.getValue());
             Expression msg = new UnextractedMessage(parsedAttr, null, null, null, false, str);
             return new Attribute(parsedAttr, NullNamespace.INSTANCE, parsedAttr.getName(),
-                                 new ConvertibleToContent(msg),
-                                 null, null);
+                                 new ConvertibleToContent(msg));
           }
 
           public Attribute visitNoMsgNamespace(NoMsgNamespace ns) {
             Expression str = new StringConstant(parsedAttr, null, parsedAttr.getValue());
             Expression nomsg = new NoMessage(parsedAttr, str);
             return new Attribute(parsedAttr, NullNamespace.INSTANCE, parsedAttr.getName(),
-                                 new ConvertibleToContent(nomsg),
-                                 null, null);
+                                 new ConvertibleToContent(nomsg));
           }
 
           public Attribute visitNullNamespace(NullNamespace ns) {
-            return new Attribute(parsedAttr, ns, parsedAttr.getName(),
-                                 new StringConstant(parsedAttr, null,
-                                                    parsedAttr.getValue()),
-                                 null, null);
+            return defaultVisitNamespace(ns);
           }
 
           public Attribute visitOutputNamespace(OutputNamespace ns) {
@@ -365,15 +351,14 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
       return null;
     }
 
-    // TODO(harryh): there might be a problem here if gxp:eval doesn't
-    //               have a plain text expr (either expr:expr or
-    //               <gxp:attr name='expr'>
     public Void visitEvalElement(GxpNamespace.GxpElement node) {
       AttributeMap attrMap = nodeParts.getAttributes();
-      String expr = attrMap.get("expr", null);
+      MultiLanguageAttrValue expr = attrMap.getMultiLanguageAttrValue("expr", true);
       String example = attrMap.getOptional("example", null);
       String phName = attrMap.getOptional(GxpNamespace.INSTANCE, "ph", null);
-      if (expr != null) {
+      if (expr.isEmpty()) {
+        alertSink.add(new MissingAttributeError(node, "expr"));
+      } else {
         output.accumulate(new NativeExpression(node, expr, example, phName));
       }
       return null;
@@ -939,8 +924,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
      */
     private List<String> getBundles(AttributeMap attrMap) {
       List<String> bundles = Lists.newArrayList();
-      String bundlesStr = attrMap.getOptional(GxpNamespace.INSTANCE, "bundles",
-                                              null);
+      String bundlesStr = attrMap.getOptional(GxpNamespace.INSTANCE, "bundles", null);
       if (bundlesStr != null) {
         for (String s : bundlesStr.split(",")) {
           bundles.add(s.trim());
@@ -952,21 +936,15 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
     // CallNamespace elements
     public Void visitCallElement(CallNamespace.CallElement node) {
       AttributeMap attrMap = nodeParts.getAttributes();
-      ImmutableMap.Builder<String, Attribute> attrBuilder =
-          ImmutableMap.builder();
-      Expression content =
-          new ConvertibleToContent(getCollapsableContent(attrMap));
+      ImmutableMap.Builder<String, Attribute> attrBuilder = ImmutableMap.builder();
+      Expression content = new ConvertibleToContent(getCollapsableContent(attrMap));
       List<String> bundles = getBundles(attrMap);
+
       for (Attribute attr : attrMap.getUnusedAttributes()) {
         if (attr.getNamespace() instanceof NullNamespace) {
-          // non expr: attributes are treated differently for "new" and "old" style
-          // calls.  For old calls they are NativeExpressions.  For new ones,
-          // they are ObjectConstants
           Expression value = attr.getValue();
           if (value instanceof StringConstant) {
-            attr = attr.withValue(node.allAttrsAreExpr()
-                                  ? attr.getExprValue()
-                                  : new ObjectConstant((StringConstant) value));
+            attr = attr.withValue(new ObjectConstant((StringConstant) value));
           }
           attrBuilder.put(attr.getName(), attr);
         } else {
@@ -974,10 +952,10 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
         }
       }
 
-      TemplateName callee = TemplateName.parseDottedName(
-          alertSink,
-          node.getSourcePosition(),
-          node.getTagName());
+      TemplateName callee = TemplateName.parseDottedName(alertSink,
+                                                         node.getSourcePosition(),
+                                                         node.getTagName());
+
       if (callee.isValid()) {
         // TODO(laurence): if callee == null then substitute good one
         output.accumulate(
@@ -992,13 +970,11 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
     }
 
     // OutputNamespace elements
-    public Void visitParsedOutputElement(
-        OutputNamespace.ParsedOutputElement node) {
+    public Void visitParsedOutputElement(OutputNamespace.ParsedOutputElement node) {
       ElementValidator validator = node.getValidator();
       AttributeMap attrMap = nodeParts.getAttributes();
 
-      String docTypeName =
-          attrMap.getOptional(GxpNamespace.INSTANCE, "doctype", null);
+      String docTypeName = attrMap.getOptional(GxpNamespace.INSTANCE, "doctype", null);
       DocType docType;
       if (docTypeName == null) {
         docType = null;

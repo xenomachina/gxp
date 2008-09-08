@@ -19,7 +19,6 @@ package com.google.gxp.compiler.alerts.common;
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.Node;
-import com.google.gxp.compiler.parser.Namespace;
 import com.google.gxp.compiler.reparent.Attribute;
 
 /**
@@ -31,22 +30,11 @@ public class MultiValueAttributeError extends ErrorAlert {
    * @param parentNode the attribute's parent {@code Node}.
    * @param attr the attribute
    */
-  public MultiValueAttributeError(Node parentNode,
-                                  Attribute attr) {
-    this(attr.getSourcePosition(), parentNode.getDisplayName(),
-         formatAttrName(attr.getNamespace(), attr.getName()));
+  public MultiValueAttributeError(Node parentNode, Attribute attr) {
+    this(attr.getSourcePosition(), parentNode.getDisplayName(), attr.getDisplayName());
   }
 
-  private static String formatAttrName(Namespace attrNs,
-                                       String attrLocalName) {
-    String nsUri = attrNs.getUri();
-    return "'" + ((nsUri == null) ? "" : ("[" + nsUri + "]")) + attrLocalName
-        + "' attribute";
-  }
-
-  public MultiValueAttributeError(SourcePosition sourcePosition,
-                                  String parentName, String attrName) {
-    super(sourcePosition, attrName + " in " + parentName
-          + " already has a value.");
+  public MultiValueAttributeError(SourcePosition pos, String parentName, String attrName) {
+    super(pos, attrName + " in " + parentName + " already has a value.");
   }
 }

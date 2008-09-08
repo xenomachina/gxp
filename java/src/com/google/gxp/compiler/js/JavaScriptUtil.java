@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.Node;
+import com.google.gxp.compiler.base.OutputLanguage;
+import com.google.gxp.compiler.codegen.MissingExpressionError;
 
 /**
  * Contains static functions for validating javascript expressions,
@@ -28,8 +30,17 @@ import com.google.gxp.compiler.base.Node;
  */
 public class JavaScriptUtil {
 
-  public static void validateExpression(AlertSink alertSink, NativeExpression expr) {
+  public static String validateExpression(AlertSink alertSink, NativeExpression expr) {
+    String result = expr.getNativeCode(OutputLanguage.JAVASCRIPT);
+    if (result == null) {
+      alertSink.add(new MissingExpressionError(expr, OutputLanguage.JAVASCRIPT));
+      return "";
+    }
+
     // TODO: do some actual validation
+
+    // TODO(harryh): is javaStringUnicodeEscaper() really the right thing here?
+    return CharEscapers.JAVA_STRING_UNICODE_ESCAPER.escape(result);
   }
 
   // TODO(harryh): I found this list on a random internet site.  It is no doubt

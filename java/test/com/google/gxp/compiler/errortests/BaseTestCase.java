@@ -21,8 +21,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gxp.compiler.alerts.Alert.Severity;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.alerts.common.SaxAlert;
+import com.google.gxp.compiler.codegen.IllegalExpressionError;
 import com.google.gxp.compiler.reparent.IllegalVariableNameError;
-import com.google.gxp.compiler.java.IllegalJavaExpressionError;
 import com.google.gxp.compiler.java.IllegalJavaOperatorError;
 import com.google.gxp.compiler.java.IllegalJavaNameError;
 import com.google.gxp.compiler.java.IllegalJavaTypeError;
@@ -118,7 +118,7 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
 
     for (String illegalExpr : ILLEGAL_EXPRESSIONS) {
       compile(prefix + CharEscapers.XML_ESCAPE.escape(illegalExpr) + suffix);
-      assertAlert(new IllegalJavaExpressionError(errorPos, illegalExpr));
+      assertAlert(new IllegalExpressionError(errorPos, "Java", illegalExpr));
       assertNoUnexpectedAlerts();
     }
   }

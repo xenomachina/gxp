@@ -368,7 +368,8 @@ public class GxpcTestCase extends TestCase {
   }
 
   public NativeExpression expr(String expr) {
-    return new NativeExpression(pos(), "(" + expr + ")", expr, null, null);
+    return new NativeExpression(pos(), "(" + expr + ")", new MultiLanguageAttrValue(expr),
+                                null, null);
   }
 
   public Expression concat(Schema schema, Expression... values) {

@@ -109,7 +109,7 @@ public class OutputElementErrorTest extends BaseTestCase {
 
     // expr: namespace
     compile("<div expr:foo='bar'></div>");
-    assertAlert(new UnknownAttributeError("<div>", pos(2,1), "'expr:foo' attribute"));
+    assertAlert(new UnknownAttributeError("<div>", pos(2,1), "'foo' attribute"));
     assertNoUnexpectedAlerts();
 
     // <gxp:attr>

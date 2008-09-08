@@ -613,10 +613,9 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
 
       @Override
       public String visitNativeExpression(NativeExpression value) {
-        JavaUtil.validateExpression(alertSink, value);
         StringBuilder sb = new StringBuilder();
         sb.append('(');
-        sb.append(CharEscapers.JAVA_STRING_UNICODE_ESCAPER.escape(value.getNativeCode()));
+        sb.append(JavaUtil.validateExpression(alertSink, value));
         sb.append(')');
         return sb.toString();
       }
@@ -814,8 +813,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
 
       @Override
       public String visitNativeExpression(NativeExpression value) {
-        JavaUtil.validateExpression(alertSink, value);
-        return CharEscapers.JAVA_STRING_UNICODE_ESCAPER.escape(value.getNativeCode());
+        return JavaUtil.validateExpression(alertSink, value);
       }
 
       @Override

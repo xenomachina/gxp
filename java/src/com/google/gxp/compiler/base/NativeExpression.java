@@ -25,19 +25,19 @@ import com.google.gxp.compiler.schema.Schema;
  * A native (that is, in the output language) expression.
  */
 public class NativeExpression extends Expression {
-  private final String nativeCode;
+  private final MultiLanguageAttrValue nativeCode;
   private final String example;
   private final String phName;
 
   public NativeExpression(SourcePosition sourcePosition, String displayName,
-                          String nativeCode, String example, String phName) {
+                          MultiLanguageAttrValue nativeCode, String example, String phName) {
     super(sourcePosition, displayName, null);
     this.nativeCode = Preconditions.checkNotNull(nativeCode);
     this.example = example;
     this.phName = phName;
   }
 
-  public NativeExpression(Node fromNode, String nativeCode,
+  public NativeExpression(Node fromNode, MultiLanguageAttrValue nativeCode,
                           String example, String phName) {
     super(fromNode, null);
     this.nativeCode = Preconditions.checkNotNull(nativeCode);
@@ -45,16 +45,28 @@ public class NativeExpression extends Expression {
     this.phName = phName;
   }
 
-  public NativeExpression(Node fromNode, String nativeCode, Schema schema) {
+  public NativeExpression(SourcePosition pos, String displayName,
+                          MultiLanguageAttrValue nativeCode) {
+    this(pos, displayName, nativeCode, null, null);
+  }
+
+  public NativeExpression(Node fromNode, MultiLanguageAttrValue nativeCode) {
+    this(fromNode, nativeCode, null, null);
+  }
+
+  public NativeExpression(Node fromNode, MultiLanguageAttrValue nativeCode, Schema schema) {
     super(fromNode, schema);
     this.nativeCode = Preconditions.checkNotNull(nativeCode);
     this.example = null;
     this.phName = null;
   }
 
-  // TODO(laurence): add multi-language support
-  public String getNativeCode() {
-    return nativeCode;
+  public String getNativeCode(OutputLanguage outputLanguage) {
+    return nativeCode.get(outputLanguage);
+  }
+
+  public String getDefaultNativeCode() {
+    return nativeCode.getDefault();
   }
 
   public String getExample() {

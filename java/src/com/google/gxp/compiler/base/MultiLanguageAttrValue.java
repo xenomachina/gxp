@@ -48,6 +48,10 @@ public class MultiLanguageAttrValue implements Serializable {
         : defaultValue;
   }
 
+  public String getDefault() {
+    return defaultValue;
+  }
+
   public boolean isEmpty() {
     return map.isEmpty() && (defaultValue == null);
   }

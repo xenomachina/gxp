@@ -67,6 +67,7 @@ import com.google.gxp.compiler.base.ValidatedCall;
 import com.google.gxp.compiler.codegen.BracesCodeGenerator;
 import com.google.gxp.compiler.msgextract.MessageExtractedTree;
 import com.google.gxp.compiler.reparent.Attribute;
+import com.google.gxp.compiler.schema.AttributeValidator;
 import com.google.gxp.compiler.schema.Schema;
 import com.google.transconsole.common.messages.MessageFragment;
 import com.google.transconsole.common.messages.Placeholder;
@@ -632,6 +633,14 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         }
       }
 
+      // TODO(harrh): delete this when unsafe-eval goes away. This is needed
+      //              for unsafe-eval of attribute bundle parameters
+      @Override
+      public Void visitNativeExpression(NativeExpression value) {
+        // TODO
+        return null;
+      }
+
       @Override
       public Void visitStringConstant(StringConstant value) {
         if (value.getSchema() == null) {
@@ -750,7 +759,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitAttrBundleReference(AttrBundleReference value) {
-        return "TODO1";
+        return value.getName();
       }
 
       @Override
@@ -773,10 +782,9 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitNativeExpression(NativeExpression value) {
-        JavaScriptUtil.validateExpression(alertSink, value);
         StringBuilder sb = new StringBuilder();
         sb.append('(');
-        sb.append(value.getNativeCode());
+        sb.append(JavaScriptUtil.validateExpression(alertSink, value));
         sb.append(')');
         return sb.toString();
       }
@@ -826,7 +834,47 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitAttrBundleParam(AttrBundleParam bundle) {
-        return "TODO4";
+        // optimization where a single bundle is being passed without
+        // restrictions to another.  Just pass the bundle along without
+        // using a GxpAttrBundle.Builder
+        if (bundle.getIncludeAttrs().isEmpty() && bundle.getAttrs().isEmpty()
+            && bundle.getSubBundles().size() == 1) {
+          return bundle.getSubBundles().get(0);
+        }
+
+        StringBuilder sb = new StringBuilder("new goog.gxp.base.GxpAttrBundle.Builder(");
+        sb.append('"');
+        sb.append(getWriteMethodName(bundle.getSchema()));
+        sb.append('"');
+        for (String includeAttr : bundle.getIncludeAttrs()) {
+          sb.append(", ");
+          sb.append(JavaScriptUtil.toJavaScriptStringLiteral(includeAttr));
+        }
+        sb.append(")");
+        for (Map.Entry<AttributeValidator, Attribute> entry : bundle.getAttrs().entrySet()) {
+          AttributeValidator validator = entry.getKey();
+          Expression condition = entry.getValue().getCondition();
+          Expression value = entry.getValue().getValue();
+
+          sb.append(".attr(");
+          sb.append(JavaScriptUtil.toJavaScriptStringLiteral(validator.getName()));
+          sb.append(", ");
+          sb.append(validator.isFlagSet(AttributeValidator.Flag.BOOLEAN)
+                      ? value.acceptVisitor(this)
+                      : toAnonymousClosure(value));
+          if (condition != null) {
+            sb.append(", ");
+            sb.append(condition.acceptVisitor(this));
+          }
+          sb.append(")");
+        }
+        for (String subBundle : bundle.getSubBundles()) {
+          sb.append(".addBundle(");
+          sb.append(subBundle);
+          sb.append(")");
+        }
+        sb.append(".build()");
+        return sb.toString();
       }
 
       @Override
@@ -881,8 +929,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitNativeExpression(NativeExpression value) {
-        JavaScriptUtil.validateExpression(alertSink, value);
-        return value.getNativeCode();
+        return JavaScriptUtil.validateExpression(alertSink, value);
       }
 
       @Override

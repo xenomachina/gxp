@@ -283,8 +283,7 @@ public class CppCodeGenerator extends BaseCppCodeGenerator<MessageExtractedTree>
 
       @Override
       public String visitNativeExpression(NativeExpression value) {
-        CppUtil.validateExpression(alertSink, value);
-        return "(" + value.getNativeCode() + ")";
+        return "(" + CppUtil.validateExpression(alertSink, value) + ")";
       }
 
       @Override
@@ -328,8 +327,7 @@ public class CppCodeGenerator extends BaseCppCodeGenerator<MessageExtractedTree>
 
       @Override
       public String visitNativeExpression(NativeExpression value) {
-        CppUtil.validateExpression(alertSink, value);
-        return "(" + value.getNativeCode() + ")";
+        return "(" + CppUtil.validateExpression(alertSink, value) + ")";
       }
     }
   }

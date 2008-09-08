@@ -29,10 +29,13 @@ import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.base.AttributeName;
 import com.google.gxp.compiler.base.Expression;
 import com.google.gxp.compiler.base.MultiLanguageAttrValue;
+import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.Node;
 import com.google.gxp.compiler.base.OutputLanguage;
+import com.google.gxp.compiler.base.StringConstant;
 import com.google.gxp.compiler.parser.CppNamespace;
 import com.google.gxp.compiler.parser.JavaNamespace;
+import com.google.gxp.compiler.parser.JavaScriptNamespace;
 import com.google.gxp.compiler.parser.Namespace;
 import com.google.gxp.compiler.parser.NullNamespace;
 import com.google.gxp.compiler.parser.OutputLanguageNamespace;
@@ -91,17 +94,45 @@ class AttributeMap {
    * @return a (new) list containing all of the unused {@code Attribute}s in
    * the order they were specified. Note that this marks all attributes as
    * "used", so the caller is responsible for reporting unused attributes on
-   * their own.
+   * their own. This function also combines multi-lingual expression attributes
+   * into a single attribute.
    */
   public List<Attribute> getUnusedAttributes() {
     List<Attribute> result = Lists.newArrayList();
-    for (Map.Entry<AttributeName, Attribute> entry : namesToAttrs.entrySet()) {
-      AttributeName key = entry.getKey();
-      if (!used.contains(key)) {
-        used.add(key);
-        result.add(entry.getValue());
+    Set<String> usedLocalNames = Sets.newHashSet();
+
+    for (AttributeName attrName : namesToAttrs.keySet()) {
+      if (!used.contains(attrName)) {
+        Namespace ns = attrName.getNamespace();
+        String localName = attrName.getLocalName();
+        if (!(ns instanceof OutputLanguageNamespace) && !(ns instanceof NullNamespace)) {
+          used.add(attrName);
+          result.add(namesToAttrs.get(attrName));
+        } else if (!usedLocalNames.contains(localName)) {
+          usedLocalNames.add(localName);
+          // if the default attribute for this name is anything but a
+          // NativeExpression then it cannot be combined with OutputLanguage
+          // specific attribute, so use it as is.
+          Attribute nullAttr = getAttribute(localName);
+          if (nullAttr != null && !(nullAttr.getValue() instanceof NativeExpression)) {
+            result.add(nullAttr);
+          } else {
+            result.add(new Attribute(forNode, localName,
+                                     getExprImpl(localName, null, false), null));
+          }
+        }
       }
     }
+
+    // at this point attributes that are unused aren't strictly unknown, so
+    // much as incompatible with other attributes, so add Alerts indicating this.
+    for (Map.Entry<AttributeName, Attribute> entry : namesToAttrs.entrySet()) {
+      if (!used.contains(entry.getKey())) {
+        used.add(entry.getKey());
+        alertSink.add(new MultiValueAttributeError(forNode, entry.getValue()));
+      }
+    }
+
     return ImmutableList.copyOf(result);
   }
 
@@ -115,12 +146,10 @@ class AttributeMap {
   }
 
   /**
-   * Core implementation of {@link #getExprValue(String,Expression)} and {@link
-   * #getValue(String,Expression)}.
+   * Core implementation of {@link #getValue(String,Expression)}.
    */
   private Expression getValueImpl(Namespace ns, String name,
                                   Expression fallback,
-                                  boolean convertToExpression,
                                   boolean optional) {
     Attribute attr = getAttribute(ns, name);
     if (attr == null) {
@@ -129,33 +158,30 @@ class AttributeMap {
       }
       return fallback;
     } else {
-      return convertToExpression ? attr.getExprValue() : attr.getValue();
+      return attr.getValue();
     }
   }
 
   /**
-   * Gets the specified attribute.
-   *
-   * @param name local name of the attribute. This method only works for
-   * attributes that have no namespace.
-   * @param fallback value to use if a value is not available. An {@code
-   * Alert} will be generated if the fallback is used.
+   * Core implementation of {@link #getExprValue(String,Expression)}.
    */
-  public Expression getExprValue(Namespace ns, String name,
-                                 Expression fallback) {
-    return getValueImpl(ns, name, fallback, true, false);
-  }
+  private Expression getExprImpl(String name, Expression fallback, boolean optional) {
+    // first check for a <gxp:attr> attribute, in which case the attribute
+    // isn't multi lingual.
+    Expression value = getValueImpl(NullNamespace.INSTANCE, name, null, true);
+    if (value != null &&
+        !(value instanceof StringConstant) && !(value instanceof NativeExpression)) {
+      return value;
+    }
 
-  /**
-   * Gets the specified optional attribute.
-   *
-   * @param name local name of the attribute. This method only works for
-   * attributes that have no namespace.
-   * @param fallback value to use if a value is not available.
-   */
-  public Expression getOptionalExprValue(Namespace ns, String name,
-                                         Expression fallback) {
-    return getValueImpl(ns, name, fallback, true, true);
+    MultiLanguageAttrValue mlar = getMultiLanguageAttrValue(name, true);
+    if (mlar.isEmpty()) {
+      if (!optional) {
+        alertSink.add(new MissingAttributeError(forNode, name));
+      }
+      return fallback;
+    }
+    return new NativeExpression(forNode.getSourcePosition(), "'" + name + "' attribute", mlar);
   }
 
   /**
@@ -167,7 +193,7 @@ class AttributeMap {
    * Alert} will be generated if the fallback is used.
    */
   public Expression getValue(Namespace ns, String name, Expression fallback) {
-    return getValueImpl(ns, name, fallback, false, false);
+    return getValueImpl(ns, name, fallback, false);
   }
 
   /**
@@ -176,7 +202,7 @@ class AttributeMap {
    */
   private String getImpl(Namespace ns, String name, final String fallback,
                          boolean optional) {
-    final Expression value = getValueImpl(ns, name, null, false, optional);
+    final Expression value = getValueImpl(ns, name, null, optional);
     if (value == null) {
       return fallback;
     } else {
@@ -218,11 +244,11 @@ class AttributeMap {
   }
 
   public Expression getExprValue(String name, Expression fallback) {
-    return getExprValue(NullNamespace.INSTANCE, name, fallback);
+    return getExprImpl(name, fallback, false);
   }
 
   public Expression getOptionalExprValue(String name, Expression fallback) {
-    return getOptionalExprValue(NullNamespace.INSTANCE, name, fallback);
+    return getExprImpl(name, fallback, true);
   }
 
   public Attribute getAttribute(String name) {
@@ -231,16 +257,24 @@ class AttributeMap {
 
   private static final ImmutableList<OutputLanguageNamespace> outputLanguageNamespaces =
       ImmutableList.of(CppNamespace.INSTANCE,
-                       JavaNamespace.INSTANCE);
+                       JavaNamespace.INSTANCE,
+                       JavaScriptNamespace.INSTANCE);
 
   public static Iterable<OutputLanguageNamespace> getOutputLanguageNamespaces() {
     return outputLanguageNamespaces;
   }
 
   /**
-   * Constructs an {@link MultiLanguageAttrValue} for the given {@code name}.
+   * Constructs a static {@link MultiLanguageAttrValue} for the given {@code name}.
    */
   public MultiLanguageAttrValue getMultiLanguageAttrValue(String name) {
+    return getMultiLanguageAttrValue(name, false);
+  }
+
+  /**
+   * Constructs an {@link MultiLanguageAttrValue} for the given {@code name}.
+   */
+  public MultiLanguageAttrValue getMultiLanguageAttrValue(String name, boolean forExpr) {
     Map<OutputLanguage, String> map = Maps.newHashMap();
     for (OutputLanguageNamespace ns : outputLanguageNamespaces) {
       String value = getOptional(ns, name, null);
@@ -248,7 +282,20 @@ class AttributeMap {
         map.put(ns.getOutputLanguage(), value);
       }
     }
-    return new MultiLanguageAttrValue(map, getOptional(name, null));
+
+    String defaultStr = null;
+    if (forExpr) {
+      Expression expr = getValueImpl(NullNamespace.INSTANCE, name, null, true);
+      if (expr != null) {
+        defaultStr = (expr instanceof NativeExpression)
+            ? ((NativeExpression) expr).getDefaultNativeCode()
+            : expr.getStaticString(alertSink, null);
+      }
+    } else {
+      defaultStr = getOptional(name, null);
+    }
+
+    return new MultiLanguageAttrValue(map, defaultStr);
   }
 
   /**

@@ -21,9 +21,7 @@ import com.google.common.base.Preconditions;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.AbstractNode;
 import com.google.gxp.compiler.base.Expression;
-import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.Node;
-import com.google.gxp.compiler.base.StringConstant;
 import com.google.gxp.compiler.parser.Namespace;
 import com.google.gxp.compiler.parser.NullNamespace;
 import com.google.gxp.compiler.schema.Schema;
@@ -81,6 +79,18 @@ public class Attribute extends AbstractNode {
                    Schema innerSchema) {
     this(fromNode.getSourcePosition(), fromNode.getDisplayName(),
          namespace, name, value, condition, innerSchema);
+  }
+
+  /**
+   * Helper for constructing an Attribute from a Node.
+   *
+   * @param fromNode the Node this Attribute was constructed from
+   * @param namespace the Namespace of this attribute
+   * @param name the (local) name of this attribute
+   * @param value the value of this attribute
+   */
+  public Attribute(Node fromNode, Namespace namespace, String name, Expression value) {
+    this(fromNode, namespace, name, value, null, null);
   }
 
   /**
@@ -150,20 +160,6 @@ public class Attribute extends AbstractNode {
   public Attribute withInnerSchema(Schema innerSchema) {
     return new Attribute(this, getNamespace(), getName(), getValue(),
                          getCondition(), Preconditions.checkNotNull(innerSchema));
-  }
-
-  /**
-   * @return the "expr" value of this attribute.
-   */
-  public Expression getExprValue() {
-    // TODO(laurence): Make this work with gxp:attr.  ie: a gxp:attr should
-    // turn into a GxpClosure.  This should probably be hoisted into
-    // AttributeMap, and likewise Reparenter.convertAttribute should probably
-    // be moved into there as well.  Then AttributeMap can lazily do the
-    // conversion, to avoid data loss.
-    return (namespace.equals(NullNamespace.INSTANCE) && value instanceof StringConstant)
-        ? new NativeExpression(value, ((StringConstant) value).evaluate(), null, null)
-        : value;
   }
 
   @Override

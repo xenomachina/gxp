@@ -79,7 +79,7 @@ public class GxpcTestCaseTest extends GxpcTestCase {
   public void testExpr() throws Exception {
     String nativeCode = "6 * 9";
     NativeExpression result = expr(nativeCode);
-    assertEquals(nativeCode, result.getNativeCode());
+    assertEquals(nativeCode, result.getDefaultNativeCode());
   }
 
   public void testConcat() throws Exception {

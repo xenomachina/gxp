@@ -22,6 +22,7 @@ import com.google.gxp.compiler.alerts.common.MissingTypeError;
 import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.OutputLanguage;
+import com.google.gxp.compiler.codegen.MissingExpressionError;
 
 /**
  * Contains static functions for validating C++ expressions and types,
@@ -33,8 +34,15 @@ public class CppUtil {
    * {@link com.google.gxp.compiler.alerts.Alert}s to the
    * {@link com.google.gxp.compiler.alerts.AlertSink} if necessary.
    */
-  public static void validateExpression(AlertSink alertSink, NativeExpression expr) {
+  public static String validateExpression(AlertSink alertSink, NativeExpression expr) {
+    String result = expr.getNativeCode(OutputLanguage.CPP);
+    if (result == null) {
+      alertSink.add(new MissingExpressionError(expr, OutputLanguage.CPP));
+      return "";
+    }
+
     // TODO(harryh): actually do some validation
+    return result;
   }
 
   /**
@@ -60,7 +68,7 @@ public class CppUtil {
   // String manipulation
   //////////////////////////////////////////////////////////////////////
 
-  // TODO(harryh): JAVA_STRING_ESCAPE is almost certainly wrong here, need
+  // TODO(harryh): javaStringEscaper() is almost certainly wrong here, need
   //               CPP_STRING_ESCAPE or something like that
   public static String toCppStringLiteral(String s) {
     return "\"" + CharEscapers.JAVA_STRING_ESCAPE.escape(s) + "\"";
