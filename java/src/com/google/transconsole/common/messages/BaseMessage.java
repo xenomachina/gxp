@@ -66,7 +66,7 @@ public abstract class BaseMessage implements Iterable<MessageFragment> {
     sb.append(" ");
     sb.append(name);
     sb.append("=\"");
-    sb.append(CharEscapers.XML_ESCAPE.escape(value));
+    sb.append(CharEscapers.xmlEscaper().escape(value));
     sb.append("\"");
   }
 

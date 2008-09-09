@@ -56,7 +56,7 @@ public class ConstructedConstant extends Expression {
   @Override
   public String toString() {
     return getDisplayName() + "=ConstructedConstant@" + getSourcePosition()
-        + "(\"" + CharEscapers.JAVA_STRING_ESCAPE.escape(getValue()) + "\")";
+        + "(\"" + CharEscapers.javaStringEscaper().escape(getValue()) + "\")";
   }
 
   @Override

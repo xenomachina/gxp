@@ -40,6 +40,6 @@ public class ThrowableClosure implements HtmlClosure {
   public void write(Appendable out, GxpContext gxpContext) throws IOException {
     StringWriter sw = new StringWriter();
     t.printStackTrace(new PrintWriter(sw));
-    CharEscapers.HTML_ESCAPE.escape(out).append(sw.toString());
+    CharEscapers.asciiHtmlEscaper().escape(out).append(sw.toString());
   }
 }

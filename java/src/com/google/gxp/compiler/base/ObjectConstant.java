@@ -62,7 +62,7 @@ public class ObjectConstant extends Expression {
   @Override
   public String toString() {
     return getDisplayName() + "=StringConstant@" + getSourcePosition()
-        + "(\"" + CharEscapers.JAVA_STRING_ESCAPE.escape(getValue()) + "\")";
+        + "(\"" + CharEscapers.javaStringEscaper().escape(getValue()) + "\")";
   }
 
   @Override

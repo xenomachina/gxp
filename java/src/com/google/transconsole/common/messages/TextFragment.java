@@ -60,7 +60,7 @@ public final class TextFragment implements MessageFragment {
    * @return the string with proper XML escaping done on the content
    */
   public String toXml(BundleFormat format) {
-    return CharEscapers.XML_CONTENT_ESCAPE.escape(getPresentation());
+    return CharEscapers.xmlContentEscaper().escape(getPresentation());
   }
 
   /** {@inheritDoc} */

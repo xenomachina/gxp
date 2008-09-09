@@ -547,7 +547,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         Message tcMessage = msg.getTcMessage();
         formatLine("// MSG %s=%s",
                    tcMessage.getId(),
-                   CharEscapers.JAVA_STRING_UNICODE_ESCAPER.escape(
+                   CharEscapers.javaStringUnicodeEscaper().escape(
                        tcMessage.getOriginal().replace("\n", " ")));
 
         StringBuilder sb = new StringBuilder("GxpTemplate.getMessage(GXP$MESSAGE_SOURCE, ");
@@ -642,7 +642,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         StringBuilder sb = new StringBuilder("GxpTemplate.getMessage(GXP$MESSAGE_SOURCE, ");
         sb.append("gxp_context.getLocale(), ");
         sb.append(String.format("/* \"%s\" */ ",
-                                CharEscapers.JAVA_STRING_UNICODE_ESCAPER.escape(
+                                CharEscapers.javaStringUnicodeEscaper().escape(
                                     tcMessage.getOriginal()
                                       .replace("\n", " ")
                                       .replace("\\*/", "*/"))));
@@ -765,7 +765,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
           }
 
           public String visitPlaintext(StringConstant value) {
-            String s = CharEscapers.JAVA_STRING_ESCAPE.escape(value.evaluate());
+            String s = CharEscapers.javaStringEscaper().escape(value.evaluate());
             return "\"" + s + "\"";
           }
         };
@@ -776,7 +776,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         String value = node.getValue();
         String type = toJavaType(node.getType());
         if (!JavaUtil.isPrimitiveType(type)) {
-          value = type + ".valueOf(\"" + CharEscapers.JAVA_STRING_ESCAPE.escape(value) + "\")";
+          value = type + ".valueOf(\"" + CharEscapers.javaStringEscaper().escape(value) + "\")";
         } else {
           if (!JavaUtil.isValidPrimitive(value, type)) {
             alertSink.add(new IllegalJavaPrimitiveError(node, value, type));

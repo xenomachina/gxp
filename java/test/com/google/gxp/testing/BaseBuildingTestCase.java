@@ -142,7 +142,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
     sb.append("<!DOCTYPE gxp:template SYSTEM"
               + " \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">");
     sb.append("<gxp:template name='"
-              + CharEscapers.XML_ESCAPE.escape(getPackage() + "." + name) + "'");
+              + CharEscapers.xmlEscaper().escape(getPackage() + "." + name) + "'");
     sb.append(" xmlns='http://www.w3.org/1999/xhtml'");
     sb.append(" xmlns:gxp='http://google.com/2001/gxp'");
     sb.append(" xmlns:call='http://google.com/2001/gxp/call'");
@@ -153,7 +153,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
       sb.append(' ');
       sb.append(s);
     }
-    sb.append(" xmlns:my='" + CharEscapers.XML_ESCAPE.escape(myNs) + "'>");
+    sb.append(" xmlns:my='" + CharEscapers.xmlEscaper().escape(myNs) + "'>");
 
     return createFileFromParts(name, sb.toString(), snippet, "</gxp:template>");
   }
@@ -179,7 +179,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
     sb.append("<!DOCTYPE gxp:interface SYSTEM"
               + " \"http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent\">");
     sb.append("<gxp:interface name='"
-              + CharEscapers.XML_ESCAPE.escape(getPackage() + "." + name) + "'");
+              + CharEscapers.xmlEscaper().escape(getPackage() + "." + name) + "'");
     sb.append(" xmlns='http://www.w3.org/1999/xhtml'");
     sb.append(" xmlns:gxp='http://google.com/2001/gxp'");
     sb.append(" xmlns:cpp='http://google.com/2001/gxp/code/cpp'");

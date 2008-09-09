@@ -49,7 +49,7 @@ public class FilePrinter implements HtmlClosure {
           out.append("<span class=\"error\">");
         }
         out.append(String.format("%4d: ", lineNumber));
-        CharEscapers.HTML_ESCAPE.escape(out).append(line);
+        CharEscapers.asciiHtmlEscaper().escape(out).append(line);
         if (lineNumber == errorLine) {
           out.append("</span>");
         }

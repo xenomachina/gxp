@@ -51,8 +51,8 @@ public class ReflectiveGraphRenderer implements GraphRenderer<Object> {
 
   private static String javaEscape(Object o) {
     return (o instanceof String)
-        ?  "\"" + CharEscapers.JAVA_STRING_ESCAPE.escape((String) o) + "\""
-        : CharEscapers.JAVA_STRING_ESCAPE.escape(String.valueOf(o));
+        ?  "\"" + CharEscapers.javaStringEscaper().escape((String) o) + "\""
+        : CharEscapers.javaStringEscaper().escape(String.valueOf(o));
   }
 
   private static final Pattern GETTER_PATTERN =

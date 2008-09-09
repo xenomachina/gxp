@@ -546,7 +546,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
             sb.append(fragment.getPresentation());
             sb.append("}");
           } else {
-            sb.append(CharEscapers.JAVASCRIPT_ESCAPER.escape(fragment.getPresentation()));
+            sb.append(CharEscapers.javascriptEscaper().escape(fragment.getPresentation()));
           }
         }
         sb.append('"');

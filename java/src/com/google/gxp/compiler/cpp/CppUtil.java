@@ -71,6 +71,6 @@ public class CppUtil {
   // TODO(harryh): javaStringEscaper() is almost certainly wrong here, need
   //               CPP_STRING_ESCAPE or something like that
   public static String toCppStringLiteral(String s) {
-    return "\"" + CharEscapers.JAVA_STRING_ESCAPE.escape(s) + "\"";
+    return "\"" + CharEscapers.javaStringEscaper().escape(s) + "\"";
   }
 }

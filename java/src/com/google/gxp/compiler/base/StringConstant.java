@@ -81,7 +81,7 @@ public class StringConstant extends Expression {
   @Override
   public String toString() {
     return getDisplayName() + "=StringConstant@" + getSourcePosition()
-        + "(\"" +  CharEscapers.JAVA_STRING_ESCAPE.escape(evaluate()) + "\")";
+        + "(\"" +  CharEscapers.javaStringEscaper().escape(evaluate()) + "\")";
   }
 
   @Override

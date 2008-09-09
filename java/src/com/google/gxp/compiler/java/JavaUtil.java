@@ -275,7 +275,7 @@ public class JavaUtil {
       }
     }
 
-    return CharEscapers.JAVA_STRING_UNICODE_ESCAPER.escape(result);
+    return CharEscapers.javaStringUnicodeEscaper().escape(result);
   }
 
   private static final Set<String> RESERVED_WORDS = ImmutableSet.of(
@@ -570,7 +570,7 @@ public class JavaUtil {
   //////////////////////////////////////////////////////////////////////
 
   public static String toJavaStringLiteral(String s) {
-    return "\"" + CharEscapers.JAVA_STRING_ESCAPE.escape(s) + "\"";
+    return "\"" + CharEscapers.javaStringEscaper().escape(s) + "\"";
   }
 
   //////////////////////////////////////////////////////////////////////

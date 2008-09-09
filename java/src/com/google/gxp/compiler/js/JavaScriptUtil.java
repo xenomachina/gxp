@@ -40,7 +40,7 @@ public class JavaScriptUtil {
     // TODO: do some actual validation
 
     // TODO(harryh): is javaStringUnicodeEscaper() really the right thing here?
-    return CharEscapers.JAVA_STRING_UNICODE_ESCAPER.escape(result);
+    return CharEscapers.javaStringUnicodeEscaper().escape(result);
   }
 
   // TODO(harryh): I found this list on a random internet site.  It is no doubt
@@ -101,6 +101,6 @@ public class JavaScriptUtil {
   //////////////////////////////////////////////////////////////////////
 
   public static String toJavaScriptStringLiteral(String s) {
-    return "'" + CharEscapers.JAVASCRIPT_ESCAPER.escape(s) + "'";
+    return "'" + CharEscapers.javascriptEscaper().escape(s) + "'";
   }
 }

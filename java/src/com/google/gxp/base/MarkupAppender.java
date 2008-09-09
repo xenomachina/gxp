@@ -50,7 +50,7 @@ public class MarkupAppender<T extends MarkupClosure> {
    * sequences.
    */
   protected CharEscaper getCharEscaper(GxpContext gxpContext) {
-    return CharEscapers.XML_ESCAPE;
+    return CharEscapers.xmlEscaper();
   }
 
   //////////////////////////////////////////////////////////////////////

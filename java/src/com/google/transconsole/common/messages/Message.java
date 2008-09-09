@@ -77,7 +77,7 @@ public final class Message extends BaseMessage {
   private void appendSource(StringBuilder sb) {
     for (String source : properties.getSources()) {
       sb.append("<source>");
-      sb.append(CharEscapers.XML_CONTENT_ESCAPE.escape(source));
+      sb.append(CharEscapers.xmlContentEscaper().escape(source));
       sb.append("</source>");
     }
   }

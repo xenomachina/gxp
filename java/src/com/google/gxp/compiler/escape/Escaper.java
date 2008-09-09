@@ -357,7 +357,7 @@ public class Escaper implements Function<PlaceholderInsertedTree, EscapedTree> {
         new ContentFamilyVisitor<String, String>() {
           public String visitMarkup(String s) {
             // TODO(laurence): what about non-HTML markup???
-            return CharEscapers.getFullHtmlEscaper().escape(s);
+            return CharEscapers.htmlEscaper().escape(s);
           }
 
           public String visitJavaScript(String s) {

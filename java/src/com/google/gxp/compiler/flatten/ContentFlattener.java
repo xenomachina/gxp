@@ -115,7 +115,7 @@ public class ContentFlattener implements Function<ValidatedTree, ContentFlattene
       }
       concatList.add(new StringConstant(element, elementSchema, "=\""));
       concatList.add(new StringConstant(element, elementSchema,
-                                        CharEscapers.XML_ESCAPE.escape(xmlns)));
+          CharEscapers.xmlEscaper().escape(xmlns)));
       concatList.add(new StringConstant(element, elementSchema, "\""));
       return new Conditional(
           element, elementSchema,

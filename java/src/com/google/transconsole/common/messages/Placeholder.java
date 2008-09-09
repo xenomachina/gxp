@@ -110,17 +110,17 @@ public final class Placeholder implements MessageFragment {
     StringBuilder sb = new StringBuilder();
 
     sb.append("<ph name=\"");
-    sb.append(CharEscapers.XML_ESCAPE.escape(presentation));
+    sb.append(CharEscapers.xmlEscaper().escape(presentation));
     sb.append("\"");
     if (format.equals(BundleFormat.XMB)) {
       sb.append(">");
        if (example != null) {
          sb.append("<ex>");
-         sb.append(CharEscapers.XML_CONTENT_ESCAPE.escape(example));
+         sb.append(CharEscapers.xmlContentEscaper().escape(example));
          sb.append("</ex>");
        }
        if (original != null) {
-         sb.append(CharEscapers.XML_CONTENT_ESCAPE.escape(original));
+         sb.append(CharEscapers.xmlContentEscaper().escape(original));
        }
        sb.append("</ph>");
     } else {

@@ -103,21 +103,21 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
                                                     int errorColumn)
       throws Exception {
     for (String legalExpr : LEGAL_EXPRESSIONS) {
-      compile(prefix + CharEscapers.XML_ESCAPE.escape(legalExpr) + suffix);
+      compile(prefix + CharEscapers.xmlEscaper().escape(legalExpr) + suffix);
       assertNoUnexpectedAlerts();
     }
 
     SourcePosition errorPos = pos(errorLine, errorColumn);
 
     for (Map.Entry<String, String> illegalOp : ILLEGAL_OPERATORS.entrySet()) {
-      compile(prefix + CharEscapers.XML_ESCAPE.escape(illegalOp.getKey()) + suffix);
+      compile(prefix + CharEscapers.xmlEscaper().escape(illegalOp.getKey()) + suffix);
       assertAlert(new IllegalJavaOperatorError(errorPos,
                                                illegalOp.getValue()));
       assertNoUnexpectedAlerts();
     }
 
     for (String illegalExpr : ILLEGAL_EXPRESSIONS) {
-      compile(prefix + CharEscapers.XML_ESCAPE.escape(illegalExpr) + suffix);
+      compile(prefix + CharEscapers.xmlEscaper().escape(illegalExpr) + suffix);
       assertAlert(new IllegalExpressionError(errorPos, "Java", illegalExpr));
       assertNoUnexpectedAlerts();
     }
@@ -166,12 +166,12 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
                                                       String suffix)
       throws Exception {
     for (String legalName : LEGAL_VAR_NAMES) {
-      compile(prefix + CharEscapers.XML_ESCAPE.escape(legalName) + suffix);
+      compile(prefix + CharEscapers.xmlEscaper().escape(legalName) + suffix);
       assertNoUnexpectedAlerts();
     }
 
     for (String illegalName : ILLEGAL_VAR_NAMES) {
-      compile(prefix + CharEscapers.XML_ESCAPE.escape(illegalName) + suffix);
+      compile(prefix + CharEscapers.xmlEscaper().escape(illegalName) + suffix);
       SourcePosition errorPos = pos(2, 1);
       assertAlert(new IllegalVariableNameError(errorPos, illegalName));
       assertNoUnexpectedAlerts();
@@ -180,7 +180,7 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
     // TODO: update this code to better test how various names can be legal
     //       in some OutputLanguages, but illegal in others
     for (String illegalName : ILLEGAL_JAVA_NAMES) {
-      compile(prefix + CharEscapers.XML_ESCAPE.escape(illegalName) + suffix);
+      compile(prefix + CharEscapers.xmlEscaper().escape(illegalName) + suffix);
       SourcePosition errorPos = pos(2, 1);
       assertAlert(new IllegalJavaNameError(errorPos, illegalName));
       assertNoUnexpectedAlerts();
@@ -241,13 +241,13 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
                                               String suffix)
       throws Exception {
     for (String legalType : LEGAL_TYPES) {
-      compile(prefix + CharEscapers.XML_ESCAPE.escape(legalType) + suffix);
+      compile(prefix + CharEscapers.xmlEscaper().escape(legalType) + suffix);
       assertNoUnexpectedAlerts();
     }
 
     SourcePosition errorPos = pos(2, 1);
     for (String illegalType : ILLEGAL_TYPES) {
-      compile(prefix + CharEscapers.XML_ESCAPE.escape(illegalType) + suffix);
+      compile(prefix + CharEscapers.xmlEscaper().escape(illegalType) + suffix);
       assertAlert(new IllegalJavaTypeError(errorPos, illegalType));
       assertNoUnexpectedAlerts();
     }
