@@ -64,4 +64,15 @@ public abstract class BaseCodeGenerator<T extends Tree<Root>> implements CodeGen
   protected static String getDefaultMethodName(Parameter param) {
     return getDefaultMethodName(param.getFormalParameter());
   }
+
+  protected static String getConstructorMethodName(FormalParameter param) {
+    String s = param.getPrimaryName();
+    s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
+
+    return "construct" + s;
+  }
+
+  protected static String getConstructorMethodName(Parameter param) {
+    return getConstructorMethodName(param.getFormalParameter());
+  }
 }

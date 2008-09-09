@@ -32,7 +32,6 @@ import com.google.gxp.compiler.base.ClassImport;
 import com.google.gxp.compiler.base.Constructor;
 import com.google.gxp.compiler.base.ContentType;
 import com.google.gxp.compiler.base.DefaultingImportVisitor;
-import com.google.gxp.compiler.base.FormalParameter;
 import com.google.gxp.compiler.base.FormalTypeParameter;
 import com.google.gxp.compiler.base.Implementable;
 import com.google.gxp.compiler.base.ImplementsDeclaration;
@@ -189,17 +188,6 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
 
     protected String getClassName(TemplateName name) {
       return (name == null) ? null : name.getBaseName();
-    }
-
-    protected String getConstructorMethodName(Parameter param) {
-      return getConstructorMethodName(param.getFormalParameter());
-    }
-
-    protected String getConstructorMethodName(FormalParameter param) {
-      String s = param.getPrimaryName();
-      s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
-
-      return "construct" + s;
     }
 
     protected String toJavaType(Type type) {

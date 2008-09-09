@@ -157,6 +157,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       appendLine();
       appendGetGxpClosureMethod(true);
       appendGetDefaultMethods();
+      appendConstructorMethods();
       appendLine();
       appendFooter();
     }
@@ -270,7 +271,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
     }
 
     private void appendGetDefaultMethods() {
-      for (Parameter param : template.getParameters()) {
+      for (Parameter param : template.getAllParameters()) {
         Expression defaultValue = param.getDefaultValue();
         if (defaultValue != null) {
           appendLine();
@@ -286,10 +287,44 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           formatLine("return %s.GXP_DEFAULT$%s;",
                      getClassName(template.getName()), param.getPrimaryName());
           appendLine("};");
+        }
+      }
+
+      // only non constuctor parameters get getDefault methods on an instantiated template
+      for (Parameter param : template.getParameters()) {
+        if (param.getDefaultValue() != null) {
+          String methodName = getDefaultMethodName(param);
           appendLine();
           formatLine("%s.prototype.%s = function() {",
                      getClassName(template.getName()), methodName);
           formatLine("return %s.%s();", getClassName(template.getName()), methodName);
+          appendLine("};");
+        }
+      }
+    }
+
+    private void appendConstructorMethods() {
+      for (Parameter param : template.getAllParameters()) {
+        if (param.getConstructor() != null) {
+          String methodName = getConstructorMethodName(param);
+          appendLine();
+          formatLine("%s.%s = function(%s) {",
+                     getClassName(template.getName()), methodName, param.getPrimaryName());
+          formatLine(param.getSourcePosition(), "return %s;",
+                     param.getConstructor().acceptVisitor(toExpressionVisitor));
+          appendLine("};");
+        }
+      }
+
+      // only non constuctor parameters get construct methods on an instantiated template
+      for (Parameter param : template.getParameters()) {
+        if (param.getConstructor() != null) {
+          String methodName = getConstructorMethodName(param);
+          appendLine();
+          formatLine("%s.prototype.%s = function(%s) {",
+                     getClassName(template.getName()), methodName, param.getPrimaryName());
+          formatLine("return %s.%s(%s);",
+                     getClassName(template.getName()), methodName, param.getPrimaryName());
           appendLine("};");
         }
       }
@@ -894,7 +929,15 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitConstructedConstant(ConstructedConstant node) {
-        return "TODO5";
+        StringBuilder sb = new StringBuilder();
+        sb.append(getCalleeName(node.getCallee()));
+        sb.append(".");
+        sb.append(getConstructorMethodName(node.getParam()));
+        sb.append("(\"");
+        sb.append(node.getValue());
+        sb.append("\")");
+
+        return sb.toString();
       }
 
       @Override
