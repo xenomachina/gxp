@@ -22,9 +22,9 @@ import com.google.gxp.compiler.alerts.Alert.Severity;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.alerts.common.SaxAlert;
 import com.google.gxp.compiler.codegen.IllegalExpressionError;
+import com.google.gxp.compiler.codegen.IllegalNameError;
+import com.google.gxp.compiler.codegen.IllegalOperatorError;
 import com.google.gxp.compiler.reparent.IllegalVariableNameError;
-import com.google.gxp.compiler.java.IllegalJavaOperatorError;
-import com.google.gxp.compiler.java.IllegalJavaNameError;
 import com.google.gxp.compiler.java.IllegalJavaTypeError;
 import com.google.gxp.testing.BaseErrorTestCase;
 
@@ -111,8 +111,7 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
 
     for (Map.Entry<String, String> illegalOp : ILLEGAL_OPERATORS.entrySet()) {
       compile(prefix + CharEscapers.xmlEscaper().escape(illegalOp.getKey()) + suffix);
-      assertAlert(new IllegalJavaOperatorError(errorPos,
-                                               illegalOp.getValue()));
+      assertAlert(new IllegalOperatorError(errorPos, "Java", illegalOp.getValue()));
       assertNoUnexpectedAlerts();
     }
 
@@ -182,7 +181,7 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
     for (String illegalName : ILLEGAL_JAVA_NAMES) {
       compile(prefix + CharEscapers.xmlEscaper().escape(illegalName) + suffix);
       SourcePosition errorPos = pos(2, 1);
-      assertAlert(new IllegalJavaNameError(errorPos, illegalName));
+      assertAlert(new IllegalNameError(errorPos, "Java", illegalName));
       assertNoUnexpectedAlerts();
     }
   }

@@ -17,10 +17,11 @@
 <gxp:template name='com.google.gxp.compiler.functests.ThrowsInAnonymousClosureGxp'
               xmlns='http://www.w3.org/1999/xhtml'
               xmlns:call='http://google.com/2001/gxp/call'
-              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:gxp='http://google.com/2001/gxp'
-              xmlns:java='http://google.com/2001/gxp/code/java'>
+              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
+              xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:js='http://google.com/2001/gxp/code/javascript'>
   
 <gxp:throws exception='JavaCodeTest.ArbitraryCheckedException'/>
 
@@ -31,7 +32,8 @@
     <div id="inner">
       <gxp:if cond='fail'>
         <!-- XXX don't do things like this in real code!!! -->
-        <gxp:eval expr='JavaCodeTest.throwException("A problem!")'/>
+        <gxp:eval java:expr='JavaCodeTest.throwException("A problem!")'
+                  js:expr='throwException("A problem!")'/>
       <gxp:else/>
         No problem.
       </gxp:if>

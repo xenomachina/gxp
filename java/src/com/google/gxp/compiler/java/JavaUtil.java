@@ -30,6 +30,8 @@ import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.Node;
 import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.codegen.IllegalExpressionError;
+import com.google.gxp.compiler.codegen.IllegalNameError;
+import com.google.gxp.compiler.codegen.IllegalOperatorError;
 import com.google.gxp.compiler.codegen.MissingExpressionError;
 
 import java.util.*;
@@ -271,7 +273,7 @@ public class JavaUtil {
     Matcher m = OPS_FINDER.matcher(s);
     while (m.find()) {
       if (FORBIDDEN_OPS.contains(m.group())) {
-        alertSink.add(new IllegalJavaOperatorError(expr, m.group()));
+        alertSink.add(new IllegalOperatorError(expr, OutputLanguage.JAVA, m.group()));
       }
     }
 
@@ -433,7 +435,7 @@ public class JavaUtil {
    */
   public static String validateName(AlertSink alertSink, Node node, String name) {
     if (RESERVED_WORDS.contains(name)) {
-      alertSink.add(new IllegalJavaNameError(node, name));
+      alertSink.add(new IllegalNameError(node, OutputLanguage.JAVA, name));
     }
     return name;
   }

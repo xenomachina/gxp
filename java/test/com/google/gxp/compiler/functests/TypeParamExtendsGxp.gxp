@@ -16,9 +16,10 @@
 -->
 <gxp:template name='com.google.gxp.compiler.functests.TypeParamExtendsGxp'
               xmlns='http://www.w3.org/1999/xhtml'
-              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:gxp='http://google.com/2001/gxp'
-              xmlns:java='http://google.com/2001/gxp/code/java'>
+              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
+              xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:js='http://google.com/2001/gxp/code/javascript'>
 
 <gxp:import class='java.io.Serializable' />
 <gxp:import class='java.util.List' />
@@ -30,7 +31,7 @@
 <gxp:param name='items'       cpp:type='list{E}' java:type='List{E}' />
 
 <gxp:loop var='i' type='E' iterable='items'>
-  <gxp:if cond='i.compareTo(specialItem) == 0'>
+  <gxp:if cond='i.equals(specialItem)' js:cond='i == specialItem'>
     <b><gxp:eval expr='i.toString()'/></b>
   <gxp:else/>
     <gxp:eval expr='i.toString()'/>

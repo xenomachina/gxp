@@ -17,6 +17,8 @@
 <gxp:template name="com.google.gxp.compiler.functests.closures.EvalInPlaintextGxp"
               xmlns="http://www.w3.org/1999/xhtml"
               xmlns:gxp="http://google.com/2001/gxp"
+              xmlns:java="http://google.com/2001/gxp/code/java"
+              xmlns:js="http://google.com/2001/gxp/code/javascript"
               content-type="text/plain">
 
 <gxp:import class='com.google.gxp.testing.TestLocalizable' />
@@ -24,14 +26,17 @@
 text
 <gxp:msg>&raquo;</gxp:msg>
 <gxp:eval expr='"string"' />
-<gxp:eval expr='(byte)1' />
-<gxp:eval expr='(short)2' />
+<gxp:eval expr='1' java:expr='(byte)1' />
+<gxp:eval expr='2' java:expr='(short)2' />
 <gxp:eval expr='3' />
-<gxp:eval expr='(long)4' />
-<gxp:eval expr='5.5f' />
-<gxp:eval expr='6.5d' />
+<gxp:eval expr='4' java:expr='(long)4' />
+<gxp:eval expr='5.5' java:expr='5.5f' />
+<gxp:eval expr='6.5' java:expr='6.5d' />
 <gxp:eval expr="'c'" />
-<gxp:eval expr='new TestLocalizable()' />
+<!-- JS doesn't have anything like Localizable, so leave it out when compiling to JS -->
+<gxp:if cond='true' js:cond='false'>
+  <gxp:eval expr='new TestLocalizable()' />
+</gxp:if>
 <gxp:eval expr='new MyPlaintextClosure()' />
 
 </gxp:template>

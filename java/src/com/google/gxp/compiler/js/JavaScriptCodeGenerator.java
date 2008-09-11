@@ -68,6 +68,7 @@ import com.google.gxp.compiler.codegen.BracesCodeGenerator;
 import com.google.gxp.compiler.msgextract.MessageExtractedTree;
 import com.google.gxp.compiler.reparent.Attribute;
 import com.google.gxp.compiler.schema.AttributeValidator;
+import com.google.gxp.compiler.schema.ContentFamilyVisitor;
 import com.google.gxp.compiler.schema.Schema;
 import com.google.transconsole.common.messages.MessageFragment;
 import com.google.transconsole.common.messages.Placeholder;
@@ -982,8 +983,31 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitStringConstant(StringConstant value) {
-        return "TODO7";
+        if (value.getSchema() == null) {
+          throw new AssertionError();
+        }
+        return value.getSchema().getContentFamily().acceptVisitor(STRING_CONSTANT_VISITOR, value);
       }
+
+      private ContentFamilyVisitor<StringConstant, String>
+        STRING_CONSTANT_VISITOR =
+        new ContentFamilyVisitor<StringConstant, String>() {
+          public String visitCss(StringConstant value) {
+            return toAnonymousClosure(value);
+          }
+
+          public String visitJavaScript(StringConstant value) {
+            return toAnonymousClosure(value);
+          }
+
+          public String visitMarkup(StringConstant value) {
+            return toAnonymousClosure(value);
+          }
+
+          public String visitPlaintext(StringConstant value) {
+            return JavaScriptUtil.toJavaScriptStringLiteral(value.evaluate());
+          }
+        };
 
       ////////////////////////////////////////////////////////////////////////////////
       // Call Visitors

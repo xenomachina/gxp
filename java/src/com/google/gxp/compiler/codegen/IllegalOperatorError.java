@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.gxp.compiler.java;
+package com.google.gxp.compiler.codegen;
 
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
-import com.google.gxp.compiler.base.Node;
+import com.google.gxp.compiler.base.NativeExpression;
+import com.google.gxp.compiler.base.OutputLanguage;
 
 /**
- * {@link com.google.gxp.compiler.alerts.Alert} which indicates that an
- * illegal variable name was encountered.
+ * {@code ErrorAlert} which indicates that an illegal operator
+ * was encountered.
  */
-public class IllegalJavaNameError extends ErrorAlert {
-  public IllegalJavaNameError(SourcePosition pos, String name) {
-    super(pos, "Illegal java name: " + name);
+public class IllegalOperatorError extends ErrorAlert {
+  public IllegalOperatorError(SourcePosition pos, String outputLanguage, String op) {
+    super(pos, op + " is forbidden by gxp in " + outputLanguage + " expressions.");
   }
 
-  public IllegalJavaNameError(Node node, String name) {
-    this(node.getSourcePosition(), name);
+  public IllegalOperatorError(NativeExpression node, OutputLanguage outputLanguage, String op) {
+    this(node.getSourcePosition(), outputLanguage.getDisplay(), op);
   }
 }

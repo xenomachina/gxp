@@ -17,18 +17,144 @@
 package com.google.gxp.compiler.js;
 
 import com.google.common.base.CharEscapers;
+import com.google.common.base.Join;
 import com.google.common.collect.ImmutableSet;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.Node;
 import com.google.gxp.compiler.base.OutputLanguage;
+import com.google.gxp.compiler.codegen.IllegalNameError;
 import com.google.gxp.compiler.codegen.MissingExpressionError;
+
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Contains static functions for validating javascript expressions,
  * and a couple additional javascript utility functions.
  */
 public class JavaScriptUtil {
+
+  // READ THIS BEFORE YOU CHANGE THE LIST BELOW!
+  //
+  // The list of disabled JavaScript operators was originally based on the list
+  // of disabled Java Operators. If you want to enable something here, see
+  // about getting it enabled for Java as well.
+
+  private static final Set<String> FORBIDDEN_OPS = ImmutableSet.of(
+      // simple boolean
+      // "!",
+      // "!=",
+      // "==",
+      // "===",
+
+      // boolean connectives
+      //  "&&",
+      //  "||",
+
+      // boolean comparators
+      // ">",
+      // ">=",
+      // "<",
+      // "<=",
+
+      // arithmetic
+      // "*",
+      // "+",
+      // "-",
+      // "/",
+      // "%",
+
+      // conditional operator (really ?:)
+      // "?",
+
+      // type inspection
+      "in",
+      "instanceof",
+      "typeof",
+
+      // object instantiation/deletion
+      // "new",
+      "delete",
+      "void",
+
+      // bitwise
+      "^",
+      "~",
+      "&",
+      "<<",
+      ">>",
+      ">>>",
+      "|",
+
+      // assignment -- I can't imagine any reason why it would ever be a good
+      //               idea to re-enable these,
+      "--",
+      "-=",
+      "/=",
+      "*=",
+      "&=",
+      "%=",
+      "++",
+      "+=",
+      "<<=",
+      "=",
+      ">>=",
+      ">>>=",
+      "|=",
+      "^=");
+
+  // compile all the patterns into a giant or Expression;
+  private static Pattern compileUnionPattern(String... patterns) {
+    return Pattern.compile(Join.join("|", patterns));
+  }
+
+  // the order is important! The '|' operator  is non-greedy in
+  // regexes. Sorting in order of descending length works.
+  private static final Pattern OPS_FINDER = compileUnionPattern(
+      "\\binstanceof\\b",
+      "\\bdelete\\b",
+      "\\btypeof\\b",
+      "\\bvoid\\b",
+      Pattern.quote(">>>="),
+      Pattern.quote("<<="),
+      Pattern.quote(">>="),
+      Pattern.quote(">>>"),
+      Pattern.quote("==="),
+      Pattern.quote("--"),
+      Pattern.quote("-="),
+      Pattern.quote("!="),
+      Pattern.quote("/="),
+      Pattern.quote("^="),
+      Pattern.quote("*="),
+      Pattern.quote("&&"),
+      Pattern.quote("&="),
+      Pattern.quote("%="),
+      Pattern.quote("++"),
+      Pattern.quote("+="),
+      Pattern.quote("<<"),
+      Pattern.quote("<="),
+      Pattern.quote("=="),
+      Pattern.quote(">="),
+      Pattern.quote(">>"),
+      Pattern.quote("|="),
+      Pattern.quote("||"),
+      "\\bnew\\b",
+      "\\bin\\b",
+      Pattern.quote("-"),
+      Pattern.quote("!"),
+      Pattern.quote("/"),
+      Pattern.quote("^"),
+      Pattern.quote("~"),
+      Pattern.quote("*"),
+      Pattern.quote("&"),
+      Pattern.quote("%"),
+      Pattern.quote("+"),
+      Pattern.quote("<"),
+      Pattern.quote("="),
+      Pattern.quote(">"),
+      Pattern.quote("|"),
+      Pattern.quote("?"));  // just use ? to find ternary operator...
 
   public static String validateExpression(AlertSink alertSink, NativeExpression expr) {
     String result = expr.getNativeCode(OutputLanguage.JAVASCRIPT);
@@ -91,7 +217,7 @@ public class JavaScriptUtil {
    */
   public static String validateName(AlertSink alertSink, Node node, String name) {
     if (RESERVED_WORDS.contains(name)) {
-      alertSink.add(new IllegalJavaScriptNameError(node, name));
+      alertSink.add(new IllegalNameError(node, OutputLanguage.JAVASCRIPT, name));
     }
     return name;
   }
@@ -101,6 +227,6 @@ public class JavaScriptUtil {
   //////////////////////////////////////////////////////////////////////
 
   public static String toJavaScriptStringLiteral(String s) {
-    return "'" + CharEscapers.javascriptEscaper().escape(s) + "'";
+    return '"' + CharEscapers.javascriptEscaper().escape(s) + '"';
   }
 }
