@@ -17,10 +17,11 @@
 <gxp:template name='com.google.gxp.compiler.functests.instantiable.ConstructorCallerGxp'
               xmlns='http://www.w3.org/1999/xhtml'
               xmlns:call='http://google.com/2001/gxp/call' 
-              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:gxp='http://google.com/2001/gxp'
-              xmlns:java='http://google.com/2001/gxp/code/java'>
+              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
+              xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:js='http://google.com/2001/gxp/code/javascript'>
 
 <gxp:param name='s1' cpp:type='const char *' java:type='String' />
 <gxp:param name='s2' cpp:type='const char *' java:type='String' />
@@ -29,6 +30,8 @@
 
 <call:ConstructorGxp expr:s2='s2' />
 
-<call:ConstructorGxp expr:this='new ConstructorGxp.Instance(s1)' expr:s2='s2' />
+<call:ConstructorGxp expr:s2='s2'
+    java:this='new ConstructorGxp.Instance(s1)'
+    js:this='new com.google.gxp.compiler.functests.instantiable.ConstructorGxp(s1)' />
 
 </gxp:template>

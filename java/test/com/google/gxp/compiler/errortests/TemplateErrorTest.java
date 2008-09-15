@@ -70,7 +70,7 @@ public class TemplateErrorTest extends BaseTestCase {
     FileRef gxp = createFile("Holy!Cow!", "Hello");
     compileFiles(gxp);
     assertAlert(new InvalidNameError(
-             pos(1, 504), "com.google.gxp.compiler.errortests.Holy!Cow!"));
+             pos(1, 558), "com.google.gxp.compiler.errortests.Holy!Cow!"));
     assertNoUnexpectedAlerts();
   }
 

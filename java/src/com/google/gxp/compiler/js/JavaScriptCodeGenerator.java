@@ -846,7 +846,13 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitValidatedCall(ValidatedCall call) {
-        return "TODO3";
+        StringBuilder sb = new StringBuilder(GXP_CONTEXT_VAR);
+        sb.append(".getString(");
+        sb.append(getJavaScriptExpression(call));
+        sb.append(".");
+        sb.append(getWriteMethodName(call.getSchema()));
+        sb.append(")");
+        return sb.toString();
       }
     }
 

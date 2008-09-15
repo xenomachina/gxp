@@ -80,6 +80,9 @@ public class JavascriptAppenderTest extends BaseFunctionalTestCase {
   public void testWriteString() throws Exception {
     JavascriptAppender.INSTANCE.append(out, gxpContext, "foo ' bar \" baz");
     assertOutputEquals("\"foo \\x27 bar \\x22 baz\"");
+
+    JavascriptAppender.INSTANCE.append(out, gxpContext, (CharSequence)null);
+    assertOutputEquals("null");
   }
 
   public void testWriteJSONArray() throws Exception {

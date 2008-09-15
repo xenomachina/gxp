@@ -169,10 +169,13 @@ public class JavascriptAppender {
    */
   public <A extends Appendable> A append(A out, GxpContext gxpContext, CharSequence value)
       throws IOException {
-    Preconditions.checkNotNull(value);
-    out.append('"');
-    CharEscapers.javascriptEscaper().escape(out).append(value);
-    out.append('"');
+    if (value == null) {
+      out.append("null");
+    } else {
+      out.append('"');
+      CharEscapers.javascriptEscaper().escape(out).append(value);
+      out.append('"');
+    }
     return out;
   }
 
