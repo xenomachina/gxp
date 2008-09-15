@@ -14,21 +14,20 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<gxp:template name='com.google.gxp.compiler.functests.LoopGxp'
+<gxp:template name='com.google.gxp.compiler.functests.multilingual.LoopDelimiterGxp'
               xmlns='http://www.w3.org/1999/xhtml'
               xmlns:gxp='http://google.com/2001/gxp'
-              xmlns:call='http://google.com/2001/gxp/call'
-              xmlns:expr='http://google.com/2001/gxp/expressions'
+              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
               xmlns:js='http://google.com/2001/gxp/code/javascript'>
 
-<gxp:param name='count' type='int' />
+<gxp:import class='com.google.gxp.compiler.functests.IntIterable' />
 
-<b>
-  <gxp:loop type='int' var='i' java:iterator='new IntIterator(count)'
-                               js:iterable='new IntIterable(count)'>
-    !
-  </gxp:loop>
-</b>
+<gxp:loop var='i' type='int' iterable='new IntIterable(2)' cpp:delimiter='"C++"'
+                                                           java:delimiter='"Java"'
+                                                           js:delimiter='"JavaScript"'>
+  |
+</gxp:loop>
+
 
 </gxp:template>

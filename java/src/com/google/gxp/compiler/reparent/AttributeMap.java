@@ -25,6 +25,7 @@ import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
 import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
+import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.base.AttributeName;
 import com.google.gxp.compiler.base.Expression;
@@ -313,6 +314,52 @@ class AttributeMap {
       alertSink.add(new InvalidAttributeValueError(getAttribute(name)));
       return false;
     }
+  }
+
+  /**
+   * Gets an Expression for the given attribute name.  Will be one of:
+   * <ol>
+   *   <li>
+   *     If there is a &lt;gxp:attr&gt; or null prefixed attribute, then
+   *     the value for that attribue.
+   *   </li>
+   *   <li>
+   *     Otherwise a multi-lingual {@code NativeExpression} based on expr:
+   *     and language specific prefixed attributes.
+   *   </li>
+   *   <li>
+   *     Or the fallback, if none of the above are available.
+   *   </li>
+   * </ol>
+   */
+  public Expression getOptionalAttributeValue(String name, Expression fallback) {
+    Expression result = null;
+    Attribute nullAttr = getAttribute(name);
+    if (nullAttr != null) {
+      if (nullAttr.getCondition() != null) {
+        alertSink.add(new RequiredAttributeHasCondError(forNode, nullAttr));
+      }
+      result = nullAttr.getValue();
+    }
+
+    // if we don't have anything yet, or if we got a NativeExpression
+    // (which would be the default) try to get an Expression attribute
+    if (result == null || result instanceof NativeExpression) {
+      result = getOptionalExprValue(name, null);
+    } else {
+      // if we aren't getting delimiter as an expresion attribute then all OL
+      // specific attribute conflict with whatever we are using
+      for (OutputLanguageNamespace ns : outputLanguageNamespaces) {
+        Attribute attr = getAttribute(ns, name);
+        if (attr != null) {
+          alertSink.add(new ConflictingAttributesError(forNode, nullAttr, attr));
+        }
+      }
+    }
+
+    return (result == null)
+        ? fallback
+        : result;
   }
 
   /**

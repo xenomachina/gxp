@@ -18,19 +18,22 @@ package com.google.gxp.compiler.codegen;
 
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
-import com.google.gxp.compiler.base.Expression;
+import com.google.gxp.compiler.base.LoopExpression;
 import com.google.gxp.compiler.base.OutputLanguage;
 
 /**
- * {@link ErrorAlert} which indicates a {@link NativeExpression} did not define
- * a type for the requested {@code OutputLanguage}.
+ * {@code ErrorAlert} which indicates that an illegal native expression
+ * was encountered.
  */
-public class MissingExpressionError extends ErrorAlert {
-  public MissingExpressionError(SourcePosition pos, String displayName, String outputLanguage) {
-    super(pos, displayName + " does not define a " + outputLanguage + " expression.");
+public class LoopMissingBothIterableAndIteratorError extends ErrorAlert {
+  public LoopMissingBothIterableAndIteratorError(SourcePosition pos,
+                                                 String displayName,
+                                                 String outputLanguage) {
+    super(pos, displayName + " does not define an iterable or an iterator in " + outputLanguage);
   }
 
-  public MissingExpressionError(Expression expr, OutputLanguage outputLanguage) {
-    this(expr.getSourcePosition(), expr.getDisplayName(), outputLanguage.getDisplay());
+  public LoopMissingBothIterableAndIteratorError(LoopExpression loop,
+                                                 OutputLanguage outputLanguage) {
+    this(loop.getSourcePosition(), loop.getDisplayName(), outputLanguage.getDisplay());
   }
 }

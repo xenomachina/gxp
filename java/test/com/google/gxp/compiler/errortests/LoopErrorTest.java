@@ -27,8 +27,8 @@ public class LoopErrorTest extends BaseTestCase {
   public void testLoop_bothIteratorAndIterable() throws Exception {
     compile("<gxp:loop var='x' type='int' iterable='foo' iterator='bar' />");
     assertAlert(new ConflictingAttributesError(pos(2,1), "<gxp:loop>",
-                                               "'iterator' attribute",
-                                               "'iterable' attribute"));
+                                               "'iterable' attribute",
+                                               "'iterator' attribute"));
     assertNoUnexpectedAlerts();
   }
 
@@ -39,7 +39,7 @@ public class LoopErrorTest extends BaseTestCase {
 
   public void testLoop_invalidIterator() throws Exception {
     assertIllegalExpressionDetected(
-        "<gxp:loop var='x' type='int' iterator='", "'/>");
+        "<gxp:loop var='x' type='int' java:iterator='", "' js:iterable='e' />");
   }
 
   public void testLoop_invalidType() throws Exception {

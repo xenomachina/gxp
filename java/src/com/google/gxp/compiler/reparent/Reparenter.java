@@ -26,7 +26,6 @@ import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.ContentTypeExpectedAlert;
 import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
-import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
 import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 import com.google.gxp.compiler.base.AbbrExpression;
 import com.google.gxp.compiler.base.BooleanConstant;
@@ -163,7 +162,8 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
   /**
    * Converts a {@code ParsedAttribute} into an {@code Attribute}.
    */
-  private static Attribute convertAttribute(final ParsedAttribute parsedAttr) {
+  private static Attribute convertAttribute(final AlertSink alertSink,
+                                            final ParsedAttribute parsedAttr) {
     Namespace namespace = parsedAttr.getNamespace();
     return namespace.acceptVisitor(
         new NamespaceVisitor<Attribute>() {
@@ -247,7 +247,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
       }
     };
     for (ParsedAttribute parsedAttr : parsedAttrs) {
-      result.accumulate(convertAttribute(parsedAttr));
+      result.accumulate(convertAttribute(alertSink, parsedAttr));
     }
     for (ParsedElement child : children) {
       child.acceptVisitor(childVisitor);
@@ -538,14 +538,8 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
       Type type = createType(node, attrMap, false, null);
       String var = getVariableName(attrMap, "var");
 
-      Attribute delimiterAttr = attrMap.getAttribute("delimiter");
-      Expression delimiter = (delimiterAttr == null)
-          ? new StringConstant(node, null, " ")
-          : delimiterAttr.getValue();
-
-      if (delimiterAttr != null && delimiterAttr.getCondition() != null) {
-        alertSink.add(new RequiredAttributeHasCondError(node, delimiterAttr));
-      }
+      Expression delimiter = attrMap.getOptionalAttributeValue(
+          "delimiter", new StringConstant(node, null, " "));
 
       Expression iterator = attrMap.getOptionalExprValue("iterator", null);
       Expression iterable = attrMap.getOptionalExprValue("iterable", null);
@@ -555,28 +549,45 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
         return null;
       }
 
-      if (iterable != null && iterator != null) {
-        alertSink.add(new ConflictingAttributesError(
-                          node,
-                          attrMap.getAttribute(NullNamespace.INSTANCE, "iterator"),
-                          attrMap.getAttribute(NullNamespace.INSTANCE, "iterable")));
+      // check for all of the ways iteratpr and iterable attributes can
+      // conflict with each other
+      boolean foundConflict = checkForConflictingLoopAttributes(node, attrMap,
+                                                                NullNamespace.INSTANCE,
+                                                                NullNamespace.INSTANCE);
+      for (OutputLanguageNamespace ns : AttributeMap.getOutputLanguageNamespaces()) {
+        foundConflict |= checkForConflictingLoopAttributes(node, attrMap,
+                                                           NullNamespace.INSTANCE, ns);
+        foundConflict |= checkForConflictingLoopAttributes(node, attrMap, ns,
+                                                           NullNamespace.INSTANCE);
+        foundConflict |= checkForConflictingLoopAttributes(node, attrMap, ns, ns);
+      }
+
+      // special case to disallow JavaScript iterator attribute this
+      // isn't in JavaScriptCodeGenerator, because we want to generate an
+      // alert for this even if we aren't generating JS code
+      Attribute jsIterator = attrMap.getAttribute(JavaScriptNamespace.INSTANCE, "iterator");
+      if (jsIterator != null) {
+        alertSink.add(new UnknownAttributeError(node, jsIterator));
         return null;
       }
 
-      if ((type != null) && (var != null)) {
-        if (iterable != null) {
-          output.accumulate(
-              LoopExpression.createWithIterable(
-                  node, type, var, iterable, getCollapsableContent(attrMap),
-                  delimiter));
-        } else if (iterator != null) {
-          output.accumulate(
-              LoopExpression.createWithIterator(
-                  node, type, var, iterator, getCollapsableContent(attrMap),
-                  delimiter));
-        }
+      if ((type != null) && (var != null) && !foundConflict) {
+        output.accumulate(new LoopExpression(node, type, var, iterable, iterator,
+                                             getCollapsableContent(attrMap), delimiter));
       }
       return null;
+    }
+
+    public boolean checkForConflictingLoopAttributes(Node node, AttributeMap attrMap,
+                                                     Namespace iterableNs, Namespace iteratorNs) {
+      Attribute attrA = attrMap.getAttribute(iterableNs, "iterable");
+      Attribute attrB = attrMap.getAttribute(iteratorNs, "iterator");
+      if (attrA != null && attrB != null) {
+        alertSink.add(new ConflictingAttributesError(node, attrA, attrB));
+        return true;
+      } else {
+        return false;
+      }
     }
 
     /**

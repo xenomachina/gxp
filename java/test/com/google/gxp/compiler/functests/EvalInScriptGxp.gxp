@@ -21,7 +21,7 @@
               xmlns:expr='http://google.com/2001/gxp/expressions'>
 
 <script type='text/javascript'>
-  var x = <gxp:eval expr='1234567d'/>;
+  var x = <gxp:eval expr='1234567.1' />;
   var y = <gxp:eval expr='"don&apos;t worry, be &lt;em&gt;happy&lt;/em&gt;"'/>;
 </script>
 

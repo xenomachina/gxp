@@ -16,6 +16,8 @@
 
 package com.google.gxp.compiler.js;
 
+import static com.google.gxp.compiler.base.OutputLanguage.JAVASCRIPT;
+
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Function;
 import com.google.common.base.Join;
@@ -634,8 +636,9 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public Void visitLoopExpression(LoopExpression loop) {
-        if (loop.getIterator() != null) {
-          // TODO(harryh): figure out what to do in this case
+        // JS Loops require an iterable
+        if (loop.getIterable() == null) {
+          alertSink.add(new LoopRequiresIterableInJavaScriptError(loop));
           return null;
         }
 

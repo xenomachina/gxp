@@ -151,7 +151,7 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
   public void testEvalInScript() throws Exception {
     EvalInScriptGxp.write(out, gxpContext);
     assertOutputEquals("<script type=\"text/javascript\">\n"
-                       + "  var x = 1234567.0;\n"
+                       + "  var x = 1234567.1;\n"
                        + "  var y = \"don\\x27t worry, be \\x3cem\\x3ehappy\\x3c/em\\x3e\";\n"
                        + "</script>");
   }

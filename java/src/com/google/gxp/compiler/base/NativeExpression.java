@@ -78,6 +78,11 @@ public class NativeExpression extends Expression {
   }
 
   @Override
+  public boolean canEvaluateAs(OutputLanguage outputLanguage) {
+    return (getNativeCode(outputLanguage) != null);
+  }
+
+  @Override
   public <T> T acceptVisitor(ExpressionVisitor<T> visitor) {
     return visitor.visitNativeExpression(this);
   }

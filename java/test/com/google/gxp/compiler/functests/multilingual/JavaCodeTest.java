@@ -45,6 +45,16 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
     assertOutputEquals("You are running:\nJava");
   }
 
+  public void testLoop() throws Exception {
+    LoopGxp.write(out, gxpContext, 3);
+    assertOutputEquals("* * * * | * * * *");
+  }
+
+  public void testLoopDelimiter() throws Exception {
+    LoopDelimiterGxp.write(out, gxpContext);
+    assertOutputEquals("|Java|");
+  }
+
   public void testOutputElement() throws Exception {
     OutputElementGxp.write(out, gxpContext);
     assertOutputEquals("<div class=\"Java\"></div>");

@@ -31,9 +31,9 @@ public class LoopExpression extends Expression {
   private final Expression subexpression;
   private final Expression delimiter;
 
-  private LoopExpression(Node fromNode, Type type, String var,
-                         Expression iterable, Expression iterator,
-                         Expression subexpression, Expression delimiter) {
+  public LoopExpression(Node fromNode, Type type, String var,
+                        Expression iterable, Expression iterator,
+                        Expression subexpression, Expression delimiter) {
     super(fromNode, subexpression.getSchema());
     this.type = Preconditions.checkNotNull(type);
     this.var = Preconditions.checkNotNull(var);
@@ -41,26 +41,6 @@ public class LoopExpression extends Expression {
     this.iterator = iterator;
     this.subexpression = Preconditions.checkNotNull(subexpression);
     this.delimiter = Preconditions.checkNotNull(delimiter);
-  }
-
-  public static LoopExpression createWithIterable(Node fromNode, Type type,
-                                                  String var,
-                                                  Expression iterable,
-                                                  Expression subexpression,
-                                                  Expression delimiter) {
-    return new LoopExpression(fromNode, type, var,
-                              Preconditions.checkNotNull(iterable), null, subexpression,
-                              delimiter);
-  }
-
-  public static LoopExpression createWithIterator(Node fromNode, Type type,
-                                                  String var,
-                                                  Expression iterator,
-                                                  Expression subexpression,
-                                                  Expression delimiter) {
-    return new LoopExpression(fromNode, type, var,
-                              null, Preconditions.checkNotNull(iterator), subexpression,
-                              delimiter);
   }
 
   public Type getType() {

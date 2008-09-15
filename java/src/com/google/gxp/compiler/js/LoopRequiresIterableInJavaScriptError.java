@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.gxp.compiler.codegen;
+package com.google.gxp.compiler.js;
 
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
-import com.google.gxp.compiler.base.Expression;
-import com.google.gxp.compiler.base.OutputLanguage;
+import com.google.gxp.compiler.base.LoopExpression;
 
 /**
- * {@link ErrorAlert} which indicates a {@link NativeExpression} did not define
- * a type for the requested {@code OutputLanguage}.
+ * {@link ErrorAlert} which indicates the a <gxp:loop> that didn't provide a
+ * javascript iterable expression was encountered.
  */
-public class MissingExpressionError extends ErrorAlert {
-  public MissingExpressionError(SourcePosition pos, String displayName, String outputLanguage) {
-    super(pos, displayName + " does not define a " + outputLanguage + " expression.");
+public class LoopRequiresIterableInJavaScriptError extends ErrorAlert {
+  public LoopRequiresIterableInJavaScriptError(SourcePosition pos, String displayName) {
+    super(pos, displayName + " requires an iterable when being compiled to JavaScript");
   }
 
-  public MissingExpressionError(Expression expr, OutputLanguage outputLanguage) {
-    this(expr.getSourcePosition(), expr.getDisplayName(), outputLanguage.getDisplay());
+  public LoopRequiresIterableInJavaScriptError(LoopExpression loop) {
+    this(loop.getSourcePosition(), loop.getDisplayName());
   }
 }

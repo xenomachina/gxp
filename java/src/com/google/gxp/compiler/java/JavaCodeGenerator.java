@@ -16,6 +16,8 @@
 
 package com.google.gxp.compiler.java;
 
+import static com.google.gxp.compiler.base.OutputLanguage.JAVA;
+
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Join;
 import com.google.common.collect.Lists;
@@ -57,6 +59,8 @@ import com.google.gxp.compiler.base.ThrowsDeclaration;
 import com.google.gxp.compiler.base.UnboundCall;
 import com.google.gxp.compiler.base.UnexpectedNodeException;
 import com.google.gxp.compiler.base.ValidatedCall;
+import com.google.gxp.compiler.codegen.MissingExpressionError;
+import com.google.gxp.compiler.codegen.LoopMissingBothIterableAndIteratorError;
 import com.google.gxp.compiler.msgextract.MessageExtractedTree;
 import com.google.gxp.compiler.reparent.Attribute;
 import com.google.gxp.compiler.schema.AttributeValidator;
@@ -426,7 +430,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         if (!delimiter.alwaysEmpty()) {
           formatLine("boolean %s = false;", boolVar);
         }
-        if (loop.getIterator() != null) {
+        if (loop.getIterator() != null && loop.getIterator().canEvaluateAs(JAVA)) {
           // start outer scope for temporary variables
           appendLine("{");
           String iterVar = createVarName("iter");
@@ -454,7 +458,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
 
           // close outer scope
           appendLine("}");
-        } else {
+        } else if (loop.getIterable() != null && loop.getIterable().canEvaluateAs(JAVA)) {
           formatLine(loop.getSourcePosition(), "for (final %s %s : %s) {",
                      toJavaType(loop.getType()),
                      JavaUtil.validateName(alertSink, loop, loop.getVar()),
@@ -462,6 +466,16 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
           writeConditionalDelim(delimiter, boolVar);
           loop.getSubexpression().acceptVisitor(this);
           appendLine("}");
+        } else {
+          // if we only have an expression for 1 of iterable/iterator then we
+          // add a MissingExpressionAlert
+          if (loop.getIterable() == null && loop.getIterator() != null) {
+            alertSink.add(new MissingExpressionError(loop.getIterator(), JAVA));
+          } else if (loop.getIterator() == null && loop.getIterable() != null) {
+            alertSink.add(new MissingExpressionError(loop.getIterable(), JAVA));
+          } else {
+            alertSink.add(new LoopMissingBothIterableAndIteratorError(loop, JAVA));
+          }
         }
         return null;
       }

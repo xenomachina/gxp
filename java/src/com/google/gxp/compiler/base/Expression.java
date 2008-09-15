@@ -60,6 +60,15 @@ public abstract class Expression extends AbstractNode {
   public abstract <T> T acceptVisitor(ExpressionVisitor<T> visitor);
 
   /**
+   * Indicates whether this {@code Expression} can be evaluated in the
+   * given {@code OutputLanguage}. Generally always true except for some
+   * {@code NativeExpression}s.
+   */
+  public boolean canEvaluateAs(OutputLanguage outputLanguage) {
+    return true;
+  }
+
+  /**
    * Indicates whether this {@code Expression} always evaluates to an empty
    * string. Generally false except for empty {@code StringConstant}s.
    */

@@ -18,8 +18,12 @@ package com.google.gxp.compiler.errortests;
 
 import com.google.gxp.compiler.alerts.common.MissingAttributeError;
 import com.google.gxp.compiler.alerts.common.MultiValueAttributeError;
+import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
+import com.google.gxp.compiler.codegen.LoopMissingBothIterableAndIteratorError;
 import com.google.gxp.compiler.codegen.MissingExpressionError;
 import com.google.gxp.compiler.fs.FileRef;
+import com.google.gxp.compiler.js.LoopRequiresIterableInJavaScriptError;
+import com.google.gxp.compiler.reparent.ConflictingAttributesError;
 
 /**
  * Tests of proper error reporting by the GXP compiler relating to
@@ -77,6 +81,97 @@ public class MultiLingualErrorTest extends BaseTestCase {
   public void testIf() throws Exception {
     assertInvalidExpressionAttributeDetected("<gxp:if", "cond", "/>",
                                              "<gxp:if>", "'cond' attribute", 2, 1);
+  }
+
+  public void testLoop() throws Exception {
+    // iterable tests
+    compile("<gxp:loop var='v' type='t' iterable='e' />");
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' expr:iterable='e' />");
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' iterable='e' java:iterable='e'/>");
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' java:iterable='e' />");
+    assertAlert(new MissingExpressionError(pos(2, 1), "'iterable' attribute", "JavaScript"));
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' js:iterable='e' />");
+    assertAlert(new MissingExpressionError(pos(2,1), "'iterable' attribute", "Java"));
+    assertNoUnexpectedAlerts();
+
+    // iterator tests
+    compile("<gxp:loop var='v' type='t' iterator='e' />");
+    assertAlert(new LoopRequiresIterableInJavaScriptError(pos(2, 1), "<gxp:loop>"));
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' expr:iterator='e' />");
+    assertAlert(new LoopRequiresIterableInJavaScriptError(pos(2, 1), "<gxp:loop>"));
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' iterator='e' java:iterator='e' />");
+    assertAlert(new LoopRequiresIterableInJavaScriptError(pos(2, 1), "<gxp:loop>"));
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' cpp:iterator='e' />");
+    assertAlert(new MissingExpressionError(pos(2, 1), "'iterator' attribute", "Java"));
+    assertAlert(new LoopRequiresIterableInJavaScriptError(pos(2, 1), "<gxp:loop>"));
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' js:iterator='e' />");
+    assertAlert(new UnknownAttributeError("<gxp:loop>", pos(2, 1), "'js:iterator' attribute"));
+    assertNoUnexpectedAlerts();
+
+    // both tests
+    compile("<gxp:loop var='v' type='t' java:iterator='e' js:iterable='e' />");
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' iterator='e' js:iterable='e' />");
+    assertAlert(new ConflictingAttributesError(pos(2, 1), "<gxp:loop>",
+                                               "'js:iterable' attribute",
+                                               "'iterator' attribute"));
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' java:iterator='e' iterable='e' />");
+    assertAlert(new ConflictingAttributesError(pos(2, 1), "<gxp:loop>",
+                                               "'iterable' attribute",
+                                               "'java:iterator' attribute"));
+
+    compile("<gxp:loop var='v' type='t' cpp:iterator='e' cpp:iterable='e' />");
+    assertAlert(new ConflictingAttributesError(pos(2, 1), "<gxp:loop>",
+                                               "'cpp:iterable' attribute",
+                                               "'cpp:iterator' attribute"));
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' cpp:iterator='e' js:iterable='e' />");
+    assertAlert(new LoopMissingBothIterableAndIteratorError(pos(2,1), "<gxp:loop>", "Java"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testLoopDelimiter() throws Exception {
+    compile("<gxp:loop var='v' type='t' iterable='e' delimiter=''/>");
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' iterable='e' expr:delimiter='' java:delimiter=''/>");
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' iterable='e' delimiter='' java:delimiter=''/>");
+    assertAlert(new ConflictingAttributesError(pos(2, 1), "<gxp:loop>",
+                                               "'delimiter' attribute",
+                                               "'java:delimiter' attribute"));
+    assertNoUnexpectedAlerts();
+
+    compile("<gxp:loop var='v' type='t' iterable='e' cpp:delimiter=''>",
+            "  <gxp:attr name='delimiter'>",
+            "    ,",
+            "  </gxp:attr>",
+            "</gxp:loop>");
+    assertAlert(new ConflictingAttributesError(pos(2, 1), "<gxp:loop>",
+                                               "'delimiter' attribute",
+                                               "'cpp:delimiter' attribute"));
+    assertNoUnexpectedAlerts();
   }
 
   public void testCall_NullAndLanguageAttribute() throws Exception {
