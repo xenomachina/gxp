@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.errortests;
 
 import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
+import com.google.gxp.compiler.js.LoopRequiresIterableInJavaScriptError;
 import com.google.gxp.compiler.reparent.ConflictingAttributesError;
 import com.google.gxp.compiler.reparent.MissingAttributesError;
 
@@ -38,8 +39,18 @@ public class LoopErrorTest extends BaseTestCase {
   }
 
   public void testLoop_invalidIterator() throws Exception {
+    testingInvalidIterator = true;
     assertIllegalExpressionDetected(
-        "<gxp:loop var='x' type='int' java:iterator='", "' js:iterable='e' />");
+        "<gxp:loop var='x' type='int' iterator='", "'/>");
+  }
+
+  private boolean testingInvalidIterator = false;
+
+  @Override
+  protected void assertAdditionalAlerts() {
+    if (testingInvalidIterator) {
+      assertAlert(new LoopRequiresIterableInJavaScriptError(pos(2,1), "<gxp:loop>"));
+    }
   }
 
   public void testLoop_invalidType() throws Exception {

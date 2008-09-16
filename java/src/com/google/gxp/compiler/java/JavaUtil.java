@@ -25,12 +25,8 @@ import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.MissingTypeError;
 import com.google.gxp.compiler.base.JavaAnnotation;
-import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.OutputLanguage;
-import com.google.gxp.compiler.codegen.IllegalExpressionError;
-import com.google.gxp.compiler.codegen.IllegalOperatorError;
-import com.google.gxp.compiler.codegen.MissingExpressionError;
 import com.google.gxp.compiler.codegen.OutputLanguageUtil;
 
 import java.util.*;
@@ -44,7 +40,9 @@ import java.util.regex.Pattern;
 public class JavaUtil extends OutputLanguageUtil {
 
   private JavaUtil() {
-    super(RESERVED_WORDS, CharEscapers.javaStringEscaper());
+    super(RESERVED_WORDS, FORBIDDEN_OPS, OPS_FINDER,
+          CharEscapers.javaStringUnicodeEscaper(),
+          CharEscapers.javaStringEscaper());
   }
 
   // READ THIS BEFORE YOU CHANGE THE LIST BELOW!
@@ -109,11 +107,6 @@ public class JavaUtil extends OutputLanguageUtil {
       "|=",
       "^=");
 
-  // compile all the patterns into a giant or Expression;
-  private static Pattern compileUnionPattern(String... patterns) {
-    return Pattern.compile(Join.join("|", patterns));
-  }
-
   private static final String NOT_IN_CAST_LOOKAHEAD = "(?!\\s*[,)>])";
 
   // the order is important! The '|' operator  is non-greedy in
@@ -164,124 +157,6 @@ public class JavaUtil extends OutputLanguageUtil {
       Pattern.quote(">"),
       Pattern.quote("|"),
       Pattern.quote("?"));  // just use ? to find ternary operator...
-
-  // the following regex has 4 pieces, one for each of the "tricky" tokens
-  // we're trying to collapse. Each of these in turn has two groups. The
-  // first is the entire token. The second is the terminator part of the
-  // token. The existence of the first group of a piece can be used to
-  // determine the token type of a match, and the emptiness of the second
-  // piece can be used to determine if the token is unterminated.
-
-  // TODO(jjb):    make java regex's suck less so that our code doesn't
-  // TODO(madbot): have to be $%^&*(ing incomprehensible modem line noise
-
-  private static final Pattern TRICKY_JAVA_TOKEN = Pattern.compile(
-      "('(?:[^\\n'\\\\]|\\\\.)*(')?)"          // char literals
-      + "|(\"(?:[^\\n\"\\\\]|\\\\.)*(\")?)"    // string literals
-      + "|(/\\*(?:[^*]|\\*+[^/*])*(\\*/)?)"    // multi-line comments
-      + "|(//[^\\n]*(\\n)?)", Pattern.DOTALL); // single-line comments
-
-  /**
-   * Remove comments, string literals, and character literals from the
-   * input string returning what's left.
-   *
-   * Add alerts to the sink if there are unclosed comments or literals
-   */
-  private static String removeCommentsAndLiterals(AlertSink alertSink, NativeExpression expr) {
-    String str = expr.getNativeCode(OutputLanguage.JAVA);
-
-    StringBuilder sb = new StringBuilder();
-    int start = 0;
-
-    Matcher m = TRICKY_JAVA_TOKEN.matcher(str);
-    while (m.find()) {
-      sb.append(str.substring(start, m.start()));
-      start = m.end();
-      if (m.group(1) != null) {
-        sb.append("'x'");
-        if (m.group(2) == null) {
-          alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
-        }
-      } else if (m.group(3) != null) {
-        sb.append("\"\"");
-        if (m.group(4) == null) {
-          alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
-        }
-      } else if (m.group(5) != null && m.group(6) == null) {
-        alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
-      } else if (m.group(7) != null && m.group(8) == null) {
-        alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
-      }
-    }
-    sb.append(str.substring(start));
-    return sb.toString();
-  }
-
-  private static final Map<Character, Character> NESTING_PAIRS
-    = ImmutableMap.<Character, Character>builder()
-        .put('(', ')')
-        .put('[', ']')
-        .put('{', '}')
-        .build();
-
-  private static final Collection<Character> NESTING_OPENINGS
-    = NESTING_PAIRS.keySet();
-
-  private static final Collection<Character> NESTING_CLOSINGS
-    = NESTING_PAIRS.values();
-
-  /**
-   * looks for mismatched ()s, []s, and {}s
-   *
-   * @reurn Character representing the mismatched item, or null if there
-   *        are no mismatches
-   */
-  private static Character findMismatches(String s) {
-    Deque<Character> state = new ArrayDeque<Character>();
-    for (Character c : s.toCharArray()) {
-      if (NESTING_OPENINGS.contains(c)) {
-        state.push(NESTING_PAIRS.get(c));
-      } else if (NESTING_CLOSINGS.contains(c)) {
-        if (state.isEmpty() || !state.peek().equals(c)) {
-          return c;
-        }
-        state.pop();
-      }
-    }
-    if (!state.isEmpty()) {
-      return state.pop();
-    }
-
-    return null;
-  }
-
-  /**
-   * Validate the given NativeExpression and adds alerts to the sink if
-   * necessary.
-   */
-  public static String validateExpression(AlertSink alertSink, NativeExpression expr) {
-    String result = expr.getNativeCode(OutputLanguage.JAVA);
-    if (result == null) {
-      alertSink.add(new MissingExpressionError(expr, OutputLanguage.JAVA));
-      return "";
-    }
-
-    String s = removeCommentsAndLiterals(alertSink, expr);
-
-    Character c = findMismatches(s);
-    if (c != null) {
-      alertSink.add(new IllegalExpressionError(expr, OutputLanguage.JAVA));
-    }
-
-    Matcher m = OPS_FINDER.matcher(s);
-    while (m.find()) {
-      if (FORBIDDEN_OPS.contains(m.group())) {
-        alertSink.add(new IllegalOperatorError(expr, OutputLanguage.JAVA, m.group()));
-      }
-    }
-
-    return CharEscapers.javaStringUnicodeEscaper().escape(result);
-  }
 
   private static final Set<String> RESERVED_WORDS = ImmutableSet.of(
       // keywords

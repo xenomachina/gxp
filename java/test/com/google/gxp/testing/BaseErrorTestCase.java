@@ -92,11 +92,20 @@ public abstract class BaseErrorTestCase extends BaseBuildingTestCase {
    * Asserts that there aren't any unexpected alerts in actualAlerts.
    */
   protected final void assertNoUnexpectedAlerts() {
+    assertAdditionalAlerts();
     if (actualAlerts != null && expectedAlerts != null) {
       for (Alert alert : unexpectedAlerts()) {
         fail("Unexpected", alert, "");
       }
     }
+  }
+
+  /**
+   * Subclasses can override this method if they need any additional
+   * alerts asserted right before unexpected alerts are checked for
+   */
+  protected void assertAdditionalAlerts() {
+    // this function is intentionally empty
   }
 
   protected AlertSink createAlertSink() {

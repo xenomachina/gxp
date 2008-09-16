@@ -17,12 +17,7 @@
 package com.google.gxp.compiler.js;
 
 import com.google.common.base.CharEscapers;
-import com.google.common.base.Join;
 import com.google.common.collect.ImmutableSet;
-import com.google.gxp.compiler.alerts.AlertSink;
-import com.google.gxp.compiler.base.NativeExpression;
-import com.google.gxp.compiler.base.OutputLanguage;
-import com.google.gxp.compiler.codegen.MissingExpressionError;
 import com.google.gxp.compiler.codegen.OutputLanguageUtil;
 
 import java.util.*;
@@ -35,7 +30,10 @@ import java.util.regex.Pattern;
 public class JavaScriptUtil extends OutputLanguageUtil {
 
   private JavaScriptUtil() {
-    super(RESERVED_WORDS, CharEscapers.javascriptEscaper());
+    super(RESERVED_WORDS, FORBIDDEN_OPS, OPS_FINDER,
+          // TODO(harryh): is javaStringUnicodeEscaper() really the right thing here?
+          CharEscapers.javaStringUnicodeEscaper(),
+          CharEscapers.javascriptEscaper());
   }
 
   // 
@@ -108,14 +106,6 @@ public class JavaScriptUtil extends OutputLanguageUtil {
       "|=",
       "^=");
 
-  /**
-   * Compile all the patterns into a giant or Expression;
-   */
-  private static Pattern compileUnionPattern(String... patterns) {
-    return Pattern.compile(Join.join("|", patterns));
-  }
-
-  //
   // the order is important! The '|' operator  is non-greedy in
   // regexes. Sorting in order of descending length works.
   //
@@ -163,19 +153,6 @@ public class JavaScriptUtil extends OutputLanguageUtil {
       Pattern.quote(">"),
       Pattern.quote("|"),
       Pattern.quote("?"));  // just use ? to find ternary operator...
-
-  public static String validateExpression(AlertSink alertSink, NativeExpression expr) {
-    String result = expr.getNativeCode(OutputLanguage.JAVASCRIPT);
-    if (result == null) {
-      alertSink.add(new MissingExpressionError(expr, OutputLanguage.JAVASCRIPT));
-      return "";
-    }
-
-    // TODO: do some actual validation
-
-    // TODO(harryh): is javaStringUnicodeEscaper() really the right thing here?
-    return CharEscapers.javaStringUnicodeEscaper().escape(result);
-  }
 
   private static final ImmutableSet<String> RESERVED_WORDS = ImmutableSet.of(
       "abstract",

@@ -629,7 +629,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
       public String visitNativeExpression(NativeExpression value) {
         StringBuilder sb = new StringBuilder();
         sb.append('(');
-        sb.append(JavaUtil.validateExpression(alertSink, value));
+        sb.append(JAVA.validateExpression(alertSink, value));
         sb.append(')');
         return sb.toString();
       }
@@ -829,7 +829,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
 
       @Override
       public String visitNativeExpression(NativeExpression value) {
-        return JavaUtil.validateExpression(alertSink, value);
+        return JAVA.validateExpression(alertSink, value);
       }
 
       @Override

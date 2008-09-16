@@ -179,7 +179,11 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
     private void appendRequires() {
       for (TemplateName templateName : extraRequires) {
-        formatLine("goog.require('%s');", getClassName(templateName));
+        // TODO(harryh): I am commenting this out for now as we don't appear to need it
+        //               I don't fully understand what's going on though so I'm not
+        //               gonna undo all the work that gets extraRequirements down to this
+        //               level of the code until I'm sure we'll never need it.
+        // formatLine("goog.require('%s');", getClassName(templateName));
       }
     }
 
@@ -648,6 +652,12 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       public Void visitLoopExpression(LoopExpression loop) {
         // JS Loops require an iterable
         if (loop.getIterable() == null) {
+          // this is kind of wonky, but even though we don't support JS Loops with
+          // iterators, if they do provide one we still do expression validation.  It
+          // makes our unit tests a bit cleaner, and there's no real harm
+          if (loop.getIterator() != null && loop.getIterator().canEvaluateAs(JAVASCRIPT)) {
+            getJavaScriptExpression(loop.getIterator());
+          }
           alertSink.add(new LoopRequiresIterableInJavaScriptError(loop));
           return null;
         }
@@ -833,7 +843,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       public String visitNativeExpression(NativeExpression value) {
         StringBuilder sb = new StringBuilder();
         sb.append('(');
-        sb.append(JavaScriptUtil.validateExpression(alertSink, value));
+        sb.append(JAVASCRIPT.validateExpression(alertSink, value));
         sb.append(')');
         return sb.toString();
       }
@@ -992,7 +1002,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitNativeExpression(NativeExpression value) {
-        return JavaScriptUtil.validateExpression(alertSink, value);
+        return JAVASCRIPT.validateExpression(alertSink, value);
       }
 
       @Override

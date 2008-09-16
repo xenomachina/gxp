@@ -20,13 +20,12 @@ import com.google.common.base.CharEscapers;
 import com.google.common.collect.ImmutableSet;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.MissingTypeError;
-import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.OutputLanguage;
-import com.google.gxp.compiler.codegen.MissingExpressionError;
 import com.google.gxp.compiler.codegen.OutputLanguageUtil;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Contains static functions for validating C++ expressions and types,
@@ -37,27 +36,28 @@ public class CppUtil extends OutputLanguageUtil {
   private CppUtil() {
     // TODO(harryh): javaStringEscaper() is almost certainly wrong here, need
     //               CPP_STRING_ESCAPE or something like that
-    super(RESERVED_WORDS, CharEscapers.javaStringEscaper());
+    super(RESERVED_WORDS, FORBIDDEN_OPS, OPS_FINDER,
+          CharEscapers.javaStringUnicodeEscaper(),
+          CharEscapers.javaStringEscaper());
   }
+
+  // READ THIS BEFORE YOU CHANGE THE LIST BELOW!
+  //
+  // The list of disabled C++ operators was originally based on the list
+  // of disabled Java Operators. If you want to enable something here, see
+  // about getting it enabled for Java as well.
+  //
+  // TODO(harryh): fill this in
+  private static final Set<String> FORBIDDEN_OPS = ImmutableSet.of();
+
+  // the order is important! The '|' operator  is non-greedy in
+  // regexes. Sorting in order of descending length works.
+  //
+  // TODO(harryh): fill this in
+  private static final Pattern OPS_FINDER = compileUnionPattern();
 
   // TODO(harryh): fill this in
   private static final Set<String> RESERVED_WORDS = ImmutableSet.of();
-
-  /**
-   * Validate the given NativeExpression and adds
-   * {@link com.google.gxp.compiler.alerts.Alert}s to the
-   * {@link com.google.gxp.compiler.alerts.AlertSink} if necessary.
-   */
-  public static String validateExpression(AlertSink alertSink, NativeExpression expr) {
-    String result = expr.getNativeCode(OutputLanguage.CPP);
-    if (result == null) {
-      alertSink.add(new MissingExpressionError(expr, OutputLanguage.CPP));
-      return "";
-    }
-
-    // TODO(harryh): actually do some validation
-    return result;
-  }
 
   /**
    * Validate the given NativeType and adds alerts to the sink if

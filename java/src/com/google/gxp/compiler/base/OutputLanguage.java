@@ -98,6 +98,10 @@ public enum OutputLanguage {
     return suffixIncludesVersion;
   }
 
+  public String validateExpression(AlertSink alertSink, NativeExpression expr) {
+    return outputLanguageUtil.validateExpression(alertSink, expr, this);
+  }
+
   public String validateName(AlertSink alertSink, Node node, String name) {
     return outputLanguageUtil.validateName(alertSink, node, name, this);
   }

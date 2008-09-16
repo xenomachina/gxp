@@ -62,9 +62,6 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
     "/* closed comment */",
     "\"illegal $ characters in string\"",
     "/* illegal % characters in comment */",
-    "(List<List<Foo>>)genericCast",
-    "(List<List<List<List<Foo>>>>) deepDenericCast",
-    "(Pair<List<List<Foo>>, Bar>)anotherGenericCast",
   };
 
   private static class IllegalOperatorExpression {
@@ -94,20 +91,47 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
 
   private static ImmutableList<IllegalOperatorExpression> ILLEGAL_OPERATORS
       = ImmutableList.of(
-          new IllegalOperatorExpression("i++", "++", OutputLanguage.JAVA),
-          new IllegalOperatorExpression("i instanceof Foo", "instanceof", OutputLanguage.JAVA),
-          new IllegalOperatorExpression("i = 10", "=", OutputLanguage.JAVA),
-          new IllegalOperatorExpression("i & 1", "&", OutputLanguage.JAVA),
-          new IllegalOperatorExpression("i >> 2", ">>", OutputLanguage.JAVA),
-          new IllegalOperatorExpression("i >>> 2", ">>>", OutputLanguage.JAVA));
+          new IllegalOperatorExpression("i++", "++",
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+          new IllegalOperatorExpression("i instanceof Foo", "instanceof",
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+          new IllegalOperatorExpression("i = 10", "=",
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+          new IllegalOperatorExpression("i & 1", "&",
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+          new IllegalOperatorExpression("i >> 2", ">>",
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+          new IllegalOperatorExpression("i >>> 2", ">>>",
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+
+          // here are a couple of expressions with java casts.  they are legal in
+          // java but illegal in javascript
+          new IllegalOperatorExpression("(List<List<Foo>>)genericCast", ">>",
+                                        OutputLanguage.JAVASCRIPT),
+          new IllegalOperatorExpression("(List<List<List<List<Foo>>>>) deepDenericCast", ">>>",
+                                        OutputLanguage.JAVASCRIPT),
+          new IllegalOperatorExpression("(Pair<List<List<Foo>>, Bar>)anotherGenericCast", ">>",
+                                        OutputLanguage.JAVASCRIPT),
+
+          // here are a few illegal JS operators, that are not illegal in JS
+          // (though they aren't valid so will result in a java compile error)
+          new IllegalOperatorExpression("x typeof y", "typeof",
+                                        OutputLanguage.JAVASCRIPT),
+          new IllegalOperatorExpression("x in y", "in",
+                                        OutputLanguage.JAVASCRIPT));
 
   private static ImmutableMap<String, Collection<OutputLanguage>> ILLEGAL_EXPRESSIONS =
     new ImmutableMultimap.Builder<String, OutputLanguage>()
-      .putAll("\"unclosed String", OutputLanguage.JAVA)
-      .putAll("//unclosed comment", OutputLanguage.JAVA)
-      .putAll("/* unclosed comment", OutputLanguage.JAVA)
-      .putAll("(mismatched_parens", OutputLanguage.JAVA)
-      .putAll("(mismatch[)1]", OutputLanguage.JAVA)
+      .putAll("\"unclosed String",
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+      .putAll("//unclosed comment",
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+      .putAll("/* unclosed comment",
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+      .putAll("(mismatched_parens",
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+      .putAll("(mismatch[)1]",
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
       .build().asMap();
 
   /**
