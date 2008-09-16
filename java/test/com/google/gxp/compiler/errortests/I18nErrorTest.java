@@ -177,7 +177,7 @@ public class I18nErrorTest extends BaseTestCase {
             "<gxp:ph name='x'/>bar<gxp:eph/>",
             "</gxp:msg>");
     assertAlert(new InvalidMessageError(
-        pos(4, 1), "Conflicting declarations of X within message"));
+                    pos(4, 1), "Conflicting declarations of X within message"));
     assertNoUnexpectedAlerts();
 
     // static the same
@@ -370,6 +370,13 @@ public class I18nErrorTest extends BaseTestCase {
             "</gxp:msg>");
     assertAlert(new InvalidMessageError(
         pos(4, 1), "Conflicting declarations of COLA within message"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testPlaceholder_conflictsWithMessageContent() throws Exception {
+    compile("<gxp:msg>Your SSN is: <gxp:ph name='ssn'/>123<gxp:eph/></gxp:msg>");
+    assertAlert(new InvalidMessageError(
+        pos(2, 1), "Placeholder name (SSN) duplicated in message content."));
     assertNoUnexpectedAlerts();
   }
 }

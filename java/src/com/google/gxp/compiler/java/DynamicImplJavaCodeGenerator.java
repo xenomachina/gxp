@@ -16,6 +16,8 @@
 
 package com.google.gxp.compiler.java;
 
+import static com.google.gxp.compiler.base.OutputLanguage.JAVA;
+
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.base.Expression;
@@ -133,8 +135,7 @@ public class DynamicImplJavaCodeGenerator extends JavaCodeGenerator {
       @Override
       public String visitExtractedMessage(ExtractedMessage msg) {
         StringBuilder sb = new StringBuilder("formatGxpMessage(");
-        sb.append(JavaUtil.toJavaStringLiteral(
-                      msg.getTcMessage().getOriginal()));
+        sb.append(JAVA.toStringLiteral(msg.getTcMessage().getOriginal()));
         for (Expression param : msg.getParameters()) {
           sb.append(", ");
           sb.append(msg.getSchema().getJavaAppender());

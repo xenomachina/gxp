@@ -17,18 +17,32 @@
 package com.google.gxp.compiler.cpp;
 
 import com.google.common.base.CharEscapers;
+import com.google.common.collect.ImmutableSet;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.MissingTypeError;
 import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.codegen.MissingExpressionError;
+import com.google.gxp.compiler.codegen.OutputLanguageUtil;
+
+import java.util.Set;
 
 /**
  * Contains static functions for validating C++ expressions and types,
  * and a couple additional C++ utility functions.
  */
-public class CppUtil {
+public class CppUtil extends OutputLanguageUtil {
+
+  private CppUtil() {
+    // TODO(harryh): javaStringEscaper() is almost certainly wrong here, need
+    //               CPP_STRING_ESCAPE or something like that
+    super(RESERVED_WORDS, CharEscapers.javaStringEscaper());
+  }
+
+  // TODO(harryh): fill this in
+  private static final Set<String> RESERVED_WORDS = ImmutableSet.of();
+
   /**
    * Validate the given NativeExpression and adds
    * {@link com.google.gxp.compiler.alerts.Alert}s to the
@@ -64,13 +78,10 @@ public class CppUtil {
     return ret;
   }
 
-  //////////////////////////////////////////////////////////////////////
-  // String manipulation
-  //////////////////////////////////////////////////////////////////////
-
-  // TODO(harryh): javaStringEscaper() is almost certainly wrong here, need
-  //               CPP_STRING_ESCAPE or something like that
-  public static String toCppStringLiteral(String s) {
-    return "\"" + CharEscapers.javaStringEscaper().escape(s) + "\"";
-  }
+  /**
+   * Static Singleton Instance
+   *
+   * Must be declared last in the source file.
+   */ 
+  public static final CppUtil INSTANCE = new CppUtil();
 }

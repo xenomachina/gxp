@@ -50,6 +50,7 @@ import com.google.gxp.compiler.base.Expression;
 import com.google.gxp.compiler.base.ExpressionVisitor;
 import com.google.gxp.compiler.base.ExtractedMessage;
 import com.google.gxp.compiler.base.FormalParameter;
+import com.google.gxp.compiler.base.FormalTypeParameter;
 import com.google.gxp.compiler.base.Implementable;
 import com.google.gxp.compiler.base.InstanceCallable;
 import com.google.gxp.compiler.base.Interface;
@@ -115,10 +116,18 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       }
 
       public Void visitTemplate(Template template) {
+        validateFormalTypeParameters(alertSink, template.getFormalTypeParameters());
         createTemplateWorker(appendable, alertSink, template, extraRequires).run();
         return null;
       }
     });
+  }
+
+  private void validateFormalTypeParameters(AlertSink alertSink,
+                                            List<FormalTypeParameter> formalTypeParameters) {
+    for (FormalTypeParameter formalTypeParameter : formalTypeParameters) {
+      JAVASCRIPT.validateName(alertSink, formalTypeParameter, formalTypeParameter.getName());
+    }
   }
 
   private TemplateWorker createTemplateWorker(Appendable appendable,
@@ -145,6 +154,9 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
     }
 
     public void run() {
+      for (Parameter param : template.getAllParameters()) {
+        JAVASCRIPT.validateName(alertSink, param, param.getPrimaryName());
+      }
       appendHeader(template);
       appendLine();
       formatLine("goog.provide('%s');", getClassName(template.getName()));
@@ -386,12 +398,11 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       if (length != 0) {
         int curPos = 0;
         while (length - curPos > MAX_JAVASCRIPT_STRING_LENGTH) {
-          writeExpression(pos, JavaScriptUtil.toJavaScriptStringLiteral(
+          writeExpression(pos, JAVASCRIPT.toStringLiteral(
                               s.substring(curPos, curPos + MAX_JAVASCRIPT_STRING_LENGTH)));
           curPos += MAX_JAVASCRIPT_STRING_LENGTH;
         }
-        writeExpression(pos,
-                        JavaScriptUtil.toJavaScriptStringLiteral(s.substring(curPos, length)));
+        writeExpression(pos, JAVASCRIPT.toStringLiteral(s.substring(curPos, length)));
       }
     }
 
@@ -483,7 +494,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         appendLine("(function() {");
         formatLine(abbr.getSourcePosition(),
                    "var %s = %s;",
-                   JavaScriptUtil.validateName(alertSink, abbr, abbr.getName()),
+                   JAVASCRIPT.validateName(alertSink, abbr, abbr.getName()),
                    getJavaScriptExpression(abbr.getValue()));
         abbr.getContent().acceptVisitor(this);
         appendLine("})();");
@@ -556,7 +567,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         }
         appendLine(value.getSourcePosition(),
                    "throw new " + excClass + "("
-                   + JavaScriptUtil.toJavaScriptStringLiteral(value.getMessage()) + ");");
+                   + JAVASCRIPT.toStringLiteral(value.getMessage()) + ");");
         return null;
       }
 
@@ -595,7 +606,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           sb = new StringBuilder();
           while(phIter.hasNext()) {
             Placeholder placeholder = phIter.next();
-            sb.append(JavaScriptUtil.toJavaScriptStringLiteral(placeholder.getPresentation()));
+            sb.append(JAVASCRIPT.toStringLiteral(placeholder.getPresentation()));
             sb.append(": ");
             sb.append(evalPlaceholder(placeholder.getOriginal(), paramVar));
             if (phIter.hasNext()) {
@@ -619,7 +630,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         Matcher m = PARAM_PATTERN.matcher(original);
         int cur = 0;
         while (m.find(cur)) {
-          parts.add(JavaScriptUtil.toJavaScriptStringLiteral(original.substring(cur, m.start())));
+          parts.add(JAVASCRIPT.toStringLiteral(original.substring(cur, m.start())));
           char ch = original.charAt(m.start() + 1);
           if (m.group(1).equals("%")) {
             parts.add("'%'");
@@ -628,8 +639,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           }
           cur = m.end();
         }
-        parts.add(JavaScriptUtil.toJavaScriptStringLiteral(
-                      original.substring(cur, original.length())));
+        parts.add(JAVASCRIPT.toStringLiteral(original.substring(cur, original.length())));
 
         return Join.join("+", parts);
       }
@@ -653,7 +663,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         formatLine("%s = %s;", iterableVar, getJavaScriptExpression(loop.getIterable()));
         formatLine(loop.getSourcePosition(), "for (var %s in %s) {", keyVar, iterableVar);
         formatLine("%s = %s[%s];",
-                   JavaScriptUtil.validateName(alertSink, loop, loop.getVar()),
+                   JAVASCRIPT.validateName(alertSink, loop, loop.getVar()),
                    iterableVar, keyVar);
         writeConditionalDelim(delimiter, boolVar);
         loop.getSubexpression().acceptVisitor(this);
@@ -893,7 +903,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         sb.append('"');
         for (String includeAttr : bundle.getIncludeAttrs()) {
           sb.append(", ");
-          sb.append(JavaScriptUtil.toJavaScriptStringLiteral(includeAttr));
+          sb.append(JAVASCRIPT.toStringLiteral(includeAttr));
         }
         sb.append(")");
         for (Map.Entry<AttributeValidator, Attribute> entry : bundle.getAttrs().entrySet()) {
@@ -902,7 +912,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           Expression value = entry.getValue().getValue();
 
           sb.append(".attr(");
-          sb.append(JavaScriptUtil.toJavaScriptStringLiteral(validator.getName()));
+          sb.append(JAVASCRIPT.toStringLiteral(validator.getName()));
           sb.append(", ");
           sb.append(validator.isFlagSet(AttributeValidator.Flag.BOOLEAN)
                       ? value.acceptVisitor(this)
@@ -987,7 +997,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitObjectConstant(ObjectConstant node) {
-        return JavaScriptUtil.toJavaScriptStringLiteral(node.getValue());
+        return JAVASCRIPT.toStringLiteral(node.getValue());
       }
 
       @Override
@@ -1014,7 +1024,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           }
 
           public String visitPlaintext(StringConstant value) {
-            return JavaScriptUtil.toJavaScriptStringLiteral(value.evaluate());
+            return JAVASCRIPT.toStringLiteral(value.evaluate());
           }
         };
 

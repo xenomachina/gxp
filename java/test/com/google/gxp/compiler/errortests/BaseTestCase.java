@@ -17,10 +17,13 @@
 package com.google.gxp.compiler.errortests;
 
 import com.google.common.base.CharEscapers;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.gxp.compiler.alerts.Alert.Severity;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.alerts.common.SaxAlert;
+import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.codegen.IllegalExpressionError;
 import com.google.gxp.compiler.codegen.IllegalNameError;
 import com.google.gxp.compiler.codegen.IllegalOperatorError;
@@ -64,23 +67,48 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
     "(Pair<List<List<Foo>>, Bar>)anotherGenericCast",
   };
 
-  private static ImmutableMap<String, String> ILLEGAL_OPERATORS
-    = new ImmutableMap.Builder<String, String>()
-      .put("i++", "++")
-      .put("i instanceof Foo", "instanceof")
-      .put("i = 10", "=")
-      .put("i & 1", "&")
-      .put("i >> 2", ">>")
-      .put("i >>> 2", ">>>")
-      .build();
+  private static class IllegalOperatorExpression {
+    private final String expression;
+    private final String operator;
+    private final ImmutableList<OutputLanguage> outputLanguages;
 
-  private static String[] ILLEGAL_EXPRESSIONS = {
-    "\"unclosed String",
-    "//unclosed comment",
-    "/* unclosed comment",
-    "(mismatched_parens",
-    "(mismatch[)1]",
-  };
+    public IllegalOperatorExpression(String expression, String operator,
+                                     OutputLanguage... outputLanguages) {
+      this.expression = expression;
+      this.operator = operator;
+      this.outputLanguages = ImmutableList.of(outputLanguages);
+    }
+
+    public String getExpression() {
+      return expression;
+    }
+
+    public String getOperator() {
+      return operator;
+    }
+
+    public ImmutableList<OutputLanguage> getOutputLanguages() {
+      return outputLanguages;
+    }
+  }
+
+  private static ImmutableList<IllegalOperatorExpression> ILLEGAL_OPERATORS
+      = ImmutableList.of(
+          new IllegalOperatorExpression("i++", "++", OutputLanguage.JAVA),
+          new IllegalOperatorExpression("i instanceof Foo", "instanceof", OutputLanguage.JAVA),
+          new IllegalOperatorExpression("i = 10", "=", OutputLanguage.JAVA),
+          new IllegalOperatorExpression("i & 1", "&", OutputLanguage.JAVA),
+          new IllegalOperatorExpression("i >> 2", ">>", OutputLanguage.JAVA),
+          new IllegalOperatorExpression("i >>> 2", ">>>", OutputLanguage.JAVA));
+
+  private static ImmutableMap<String, Collection<OutputLanguage>> ILLEGAL_EXPRESSIONS =
+    new ImmutableMultimap.Builder<String, OutputLanguage>()
+      .putAll("\"unclosed String", OutputLanguage.JAVA)
+      .putAll("//unclosed comment", OutputLanguage.JAVA)
+      .putAll("/* unclosed comment", OutputLanguage.JAVA)
+      .putAll("(mismatched_parens", OutputLanguage.JAVA)
+      .putAll("(mismatch[)1]", OutputLanguage.JAVA)
+      .build().asMap();
 
   /**
    * Convenience method for when the error position should be pos(2,1)
@@ -109,15 +137,22 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
 
     SourcePosition errorPos = pos(errorLine, errorColumn);
 
-    for (Map.Entry<String, String> illegalOp : ILLEGAL_OPERATORS.entrySet()) {
-      compile(prefix + CharEscapers.xmlEscaper().escape(illegalOp.getKey()) + suffix);
-      assertAlert(new IllegalOperatorError(errorPos, "Java", illegalOp.getValue()));
+    for (IllegalOperatorExpression illegalOp : ILLEGAL_OPERATORS) {
+      compile(prefix + CharEscapers.xmlEscaper().escape(illegalOp.getExpression()) + suffix);
+      for (OutputLanguage outputLanguage : illegalOp.getOutputLanguages()) {
+        assertAlert(new IllegalOperatorError(errorPos, outputLanguage.getDisplay(),
+                                             illegalOp.getOperator()));
+      }
       assertNoUnexpectedAlerts();
     }
 
-    for (String illegalExpr : ILLEGAL_EXPRESSIONS) {
-      compile(prefix + CharEscapers.xmlEscaper().escape(illegalExpr) + suffix);
-      assertAlert(new IllegalExpressionError(errorPos, "Java", illegalExpr));
+    for (Map.Entry<String, Collection<OutputLanguage>> illegalExpr :
+             ILLEGAL_EXPRESSIONS.entrySet()) {
+      compile(prefix + CharEscapers.xmlEscaper().escape(illegalExpr.getKey()) + suffix);
+      for (OutputLanguage outputLanguage : illegalExpr.getValue()) {
+        assertAlert(new IllegalExpressionError(errorPos, outputLanguage.getDisplay(),
+                                               illegalExpr.getKey()));
+      }
       assertNoUnexpectedAlerts();
     }
   }
@@ -134,13 +169,6 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
     "IWishICouldThinkOfAVariableNameThatWasExactlySixtyFiveLettersLong",
   };
 
-  private static String[] ILLEGAL_JAVA_NAMES = {
-    "boolean",
-    "true",
-    "null",
-    "final",
-  };
-
   private static String[] LEGAL_VAR_NAMES = {
     "x",
     "gumby",
@@ -152,6 +180,15 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
     "gxpWithoutAnUnderscoreIsFine",
     "allTheKingsHorsesAndAllTheKingsMenCouldNotPutHumptyTogetherAgain",
   };
+
+  private static ImmutableMap<String, Collection<OutputLanguage>> ILLEGAL_OUTPUT_LANGUAGE_NAMES =
+    new ImmutableMultimap.Builder<String, OutputLanguage>()
+      .putAll("for", OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+      .putAll("boolean", OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+      .putAll("true", OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+      .putAll("assert", OutputLanguage.JAVA)
+      .putAll("delete", OutputLanguage.JAVASCRIPT)
+      .build().asMap();
 
   /**
    * Givin a prefix and suffix, constructs and compiles GXPs containing the
@@ -176,12 +213,14 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
       assertNoUnexpectedAlerts();
     }
 
-    // TODO: update this code to better test how various names can be legal
-    //       in some OutputLanguages, but illegal in others
-    for (String illegalName : ILLEGAL_JAVA_NAMES) {
-      compile(prefix + CharEscapers.xmlEscaper().escape(illegalName) + suffix);
+    for (Map.Entry<String, Collection<OutputLanguage>> illegalName :
+             ILLEGAL_OUTPUT_LANGUAGE_NAMES.entrySet()) {
+      compile(prefix + CharEscapers.xmlEscaper().escape(illegalName.getKey()) + suffix);
       SourcePosition errorPos = pos(2, 1);
-      assertAlert(new IllegalNameError(errorPos, "Java", illegalName));
+      for (OutputLanguage outputLanguage : illegalName.getValue()) {
+        assertAlert(new IllegalNameError(errorPos, outputLanguage.getDisplay(),
+                                         illegalName.getKey()));
+      }
       assertNoUnexpectedAlerts();
     }
   }

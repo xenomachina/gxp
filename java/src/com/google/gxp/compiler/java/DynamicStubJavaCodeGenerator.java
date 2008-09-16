@@ -16,6 +16,8 @@
 
 package com.google.gxp.compiler.java;
 
+import static com.google.gxp.compiler.base.OutputLanguage.JAVA;
+
 import com.google.common.base.Functions;
 import com.google.common.base.Join;
 import com.google.common.base.Preconditions;
@@ -174,13 +176,11 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
 
       appendLine("private static final com.google.gxp.compiler.fs.FileRef SRC$GXP = ");
       formatLine("  parseFilename(%s);",
-                 JavaUtil.toJavaStringLiteral(
-                     template.getSourcePosition().getSourceName()));
+                 JAVA.toStringLiteral(template.getSourcePosition().getSourceName()));
 
-      final String classBase = JavaUtil.toJavaStringLiteral(
-          template.getName().toString() + "$Impl");
+      final String classBase = JAVA.toStringLiteral(template.getName().toString() + "$Impl");
 
-      final String javaBase = JavaUtil.toJavaStringLiteral(
+      final String javaBase = JAVA.toStringLiteral(
           "/" + template.getName().toString().replace('.', '/') + "$Impl");
 
       appendLine("private static final String JAVA$BASE =");
@@ -213,7 +213,7 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
       appendLine(null, "  parseFilenameList(");
       List<String> parseFiles = Lists.newArrayList();
       for (FileRef file : files) {
-        parseFiles.add("    " + JavaUtil.toJavaStringLiteral(file.toFilename()));
+        parseFiles.add("    " + JAVA.toStringLiteral(file.toFilename()));
       }
       appendLine(null, Join.join(",\n", parseFiles));
       appendLine(null, "  );");

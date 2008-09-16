@@ -16,6 +16,8 @@
 
 package com.google.gxp.compiler.cpp;
 
+import static com.google.gxp.compiler.base.OutputLanguage.CPP;
+
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.AbbrExpression;
@@ -119,11 +121,11 @@ public class CppCodeGenerator extends BaseCppCodeGenerator<MessageExtractedTree>
       if (length != 0) {
         int curPos = 0;
         while (length - curPos > MAX_CPP_STRING_LENGTH) {
-          writeExpression(pos, CppUtil.toCppStringLiteral(
+          writeExpression(pos, CPP.toStringLiteral(
                               s.substring(curPos, curPos + MAX_CPP_STRING_LENGTH)));
           curPos += MAX_CPP_STRING_LENGTH;
         }
-        writeExpression(pos, CppUtil.toCppStringLiteral(s.substring(curPos, length)));
+        writeExpression(pos, CPP.toStringLiteral(s.substring(curPos, length)));
       }
     }
 

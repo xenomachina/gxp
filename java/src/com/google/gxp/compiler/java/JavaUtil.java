@@ -27,12 +27,11 @@ import com.google.gxp.compiler.alerts.common.MissingTypeError;
 import com.google.gxp.compiler.base.JavaAnnotation;
 import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.NativeType;
-import com.google.gxp.compiler.base.Node;
 import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.codegen.IllegalExpressionError;
-import com.google.gxp.compiler.codegen.IllegalNameError;
 import com.google.gxp.compiler.codegen.IllegalOperatorError;
 import com.google.gxp.compiler.codegen.MissingExpressionError;
+import com.google.gxp.compiler.codegen.OutputLanguageUtil;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -42,7 +41,11 @@ import java.util.regex.Pattern;
  * Contains static functions for validating java expressions and types,
  * and a couple additional java utility functions.
  */
-public class JavaUtil {
+public class JavaUtil extends OutputLanguageUtil {
+
+  private JavaUtil() {
+    super(RESERVED_WORDS, CharEscapers.javaStringEscaper());
+  }
 
   // READ THIS BEFORE YOU CHANGE THE LIST BELOW!
   //
@@ -428,19 +431,6 @@ public class JavaUtil {
   }
 
   /**
-   * Validate that the given name is a valid java variable name.  Add an
-   * {@code Alert} to the {@code AlertSink} if it isn't.
-   *
-   * @return the name
-   */
-  public static String validateName(AlertSink alertSink, Node node, String name) {
-    if (RESERVED_WORDS.contains(name)) {
-      alertSink.add(new IllegalNameError(node, OutputLanguage.JAVA, name));
-    }
-    return name;
-  }
-
-  /**
    * Validate that the given {@link JavaAnnotation} contains a well formed
    * Java annotation.
    *
@@ -568,14 +558,6 @@ public class JavaUtil {
   }
 
   //////////////////////////////////////////////////////////////////////
-  // String manipulation
-  //////////////////////////////////////////////////////////////////////
-
-  public static String toJavaStringLiteral(String s) {
-    return "\"" + CharEscapers.javaStringEscaper().escape(s) + "\"";
-  }
-
-  //////////////////////////////////////////////////////////////////////
   // Primitive Parsing
   //////////////////////////////////////////////////////////////////////
 
@@ -673,4 +655,11 @@ public class JavaUtil {
       return false;
     }
   }
+
+  /**
+   * Static Singleton Instance
+   *
+   * Must be declared last in the source file.
+   */ 
+  public static final JavaUtil INSTANCE = new JavaUtil();
 }

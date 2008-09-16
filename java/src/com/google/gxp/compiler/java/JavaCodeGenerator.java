@@ -137,7 +137,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
       appendLine();
       if (runtimeMessageSource != null) {
         formatLine("private static final String GXP$MESSAGE_SOURCE = %s;",
-                   JavaUtil.toJavaStringLiteral(runtimeMessageSource));
+                   JAVA.toStringLiteral(runtimeMessageSource));
         appendLine();
       }
       appendWriteMethod();
@@ -283,11 +283,11 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
       if (length != 0) {
         int curPos = 0;
         while (length - curPos > MAX_JAVA_STRING_LENGTH) {
-          writeExpression(pos, JavaUtil.toJavaStringLiteral(
+          writeExpression(pos, JAVA.toStringLiteral(
                               s.substring(curPos, curPos + MAX_JAVA_STRING_LENGTH)));
           curPos += MAX_JAVA_STRING_LENGTH;
         }
-        writeExpression(pos, JavaUtil.toJavaStringLiteral(s.substring(curPos, length)));
+        writeExpression(pos, JAVA.toStringLiteral(s.substring(curPos, length)));
       }
     }
 
@@ -345,7 +345,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         }
         appendLine(value.getSourcePosition(),
                    "throw new " + excClass + "("
-                   + JavaUtil.toJavaStringLiteral(value.getMessage()) + ");");
+                   + JAVA.toStringLiteral(value.getMessage()) + ");");
         return null;
       }
 
@@ -450,7 +450,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
           formatLine(loop.getType().getSourcePosition(),
                      "final %s %s = %s;",
                      toJavaType(loop.getType()),
-                     JavaUtil.validateName(alertSink, loop, loop.getVar()),
+                     JAVA.validateName(alertSink, loop, loop.getVar()),
                      itemExpr);
           writeConditionalDelim(delimiter, boolVar);
           loop.getSubexpression().acceptVisitor(this);
@@ -461,7 +461,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         } else if (loop.getIterable() != null && loop.getIterable().canEvaluateAs(JAVA)) {
           formatLine(loop.getSourcePosition(), "for (final %s %s : %s) {",
                      toJavaType(loop.getType()),
-                     JavaUtil.validateName(alertSink, loop, loop.getVar()),
+                     JAVA.validateName(alertSink, loop, loop.getVar()),
                      getJavaExpression(loop.getIterable()));
           writeConditionalDelim(delimiter, boolVar);
           loop.getSubexpression().acceptVisitor(this);
@@ -486,7 +486,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         formatLine(abbr.getSourcePosition(),
                    "final %s %s = %s;",
                    toJavaType(abbr.getType()),
-                   JavaUtil.validateName(alertSink, abbr, abbr.getName()),
+                   JAVA.validateName(alertSink, abbr, abbr.getName()),
                    getJavaExpression(abbr.getValue()));
         abbr.getContent().acceptVisitor(this);
         appendLine("}");
@@ -719,7 +719,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         sb.append(">(");
         List<String> includeAttrs = Lists.newArrayList();
         for (String includeAttr : bundle.getIncludeAttrs()) {
-          includeAttrs.add(JavaUtil.toJavaStringLiteral(includeAttr));
+          includeAttrs.add(JAVA.toStringLiteral(includeAttr));
         }
         Join.join(sb, ", ", includeAttrs);
         sb.append(')');
@@ -729,7 +729,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
           Expression value = entry.getValue().getValue();
 
           sb.append(".attr(");
-          sb.append(JavaUtil.toJavaStringLiteral(validator.getName()));
+          sb.append(JAVA.toStringLiteral(validator.getName()));
           sb.append(", ");
           sb.append(validator.isFlagSet(AttributeValidator.Flag.BOOLEAN)
                       ? value.acceptVisitor(this)
@@ -779,7 +779,8 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
           }
 
           public String visitPlaintext(StringConstant value) {
-            String s = CharEscapers.javaStringEscaper().escape(value.evaluate());
+            String s = CharEscapers.javaStringEscaper().escape(
+                value.evaluate());
             return "\"" + s + "\"";
           }
         };
@@ -790,7 +791,8 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         String value = node.getValue();
         String type = toJavaType(node.getType());
         if (!JavaUtil.isPrimitiveType(type)) {
-          value = type + ".valueOf(\"" + CharEscapers.javaStringEscaper().escape(value) + "\")";
+          value = type + ".valueOf(\""
+              + CharEscapers.javaStringEscaper().escape(value) + "\")";
         } else {
           if (!JavaUtil.isValidPrimitive(value, type)) {
             alertSink.add(new IllegalJavaPrimitiveError(node, value, type));

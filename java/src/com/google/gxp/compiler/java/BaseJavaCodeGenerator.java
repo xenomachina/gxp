@@ -16,6 +16,8 @@
 
 package com.google.gxp.compiler.java;
 
+import static com.google.gxp.compiler.base.OutputLanguage.JAVA;
+
 import com.google.common.base.Function;
 import com.google.common.base.Join;
 import com.google.common.base.Preconditions;
@@ -111,7 +113,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
   private void validateFormalTypeParameters(AlertSink alertSink,
                                             List<FormalTypeParameter> formalTypeParameters) {
     for (FormalTypeParameter formalTypeParameter : formalTypeParameters) {
-      JavaUtil.validateName(alertSink, formalTypeParameter, formalTypeParameter.getName());
+      JAVA.validateName(alertSink, formalTypeParameter, formalTypeParameter.getName());
     }
   }
 
@@ -275,7 +277,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
     public void run() {
       for (Parameter param :
                Iterables.filter(iface.getParameters(), Implementable.NOT_INSTANCE_PARAM)) {
-        JavaUtil.validateName(alertSink, param, param.getPrimaryName());
+        JAVA.validateName(alertSink, param, param.getPrimaryName());
       }
       appendHeader(iface);
       appendImports(iface);
@@ -366,7 +368,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
 
     public void run() {
       for (Parameter param : template.getAllParameters()) {
-        JavaUtil.validateName(alertSink, param, param.getPrimaryName());
+        JAVA.validateName(alertSink, param, param.getPrimaryName());
       }
       appendHeader(template);
       appendImports(template);
@@ -487,7 +489,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
 
       List<String> parameterNames = Lists.newArrayList();
       for (Parameter param : template.getAllParameters()) {
-        parameterNames.add(JavaUtil.toJavaStringLiteral(param.getPrimaryName()));
+        parameterNames.add(JAVA.toStringLiteral(param.getPrimaryName()));
       }
 
       if (parameterNames.isEmpty()) {
