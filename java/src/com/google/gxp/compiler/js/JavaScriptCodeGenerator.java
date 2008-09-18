@@ -84,20 +84,8 @@ import java.util.regex.Pattern;
  * {@code CodeGenerator} which generates JavaScript code.
  */
 public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtractedTree> {
-  private final ImmutableSet<TemplateName> extraRequires;
-
-  public JavaScriptCodeGenerator(MessageExtractedTree tree, Set<Callable> requirements) {
+  public JavaScriptCodeGenerator(MessageExtractedTree tree) {
     super(tree);
-
-    // In JavaScript we need to goog.require anything we depend on, so build
-    // up a list of what we need.
-    this.extraRequires = ImmutableSet.copyOf(
-        Iterables.transform(requirements,
-                            new Function<Callable, TemplateName>() {
-                              public TemplateName apply(Callable requirement) {
-                                return requirement.getName();
-                              }
-                            }));
   }
 
   public void generateCode(final Appendable appendable, final AlertSink alertSink) {
@@ -117,7 +105,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       public Void visitTemplate(Template template) {
         validateFormalTypeParameters(alertSink, template.getFormalTypeParameters());
-        createTemplateWorker(appendable, alertSink, template, extraRequires).run();
+        createTemplateWorker(appendable, alertSink, template).run();
         return null;
       }
     });
@@ -132,25 +120,21 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
   private TemplateWorker createTemplateWorker(Appendable appendable,
                                               AlertSink alertSink,
-                                              Template template,
-                                              Set<TemplateName> extraRequires) {
-    return new TemplateWorker(appendable, alertSink, template, extraRequires);
+                                              Template template) {
+    return new TemplateWorker(appendable, alertSink, template);
   }
 
   private static class TemplateWorker extends BracesCodeGenerator.Worker {
     private final Template template;
-    private final ImmutableSet<TemplateName> extraRequires;
     private int varCounter = 0;
 
-    public TemplateWorker(Appendable appendable, AlertSink alertSink, Template template,
-                          Set<TemplateName> extraRequires) {
+    public TemplateWorker(Appendable appendable, AlertSink alertSink, Template template) {
       super(appendable, alertSink);
       this.template = Preconditions.checkNotNull(template);
-      this.extraRequires = ImmutableSet.copyOf(extraRequires);
     }
 
     public TemplateWorker createSubWorker(Appendable newAppendable) {
-      return new TemplateWorker(newAppendable, alertSink, template, extraRequires);
+      return new TemplateWorker(newAppendable, alertSink, template);
     }
 
     public void run() {
@@ -160,7 +144,6 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       appendHeader(template);
       appendLine();
       formatLine("goog.provide('%s');", getClassName(template.getName()));
-      appendRequires();
       appendLine();
       appendConstructor();
       appendLine();
@@ -175,16 +158,6 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       appendConstructorMethods();
       appendLine();
       appendFooter();
-    }
-
-    private void appendRequires() {
-      for (TemplateName templateName : extraRequires) {
-        // TODO(harryh): I am commenting this out for now as we don't appear to need it
-        //               I don't fully understand what's going on though so I'm not
-        //               gonna undo all the work that gets extraRequirements down to this
-        //               level of the code until I'm sure we'll never need it.
-        // formatLine("goog.require('%s');", getClassName(templateName));
-      }
     }
 
     private String getWriteMethodSignature(boolean isStatic) {
