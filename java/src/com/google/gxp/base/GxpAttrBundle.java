@@ -71,8 +71,8 @@ public class GxpAttrBundle<T extends MarkupClosure> {
    */
   public static class Builder<T extends MarkupClosure> {
     private final ImmutableSet<String> includeAttrs;
-    private final Map<String, T> attrs = Maps.newHashMap();
-    private final Set<String> booleanAttrs = Sets.newHashSet();
+    private final Map<String, T> attrs = Maps.newLinkedHashMap();
+    private final Set<String> booleanAttrs = Sets.newLinkedHashSet();
 
     // in this case all attributes from added bundles will be accepted
     public Builder() {

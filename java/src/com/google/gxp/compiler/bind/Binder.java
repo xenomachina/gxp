@@ -61,11 +61,7 @@ import com.google.gxp.compiler.schema.SchemaFactory;
 import com.google.gxp.compiler.servicedir.ScopedServiceDirectory;
 import com.google.gxp.compiler.servicedir.ServiceDirectory;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Binds references to resources, typically across compilation units, by
@@ -156,11 +152,12 @@ public class Binder implements Function<ReparentedTree, BoundTree> {
         final ImmutableMap.Builder<String, Attribute> newAttrBuilder = ImmutableMap.builder();
 
         // construct a Map of attribute bundles with one entry for each bundle parameter
-        final Map<String, Map<AttributeValidator, Attribute>> attrBundles = Maps.newHashMap();
+        final Map<String, Map<AttributeValidator, Attribute>> attrBundles
+            = Maps.newLinkedHashMap();
         for (FormalParameter parameter : callee.getParameters()) {
           if (parameter.getType() instanceof BundleType) {
             attrBundles.put(parameter.getPrimaryName(),
-                            new HashMap<AttributeValidator, Attribute>());
+                            new LinkedHashMap<AttributeValidator, Attribute>());
           }
         }
 
