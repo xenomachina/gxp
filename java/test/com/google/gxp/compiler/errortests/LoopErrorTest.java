@@ -58,6 +58,11 @@ public class LoopErrorTest extends BaseTestCase {
         "<gxp:loop var='x' type='", "' iterable='list' />");
   }
 
+  public void testLoop_invalidKey() throws Exception {
+    assertIllegalVariableNameDetected(
+        "key", "<gxp:loop key='", "' var='v' type='int' iterable='list'/>");
+  }
+
   public void testLoop_invalidVar() throws Exception {
     assertIllegalVariableNameDetected(
         "var", "<gxp:loop var='", "' type='int' iterable='list'/>");

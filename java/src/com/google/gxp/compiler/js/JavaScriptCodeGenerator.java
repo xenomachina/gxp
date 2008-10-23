@@ -197,6 +197,9 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
     private void appendConstructor() {
       Iterable<Parameter> params = template.getConstructor().getParameters();
 
+      appendLine("/**");
+      formatLine(" * @this {%s}", getClassName(template.getName()));
+      appendLine(" */");
       StringBuilder sb = new StringBuilder();
       sb.append(getClassName(template.getName()));
       sb.append(" = function(");
@@ -548,6 +551,21 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         return null;
       }
 
+      public String toLowerCamelCase(String s) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String part : s.split("_")) {
+          part = part.toLowerCase();
+          if (first) {
+            first = false;
+          } else {
+            part = Character.toUpperCase(part.charAt(0)) + part.substring(1);
+          }
+          sb.append(part);
+        }
+        return sb.toString();
+      }
+
       @Override
       public Void visitExtractedMessage(ExtractedMessage msg) {
         String paramVar = createVarName("params");
@@ -561,7 +579,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           appendLine(sb);
         }
         Set<Placeholder> placeholders = Sets.newHashSet();
-        String msgVar = "MSG_" + msg.getTcMessage().getId();
+        String msgVar = "MSG_EXTERNAL_" + msg.getTcMessage().getId();
         StringBuilder sb = new StringBuilder("var ");
         sb.append(msgVar);
         sb.append(" = goog.getMsg(\"");
@@ -569,7 +587,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           if (fragment instanceof Placeholder) {
             placeholders.add((Placeholder) fragment);
             sb.append("{$");
-            sb.append(fragment.getPresentation());
+            sb.append(toLowerCamelCase(fragment.getPresentation()));
             sb.append("}");
           } else {
             sb.append(CharEscapers.javascriptEscaper().escape(fragment.getPresentation()));
@@ -583,7 +601,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           sb = new StringBuilder();
           while(phIter.hasNext()) {
             Placeholder placeholder = phIter.next();
-            sb.append(JAVASCRIPT.toStringLiteral(placeholder.getPresentation()));
+            sb.append(JAVASCRIPT.toStringLiteral(toLowerCamelCase(placeholder.getPresentation())));
             sb.append(": ");
             sb.append(evalPlaceholder(placeholder.getOriginal(), paramVar));
             if (phIter.hasNext()) {
@@ -641,11 +659,13 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         if (!delimiter.alwaysEmpty()) {
           formatLine("var %s = false;", boolVar);
         }
-        String keyVar = createVarName("key");
+        String keyVar = (loop.getKey() == null)
+            ? createVarName("key")
+            : JAVASCRIPT.validateName(alertSink, loop, loop.getKey());
         String iterableVar = createVarName("iterable");
-        formatLine("%s = %s;", iterableVar, getJavaScriptExpression(loop.getIterable()));
+        formatLine("var %s = %s;", iterableVar, getJavaScriptExpression(loop.getIterable()));
         formatLine(loop.getSourcePosition(), "for (var %s in %s) {", keyVar, iterableVar);
-        formatLine("%s = %s[%s];",
+        formatLine("var %s = %s[%s];",
                    JAVASCRIPT.validateName(alertSink, loop, loop.getVar()),
                    iterableVar, keyVar);
         writeConditionalDelim(delimiter, boolVar);
@@ -715,7 +735,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
             appendLine("{");
             if (thisAttr != null) {
-              formatLine(call.getSourcePosition(), "%s = %s;",
+              formatLine(call.getSourcePosition(), "var %s = %s;",
                          instantiatedGxps.peek(),
                          thisAttr.getValue().acceptVisitor(toExpressionVisitor));
             }

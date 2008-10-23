@@ -245,6 +245,11 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
                        + "\n<b>!,!,!</b>\n<b>!,!,!</b>");
   }
 
+  public void testLoopKey() throws Exception {
+    LoopKeyGxp.write(out, gxpContext, Lists.newArrayList("Alice", "Bob", "Charlie"));
+    assertOutputEquals("0:Alice 1:Bob 2:Charlie");
+  }
+
   public void testIterableLoop() throws Exception {
     IterableLoopGxp.write(out, gxpContext, Collections.<String>emptyList());
     assertOutputEquals("<ul></ul>");

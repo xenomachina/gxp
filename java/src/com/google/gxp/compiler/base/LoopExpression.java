@@ -25,17 +25,19 @@ import com.google.common.base.Preconditions;
  */
 public class LoopExpression extends Expression {
   private final Type type;
+  private final String key;
   private final String var;
   private final Expression iterable;
   private final Expression iterator;
   private final Expression subexpression;
   private final Expression delimiter;
 
-  public LoopExpression(Node fromNode, Type type, String var,
+  public LoopExpression(Node fromNode, Type type, String key, String var,
                         Expression iterable, Expression iterator,
                         Expression subexpression, Expression delimiter) {
     super(fromNode, subexpression.getSchema());
     this.type = Preconditions.checkNotNull(type);
+    this.key = key;
     this.var = Preconditions.checkNotNull(var);
     this.iterable = iterable;
     this.iterator = iterator;
@@ -45,6 +47,10 @@ public class LoopExpression extends Expression {
 
   public Type getType() {
     return type;
+  }
+
+  public String getKey() {
+    return key;
   }
 
   public String getVar() {
@@ -67,12 +73,12 @@ public class LoopExpression extends Expression {
     return delimiter;
   }
 
-  public LoopExpression withSubexpressionAndDelimiter(
-      Expression newSubexpression, Expression newDelimiter) {
+  public LoopExpression withSubexpressionAndDelimiter(Expression newSubexpression,
+                                                      Expression newDelimiter) {
     return (Objects.equal(subexpression, newSubexpression)
             && Objects.equal(delimiter, newDelimiter))
         ? this
-        : new LoopExpression(this, type, var, iterable, iterator,
+        : new LoopExpression(this, type, key, var, iterable, iterator,
                              newSubexpression, newDelimiter);
   }
 
@@ -89,6 +95,7 @@ public class LoopExpression extends Expression {
   public boolean equals(LoopExpression that) {
     return equalsExpression(that)
         && Objects.equal(type, that.type)
+        && Objects.equal(key, that.key)
         && Objects.equal(var, that.var)
         && Objects.equal(iterable, that.iterable)
         && Objects.equal(iterator, that.iterator)
@@ -101,6 +108,7 @@ public class LoopExpression extends Expression {
     return Objects.hashCode(
         expressionHashCode(),
         type,
+        key,
         var,
         iterable,
         iterator,

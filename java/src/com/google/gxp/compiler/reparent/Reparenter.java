@@ -524,7 +524,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
     public Void visitAbbrElement(GxpNamespace.GxpElement node) {
       AttributeMap attrMap = nodeParts.getAttributes();
       Type type = createType(node, attrMap, false, null);
-      String name = getVariableName(attrMap, "name");
+      String name = getVariableName(attrMap, "name", false);
       Expression expr = attrMap.getExprValue("expr", null);
       Expression content = getCollapsableContent(attrMap);
       if (type != null && name != null && expr != null) {
@@ -536,7 +536,8 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
     public Void visitLoopElement(GxpNamespace.GxpElement node) {
       AttributeMap attrMap = nodeParts.getAttributes();
       Type type = createType(node, attrMap, false, null);
-      String var = getVariableName(attrMap, "var");
+      String key = getVariableName(attrMap, "key", true);
+      String var = getVariableName(attrMap, "var", false);
 
       Expression delimiter = attrMap.getOptionalAttributeValue(
           "delimiter", new StringConstant(node, null, " "));
@@ -572,7 +573,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
       }
 
       if ((type != null) && (var != null) && !foundConflict) {
-        output.accumulate(new LoopExpression(node, type, var, iterable, iterator,
+        output.accumulate(new LoopExpression(node, type, key, var, iterable, iterator,
                                              getCollapsableContent(attrMap), delimiter));
       }
       return null;
@@ -709,7 +710,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
     public Void visitParamElement(GxpNamespace.GxpElement node) {
       AttributeMap attrMap = nodeParts.getAttributes();
-      String name = getVariableName(attrMap, "name");
+      String name = getVariableName(attrMap, "name", false);
       List<JavaAnnotation> javaAnnotations
           = getJavaAnnotations(node, JavaAnnotation.Element.PARAM);
       Expression defaultValue = null;
@@ -875,7 +876,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
     public Void visitTypeParamElement(GxpNamespace.GxpElement node) {
       AttributeMap attrMap = nodeParts.getAttributes();
-      String name = getVariableName(attrMap, "name");
+      String name = getVariableName(attrMap, "name", false);
       String extendsType = attrMap.getOptional("extends", null);
       if (name != null) {
         NativeType type = (extendsType == null)
@@ -1150,8 +1151,10 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
       }
     }
 
-    private String getVariableName(AttributeMap attrMap, String attrName) {
-      String result = attrMap.get(attrName, null);
+    private String getVariableName(AttributeMap attrMap, String attrName, boolean optional) {
+      String result = optional
+          ? attrMap.getOptional(attrName, null)
+          : attrMap.get(attrName, null);
       if (result != null) {
         if (!VARIABLE_NAME_PATTERN.matcher(result).matches()) {
           alertSink.add(new IllegalVariableNameError(attrMap.getAttribute(attrName), result));

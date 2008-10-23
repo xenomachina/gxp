@@ -425,14 +425,20 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
 
       @Override
       public Void visitLoopExpression(LoopExpression loop) {
+        // start outer scope for temporary variables
+        appendLine("{");
         Expression delimiter = loop.getDelimiter();
         String boolVar = createVarName("bool");
         if (!delimiter.alwaysEmpty()) {
           formatLine("boolean %s = false;", boolVar);
         }
+        String tmpKeyVar = null, keyVar = null;
+        if (loop.getKey() != null) {
+          tmpKeyVar = createVarName("key");
+          keyVar = JAVA.validateName(alertSink, loop, loop.getKey());
+          formatLine("int %s = 0;", tmpKeyVar);
+        }
         if (loop.getIterator() != null && loop.getIterator().canEvaluateAs(JAVA)) {
-          // start outer scope for temporary variables
-          appendLine("{");
           String iterVar = createVarName("iter");
           Expression iter = loop.getIterator();
           formatLine(iter.getSourcePosition(),
@@ -453,10 +459,10 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
                      JAVA.validateName(alertSink, loop, loop.getVar()),
                      itemExpr);
           writeConditionalDelim(delimiter, boolVar);
+          if (keyVar != null) {
+            formatLine("final int %s = %s++;", keyVar, tmpKeyVar);
+          }
           loop.getSubexpression().acceptVisitor(this);
-          appendLine("}");
-
-          // close outer scope
           appendLine("}");
         } else if (loop.getIterable() != null && loop.getIterable().canEvaluateAs(JAVA)) {
           formatLine(loop.getSourcePosition(), "for (final %s %s : %s) {",
@@ -464,6 +470,9 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
                      JAVA.validateName(alertSink, loop, loop.getVar()),
                      getJavaExpression(loop.getIterable()));
           writeConditionalDelim(delimiter, boolVar);
+          if (keyVar != null) {
+            formatLine("final int %s = %s++;", keyVar, tmpKeyVar);
+          }
           loop.getSubexpression().acceptVisitor(this);
           appendLine("}");
         } else {
@@ -477,6 +486,8 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
             alertSink.add(new LoopMissingBothIterableAndIteratorError(loop, JAVA));
           }
         }
+        // close outer scope
+        appendLine("}");
         return null;
       }
 
