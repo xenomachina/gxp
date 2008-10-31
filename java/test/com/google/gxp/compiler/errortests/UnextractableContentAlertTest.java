@@ -400,6 +400,13 @@ public class UnextractableContentAlertTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
   }
 
+  public void testPlaintext() throws Exception {
+    extraHeaders.add("content-type='text/plain'");
+    compile("alert('hello, world!');");
+    assertAlert(new UnextractableContentAlert(pos(1, 678), "text"));
+    assertNoUnexpectedAlerts();
+  }
+
   public void testNonMarkup_msg() throws Exception {
     extraHeaders.add("content-type='text/javascript'");
     compile("alert(<gxp:msg>Hello, World!</gxp:msg>);",

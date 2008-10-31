@@ -245,7 +245,8 @@ public class I18nChecker {
     }
 
     private static boolean isSchemaVisible(Schema schema) {
-      return (schema.getContentFamily() == ContentFamily.MARKUP);
+      return (schema.getContentFamily() == ContentFamily.MARKUP ||
+              schema.getContentFamily() == ContentFamily.PLAINTEXT);
     }
 
     private static boolean isTypeVisible(Type type) {
