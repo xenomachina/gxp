@@ -20,6 +20,7 @@ import com.google.common.base.CharEscapers;
 import com.google.common.collect.ImmutableSet;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.MissingTypeError;
+import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.codegen.OutputLanguageUtil;
@@ -58,6 +59,20 @@ public class CppUtil extends OutputLanguageUtil {
 
   // TODO(harryh): fill this in
   private static final Set<String> RESERVED_WORDS = ImmutableSet.of();
+
+  /**
+   * Temporarily override this until all C++ expressions get passed through
+   * validate expression (otherwise getting the test to work right is hard)
+   */
+  @Override
+  public String validateExpression(AlertSink alertSink, NativeExpression expr,
+                                   OutputLanguage outputLanguage) {
+    String result = expr.getNativeCode(outputLanguage);
+    if (result == null) {
+      return "";
+    }
+    return CharEscapers.javaStringUnicodeEscaper().escape(result);
+  }
 
   /**
    * Validate the given NativeType and adds alerts to the sink if
