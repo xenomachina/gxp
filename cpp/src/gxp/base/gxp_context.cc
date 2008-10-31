@@ -18,6 +18,6 @@ GxpContext::GxpContext(bool is_using_xml_syntax)
     : is_using_xml_syntax_(is_using_xml_syntax) {
 }
 
-bool GxpContext::IsUsingXmlSyntax() {
+bool GxpContext::IsUsingXmlSyntax() const {
   return is_using_xml_syntax_;
 }

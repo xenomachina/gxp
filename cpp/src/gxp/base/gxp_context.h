@@ -23,9 +23,9 @@
 class GxpContext {
   public:
     GxpContext(bool is_using_xml_syntax);
-    bool IsUsingXmlSyntax();
+    bool IsUsingXmlSyntax() const;
   private:
-    bool is_using_xml_syntax_;
+    const bool is_using_xml_syntax_;
 };
 
 #endif  // GXP_BASE_GXP_CONTEXT_H__

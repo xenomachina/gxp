@@ -47,6 +47,7 @@ import com.google.gxp.compiler.base.UnexpectedNodeException;
 import com.google.gxp.compiler.base.ValidatedCall;
 import com.google.gxp.compiler.msgextract.MessageExtractedTree;
 
+import java.util.Iterator;
 
 /**
  * C++ {@code CodeGenerator}.
@@ -202,8 +203,29 @@ public class CppCodeGenerator extends BaseCppCodeGenerator<MessageExtractedTree>
 
       @Override
       public Void visitConditional(Conditional value) {
-        // TODO(harryh): implement
+        Iterator<Conditional.Clause> clauses = value.getClauses().iterator();
+        if (clauses.hasNext()) {
+          appendIf("if (", clauses.next());
+          while (clauses.hasNext()) {
+            appendIf("} else if (", clauses.next());
+          }
+          Expression elseExpression = value.getElseExpression();
+          if (!elseExpression.alwaysEmpty()) {
+            appendLine("} else {");
+            elseExpression.acceptVisitor(this);
+          }
+          appendLine("}");
+        } else {
+          throw new AssertionError("No clauses in Conditional!");
+        }
         return null;
+      }
+
+      private void appendIf(String prefix, Conditional.Clause clause) {
+        Expression predicate = clause.getPredicate();
+        appendLine(predicate.getSourcePosition(),
+                   prefix + getCppExpression(predicate) + ") {");
+        clause.getExpression().acceptVisitor(this);
       }
 
       @Override
@@ -323,8 +345,7 @@ public class CppCodeGenerator extends BaseCppCodeGenerator<MessageExtractedTree>
 
       @Override
       public String visitIsXmlExpression(IsXmlExpression ixe) {
-        // TODO(harryh): implement
-        return "";
+        return "gxp_context.IsUsingXmlSyntax()";
       }
 
       @Override
