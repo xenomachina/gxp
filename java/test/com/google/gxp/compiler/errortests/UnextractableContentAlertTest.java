@@ -60,7 +60,7 @@ public class UnextractableContentAlertTest extends BaseTestCase {
   public void testBase_text() throws Exception {
     compile("hello, world!");
     // position is fragile because text starts right after gxp:template. :-(
-    assertAlert(new UnextractableContentAlert(pos(1, 562), "text"));
+    assertAlert(new UnextractableContentAlert(pos(1, 652), "text"));
 
     assertNoUnexpectedAlerts();
   }

@@ -22,7 +22,7 @@
               xmlns:my='http://google.com/2001/gxp/call/com/google/gxp/compiler/functests/i18n'
               xmlns:nomsg='http://google.com/2001/gxp/nomsg'>
 
-<div nomsg:id='foo'/>
+<img nomsg:alt='foo'/>
 
 <call:OneContentParamCalleeGxp nomsg:y='bar'/>
 

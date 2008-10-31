@@ -221,6 +221,11 @@ public class I18nChecker {
 
     @Override
     public Expression visitNoMessage(NoMessage noMsg) {
+      if (!visible) {
+        // TODO(harryh): it would be nice to turn this into a BadNodePlacementError
+        //               someday
+        alertSink.add(new UnnecessaryNomsgWarning(noMsg));
+      }
       insideNoMsg = true;
       super.visitNoMessage(noMsg);
       insideNoMsg = false;

@@ -208,7 +208,10 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
           public Attribute visitNoMsgNamespace(NoMsgNamespace ns) {
             Expression str = new StringConstant(parsedAttr, null, parsedAttr.getValue());
-            Expression nomsg = new NoMessage(parsedAttr, str);
+            Expression nomsg = new NoMessage(parsedAttr.getSourcePosition(),
+                                             String.format("%s namespace on %s attribute",
+                                                           ns.getUri(), parsedAttr.getName()),
+                                             str);
             return new Attribute(parsedAttr, NullNamespace.INSTANCE, parsedAttr.getName(),
                                  new ConvertibleToContent(nomsg));
           }

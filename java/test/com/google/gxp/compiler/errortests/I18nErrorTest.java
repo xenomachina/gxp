@@ -21,6 +21,7 @@ import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.InvalidMessageError;
 import com.google.gxp.compiler.codegen.CodeGeneratorFactory;
 import com.google.gxp.compiler.codegen.DefaultCodeGeneratorFactory;
+import com.google.gxp.compiler.i18ncheck.UnnecessaryNomsgWarning;
 import com.google.gxp.compiler.java.NoMessageSourceError;
 import com.google.gxp.compiler.msgextract.TooManyDynamicPlaceholdersError;
 import com.google.gxp.compiler.phpivot.EmptyPlaceholderError;
@@ -47,22 +48,19 @@ public class I18nErrorTest extends BaseTestCase {
 
   public void testMsg_dynamicContentOutsidePlaceholder() throws Exception {
     compile("<gxp:msg><gxp:eval expr='1'/></gxp:msg>");
-    assertAlert(new BadNodePlacementError(pos(2, 10), "<gxp:eval>",
-                                          "inside <gxp:msg>"));
+    assertAlert(new BadNodePlacementError(pos(2, 10), "<gxp:eval>", "inside <gxp:msg>"));
     assertNoUnexpectedAlerts();
   }
 
   public void testMsg_insideMsg() throws Exception {
     compile("<gxp:msg>foo <b><gxp:msg>bar</gxp:msg></b> baz</gxp:msg>");
-    assertAlert(new BadNodePlacementError(pos(2, 17), "<gxp:msg>",
-                                          "inside <gxp:msg>"));
+    assertAlert(new BadNodePlacementError(pos(2, 17), "<gxp:msg>", "inside <gxp:msg>"));
     assertNoUnexpectedAlerts();
   }
 
   public void testMsg_insideNoMsg() throws Exception {
     compile("<gxp:nomsg>foo <b><gxp:msg>bar</gxp:msg></b> baz</gxp:nomsg>");
-    assertAlert(new BadNodePlacementError(pos(2, 19), "<gxp:msg>",
-                                          "inside <gxp:nomsg>"));
+    assertAlert(new BadNodePlacementError(pos(2, 19), "<gxp:msg>", "inside <gxp:nomsg>"));
     assertNoUnexpectedAlerts();
   }
 
@@ -158,15 +156,24 @@ public class I18nErrorTest extends BaseTestCase {
 
   public void testNoMsg_insideMsg() throws Exception {
     compile("<gxp:msg><gxp:nomsg>foo</gxp:nomsg></gxp:msg>");
-    assertAlert(new BadNodePlacementError(pos(2, 10), "<gxp:nomsg>",
-                                          "inside <gxp:msg>"));
+    assertAlert(new BadNodePlacementError(pos(2, 10), "<gxp:nomsg>", "inside <gxp:msg>"));
     assertNoUnexpectedAlerts();
   }
 
   public void testNoMsg_insideNoMsg() throws Exception {
     compile("<gxp:nomsg><gxp:nomsg>foo</gxp:nomsg></gxp:nomsg>");
-    assertAlert(new BadNodePlacementError(pos(2, 12), "<gxp:nomsg>",
-                                          "inside <gxp:nomsg>"));
+    assertAlert(new BadNodePlacementError(pos(2, 12), "<gxp:nomsg>", "inside <gxp:nomsg>"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testNoMsg_whenNotVisible() throws Exception {
+    compile("<div><gxp:attr name='id'><gxp:nomsg>foo</gxp:nomsg></gxp:attr></div>");
+    assertAlert(new UnnecessaryNomsgWarning(pos(2,26), "<gxp:nomsg>"));
+    assertNoUnexpectedAlerts();
+
+    compile("<div nomsg:id='foo' />");
+    assertAlert(new UnnecessaryNomsgWarning(
+                    pos(2,1), "http://google.com/2001/gxp/nomsg namespace on id attribute"));
     assertNoUnexpectedAlerts();
   }
 

@@ -18,12 +18,18 @@ package com.google.gxp.compiler.base;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.gxp.compiler.alerts.SourcePosition;
 
 /**
  * Internal representation of a {@code <gxp:nomsg>} element.
  */
 public class NoMessage extends Expression {
   private final Expression subexpression;
+
+  public NoMessage(SourcePosition pos, String displayName, Expression subexpression) {
+    super(pos, displayName, subexpression.getSchema());
+    this.subexpression = Preconditions.checkNotNull(subexpression);
+  }
 
   public NoMessage(Node fromNode, Expression subexpression) {
     super(fromNode, subexpression.getSchema());

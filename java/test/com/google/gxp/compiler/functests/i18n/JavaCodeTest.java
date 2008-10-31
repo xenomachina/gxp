@@ -96,7 +96,7 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
 
   public void testNoMsgNamespace() throws Exception {
     NoMsgNamespaceGxp.write(out, gxpContext);
-    assertOutputEquals("<div id=\"foo\"></div>\n<b>bar</b>\n<b>baz</b>");
+    assertOutputEquals("<img alt=\"foo\">\n<b>bar</b>\n<b>baz</b>");
   }
 
   public void testAttrInsideMsg() throws Exception {
