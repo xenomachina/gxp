@@ -653,36 +653,22 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           return null;
         }
 
-        appendLine("(function() {");
-        Expression delimiter = loop.getDelimiter();
-        String boolVar = createVarName("bool");
-        if (!delimiter.alwaysEmpty()) {
-          formatLine("var %s = false;", boolVar);
-        }
         String keyVar = (loop.getKey() == null)
             ? createVarName("key")
             : JAVASCRIPT.validateName(alertSink, loop, loop.getKey());
-        String iterableVar = createVarName("iterable");
-        formatLine("var %s = %s;", iterableVar, getJavaScriptExpression(loop.getIterable()));
-        formatLine(loop.getSourcePosition(), "for (var %s in %s) {", keyVar, iterableVar);
-        formatLine("var %s = %s[%s];",
-                   JAVASCRIPT.validateName(alertSink, loop, loop.getVar()),
-                   iterableVar, keyVar);
-        writeConditionalDelim(delimiter, boolVar);
-        loop.getSubexpression().acceptVisitor(this);
-        appendLine("}");
-        appendLine("})();");
-        return null;
-      }
 
-      private void writeConditionalDelim(Expression delimiter, String boolVar) {
-        if (!delimiter.alwaysEmpty()) {
-          formatLine("if (%s) {", boolVar);
-          delimiter.acceptVisitor(this);
-          appendLine("} else {");
-          formatLine("%s = true;", boolVar);
+        formatLine(loop.getSourcePosition(),
+                   "goog.gxp.base.forEach(%s, function(%s, %s, gxp$isFirst) {",
+                   getJavaScriptExpression(loop.getIterable()), keyVar,
+                   JAVASCRIPT.validateName(alertSink, loop, loop.getVar()));
+        if (!loop.getDelimiter().alwaysEmpty()) {
+          appendLine("if (!gxp$isFirst) {");
+          loop.getDelimiter().acceptVisitor(this);
           appendLine("}");
         }
+        loop.getSubexpression().acceptVisitor(this);
+        appendLine("});");
+        return null;
       }
 
       // TODO(harrh): delete this when unsafe-eval goes away. This is needed

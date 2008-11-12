@@ -16,9 +16,11 @@
 
 package com.google.gxp.base;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Locale;
 
 /**
@@ -30,12 +32,13 @@ import java.util.Locale;
 public final class GxpContext {
   private final Locale locale;
   private final boolean useXmlSyntax;
+  private final Charset charset;
 
   /**
    * @param locale the Locale to use when writing a {@code GxpTemplate}
    */
   public GxpContext(Locale locale) {
-    this(locale, false);
+    this(locale, false, Charsets.US_ASCII);
   }
 
   /**
@@ -43,22 +46,40 @@ public final class GxpContext {
    * @param useXmlSyntax flag indicating if gxp should generate XML (instead of SGML)
    */
   public GxpContext(Locale locale, boolean useXmlSyntax) {
-    this.locale = Preconditions.checkNotNull(locale);
-    this.useXmlSyntax = useXmlSyntax;
+    this(locale, useXmlSyntax, Charsets.US_ASCII);
   }
 
   /**
-   * @return the Locale.
+   * @param locale the Locale to use when writing a {@code GxpTemplate}
+   * @param useXmlSyntax flag indicating if gxp should generate XML (instead of SGML)
+   * @param charset the {@code Charset} to escape output into
+   */
+  public GxpContext(Locale locale, boolean useXmlSyntax, Charset charset) {
+    this.locale = Preconditions.checkNotNull(locale);
+    this.useXmlSyntax = useXmlSyntax;
+    this.charset = Preconditions.checkNotNull(charset);
+  }
+
+  /**
+   * @return the {@code Locale}.
    */
   public Locale getLocale() {
     return locale;
   }
 
   /**
-   * @return true if this context renders strict xml compliant output
+   * @return {@code true} if this context renders strict xml compliant output
    */
   public boolean isUsingXmlSyntax() {
     return useXmlSyntax;
+  }
+
+  /**
+   * @return the {@code Charset} into which output should be escaped
+   * into.
+   */
+  public Charset getCharset() {
+    return charset;
   }
 
   ////////////////////////////////////////////////////////////////////////////
