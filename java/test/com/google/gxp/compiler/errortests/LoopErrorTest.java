@@ -16,6 +16,7 @@
 
 package com.google.gxp.compiler.errortests;
 
+import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.RequiredAttributeHasCondError;
 import com.google.gxp.compiler.js.LoopRequiresIterableInJavaScriptError;
 import com.google.gxp.compiler.reparent.ConflictingAttributesError;
@@ -26,7 +27,7 @@ import com.google.gxp.compiler.reparent.MissingAttributesError;
  */
 public class LoopErrorTest extends BaseTestCase {
   public void testLoop_bothIteratorAndIterable() throws Exception {
-    compile("<gxp:loop var='x' type='int' iterable='foo' iterator='bar' />");
+    compile("<gxp:loop var='x' type='int' iterable='foo' iterator='bar'>content</gxp:loop>");
     assertAlert(new ConflictingAttributesError(pos(2,1), "<gxp:loop>",
                                                "'iterable' attribute",
                                                "'iterator' attribute"));
@@ -35,13 +36,13 @@ public class LoopErrorTest extends BaseTestCase {
 
   public void testLoop_invalidIterable() throws Exception {
     assertIllegalExpressionDetected(
-        "<gxp:loop var='x' type='int' iterable='", "'/>");
+        "<gxp:loop var='x' type='int' iterable='", "'>content</gxp:loop>");
   }
 
   public void testLoop_invalidIterator() throws Exception {
     testingInvalidIterator = true;
     assertIllegalExpressionDetected(
-        "<gxp:loop var='x' type='int' iterator='", "'/>");
+        "<gxp:loop var='x' type='int' iterator='", "'>content</gxp:loop>");
   }
 
   private boolean testingInvalidIterator = false;
@@ -55,23 +56,28 @@ public class LoopErrorTest extends BaseTestCase {
 
   public void testLoop_invalidType() throws Exception {
     assertIllegalTypeDetected(
-        "<gxp:loop var='x' type='", "' iterable='list' />");
+        "<gxp:loop var='x' type='", "' iterable='list' >content</gxp:loop>");
+  }
+
+  public void testLoop_invalidGxpType() throws Exception {
+    compile("<gxp:loop var='x' gxp:type='bad' iterable='list'>content</gxp:loop>");
+    assertAlert(new InvalidAttributeValueError(pos(2,1), "'gxp:type' attribute"));
+    assertNoUnexpectedAlerts();
   }
 
   public void testLoop_invalidKey() throws Exception {
     assertIllegalVariableNameDetected(
-        "key", "<gxp:loop key='", "' var='v' type='int' iterable='list'/>");
+        "key", "<gxp:loop key='", "' var='v' type='int' iterable='list'>content</gxp:loop>");
   }
 
   public void testLoop_invalidVar() throws Exception {
     assertIllegalVariableNameDetected(
-        "var", "<gxp:loop var='", "' type='int' iterable='list'/>");
+        "var", "<gxp:loop var='", "' type='int' iterable='list'>content</gxp:loop>");
   }
 
   public void testLoop_missingIteratorAndIterable() throws Exception {
     compile("<gxp:loop var='x' type='int' />");
-    assertAlert(new MissingAttributesError(pos(2,1), "<gxp:loop>", "iterator",
-                                           "iterable"));
+    assertAlert(new MissingAttributesError(pos(2,1), "<gxp:loop>", "iterator", "iterable"));
     assertNoUnexpectedAlerts();
   }
 

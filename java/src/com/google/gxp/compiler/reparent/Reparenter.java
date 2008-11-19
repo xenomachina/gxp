@@ -541,6 +541,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
       Type type = createType(node, attrMap, false, null);
       String key = getVariableName(attrMap, "key", true);
       String var = getVariableName(attrMap, "var", false);
+      Expression content = getCollapsableContent(attrMap);
 
       Expression delimiter = attrMap.getOptionalAttributeValue(
           "delimiter", new StringConstant(node, null, " "));
@@ -577,7 +578,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
       if ((type != null) && (var != null) && !foundConflict) {
         output.accumulate(new LoopExpression(node, type, key, var, iterable, iterator,
-                                             getCollapsableContent(attrMap), delimiter));
+                                             content, delimiter));
       }
       return null;
     }
@@ -603,9 +604,10 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
       GxpType type = GxpType.parse(kind);
       if (type == null) {
+        alertSink.add(new InvalidAttributeValueError(gxpType));
         return null;
       }
-      switch(type) {
+      switch (type) {
         case BOOL:
           return new BooleanType(node);
         case BUNDLE:
