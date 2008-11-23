@@ -105,7 +105,7 @@ class GxpcFlags implements Configuration {
 
     allowedOutputFileRefs = getFileRefs(sourcePathFs, commandLine.FLAG_output);
 
-    alertPolicy = computeAlertPolicy(commandLine.FLAG_warn);
+    alertPolicy = computeAlertPolicy(commandLine.FLAG_warn, commandLine.FLAG_error);
 
     // Compute Dependency File
     dependencyFile = (commandLine.FLAG_depend == null)
@@ -166,15 +166,24 @@ class GxpcFlags implements Configuration {
   }
 
   // TODO(laurence): add more general support for AlertPolicy configuration
-  private static final AlertPolicy computeAlertPolicy(List<String> warnFlags) {
+  private static final AlertPolicy computeAlertPolicy(List<String> warnFlags,
+                                                      List<String> errorFlags) {
     ConfigurableAlertPolicy result = new ConfigurableAlertPolicy();
-    if (warnFlags.contains("i18n")) {
-      result.setSeverity(UnextractableContentAlert.class, Severity.WARNING);
-    }
+    configureAlertPolicy(result, warnFlags,  Severity.WARNING);
+    configureAlertPolicy(result, errorFlags, Severity.ERROR);
     if (warnFlags.contains("error")) {
       result.setTreatWarningsAsErrors(true);
     }
+
     return result;
+  }
+
+  private static final void configureAlertPolicy(ConfigurableAlertPolicy alertPolicy,
+                                                 List<String> flags,
+                                                 Severity severity) {
+    if (flags.contains("i18n")) {
+      alertPolicy.setSeverity(UnextractableContentAlert.class, severity);
+    }
   }
 
   private static ImmutableSortedSet<Phase> computeDotPhases(List<String> phaseNames)
@@ -305,6 +314,11 @@ class GxpcFlags implements Configuration {
                   + "i18n (enable i18n warnings),\n"
                   + "error (warnings are errors)")
     public List<String> FLAG_warn = Lists.newArrayList();
+
+    @Option(name = "--error",
+            usage = "Sets error options. VAL can be one of:\n"
+                  + "i18n (enable i18n errors)")
+    public List<String> FLAG_error = Lists.newArrayList();
 
     @Option(name = "--source",
             usage = "base directory for source")

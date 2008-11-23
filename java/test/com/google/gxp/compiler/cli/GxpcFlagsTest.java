@@ -423,4 +423,21 @@ public class GxpcFlagsTest extends TestCase {
     assertEquals(Severity.INFO, alertPolicy.getSeverity(INFO_ALERT));
     assertEquals(Severity.ERROR, alertPolicy.getSeverity(I18N_ALERT));
   }
+
+  public void testGenErrorFlags_errorI18n() throws Exception {
+    alertPolicy = createConfig("--error", "i18n").getAlertPolicy();
+    assertEquals(Severity.ERROR, alertPolicy.getSeverity(ERROR_ALERT));
+    assertEquals(Severity.WARNING, alertPolicy.getSeverity(WARNING_ALERT));
+    assertEquals(Severity.INFO, alertPolicy.getSeverity(INFO_ALERT));
+    assertEquals(Severity.ERROR, alertPolicy.getSeverity(I18N_ALERT));
+  }
+
+  public void testGenErrorFlags_errorI18nAndwarnI18n() throws Exception {
+    alertPolicy = createConfig("--error", "i18n",
+                               "--warn", "i18n").getAlertPolicy();
+    assertEquals(Severity.ERROR, alertPolicy.getSeverity(ERROR_ALERT));
+    assertEquals(Severity.WARNING, alertPolicy.getSeverity(WARNING_ALERT));
+    assertEquals(Severity.INFO, alertPolicy.getSeverity(INFO_ALERT));
+    assertEquals(Severity.ERROR, alertPolicy.getSeverity(I18N_ALERT));
+  }
 }
