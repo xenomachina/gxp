@@ -167,9 +167,9 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
      * template.
      */
     private void appendStaticContent() {
-      formatLine("private static long COMPILATION$TIME = %dL;",
-                 template.getSourcePosition().getSource().getLastModified());
-      formatLine("private static long COMPILATION$VERSION = 1;");
+      formatLine("private static long COMPILATION$CHECKSUM = %dL;",
+                 template.getSourcePosition().getSource().getChecksum());
+      formatLine("private static long COMPILATION$VERSION = 0;");
 
       appendLine("private static final com.google.gxp.compiler.alerts.AlertPolicy ALERT$POLICY =");
       formatLine("  createAlertPolicy(new byte[] {%s});", serializeAlertPolicy());
@@ -220,16 +220,16 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
     }
 
     private void appendReload() {
-      appendLine("long LAST$MODIFIED = SRC$GXP.getLastModified();");
-      appendLine("if ((LAST$MODIFIED != 0 && LAST$MODIFIED != COMPILATION$TIME)");
+      appendLine("long LAST$CHECKSUM = SRC$GXP.getChecksum();");
+      appendLine("if ((LAST$CHECKSUM != 0 && LAST$CHECKSUM != COMPILATION$CHECKSUM)");
       appendLine("    || METHODS$ == null) {");
+      appendLine("COMPILATION$VERSION++;");
       appendLine("com.google.gxp.compiler.fs.InMemoryFileSystem MEM$FS =");
       appendLine("    new com.google.gxp.compiler.fs.InMemoryFileSystem();");
       appendLine("JAVA$FILE = compileGxp(MEM$FS, SRC$GXPS, SRC$SCHEMAS, SRC$PATHS,");
       appendLine("                       JAVA$BASE, COMPILATION$VERSION, ALERT$POLICY);");
       appendLine("METHODS$ = compileJava(MEM$FS, CLASS$BASE, COMPILATION$VERSION);");
-      appendLine("COMPILATION$TIME = LAST$MODIFIED;");
-      appendLine("COMPILATION$VERSION++;");
+      appendLine("COMPILATION$CHECKSUM = LAST$CHECKSUM;");
       appendLine("}");
     }
 
@@ -237,18 +237,16 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
      * Generates accessor methods for retrieving default parameters.
      */
     private void appendDefaultAccessors() {
-      for (Parameter param : template.getParameters()) {
+      for (Parameter param : template.getAllParameters()) {
         Expression defaultValue = param.getDefaultValue();
         if (defaultValue != null) {
           String methodName = getDefaultMethodName(param);
           String paramType = toJavaType(param.getType());
           appendLine();
-          formatLine("public static %s %s() {",
-                     paramType, methodName);
+          formatLine("public static %s %s() {", paramType, methodName);
           appendReload();
-          formatLine("return (%s)execNoExceptions(METHODS$, \"%s\", "
-                     + "new Object[] {});",
-                     toReferenceType(paramType), methodName);
+          formatLine("return %s.<%s>execNoExceptions(METHODS$, \"%s\", new Object[] {});",
+                     getBaseClassName(), toReferenceType(paramType), methodName);
           appendLine("}");
         }
       }
@@ -258,18 +256,16 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
      * Generates methods for constructing object parameters from strings.
      */
     private void appendParamConstructors() {
-      for (Parameter param : template.getParameters()) {
+      for (Parameter param : template.getAllParameters()) {
         if (param.getConstructor() != null) {
           String methodName = getConstructorMethodName(param);
           String paramType = toJavaType(param.getType());
           String paramName = param.getPrimaryName();
           appendLine();
-          formatLine("public static %s %s(String %s) {",
-                     paramType, methodName, paramName);
+          formatLine("public static %s %s(String %s) {", paramType, methodName, paramName);
           appendReload();
-          formatLine("return (%s)execNoExceptions(METHODS$, \"%s\", "
-                     + "new Object[] { %s });",
-                     toReferenceType(paramType), methodName, paramName);
+          formatLine("return %s.<%s>execNoExceptions(METHODS$, \"%s\", new Object[] { %s });",
+                     getBaseClassName(), toReferenceType(paramType), methodName, paramName);
           appendLine("}");
         }
       }

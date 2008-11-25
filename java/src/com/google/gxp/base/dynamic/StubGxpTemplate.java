@@ -279,11 +279,13 @@ public class StubGxpTemplate extends GxpTemplate {
     }
   }
 
-  protected static Object execNoExceptions(Map<String, Method> methods,
-                                           String function,
-                                           Object[] args) {
+  protected static <T> T execNoExceptions(Map<String, Method> methods,
+                                          String function,
+                                          Object[] args) {
     try {
-      return exec(methods, function, args);
+      @SuppressWarnings("unchecked")
+      T result = (T)exec(methods, function, args);
+      return result;
     } catch (Error e) {
       throw e;
     } catch (RuntimeException e) {

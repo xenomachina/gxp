@@ -18,13 +18,15 @@ package com.google.gxp.compiler.fs;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.io.Bytes;
 import com.google.common.io.Characters;
 
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.*;
+import java.util.zip.Adler32;
 
 import javax.tools.FileObject;
 import javax.tools.JavaFileObject.Kind;
@@ -86,6 +88,22 @@ public final class FileRef implements FileObject {
    */
   public long getLastModified() {
     return store.getLastModified(this);
+  }
+
+  /**
+   * @return a {@code Adler32} checksum of the file contents or 0 if the file
+   * cannot be read.
+   */
+  public long getChecksum() {
+    try {
+      Adler32 checksum = new Adler32();
+      InputStream is = openInputStream();
+      checksum.update(Bytes.toByteArray(is));
+      is.close();
+      return checksum.getValue();
+    } catch (IOException e) {
+      return 0;
+    }
   }
 
   /**
