@@ -563,8 +563,6 @@
              elements='frame iframe'
              flags='framesetdtd'
              pattern='URI'/>
-  <attribute name='manifest'
-             elements='html'/>
   <attribute name='marginheight'
              elements='frame iframe'
              flags='framesetdtd'
@@ -1039,101 +1037,4 @@
              elements='textarea'
              flags='nonstandard'
              regex='^(off|soft|hard)$'/>
-
-  <!--
-    See http://msdn.microsoft.com/workshop/author/dhtml/reference/properties/contenteditable.asp
-    Note: nonstandard elements 'custom', 'listing', 'marquee', 'nobr',
-          'plaintext', 'rt', 'ruby' and 'xmp'  removed from elements list.
-  -->
-  <attribute name='contenteditable'
-             except-elements='abbr applet area base basefont br caption col colgroup embed frame frameset head hr html iframe img link map meta noframes noscript object optgroup option param script select style table tbody td tfoot th thead title tr'
-             flags='internal-only'
-             regex='^(inherit|false|true)$'/>
-
-  <!--
-    See http://msdn.microsoft.com/workshop/author/dhtml/reference/events/oncontextmenu.asp
-    Note: nonstandard elements 'custom', 'embed', 'listing', 'marquee', 'nobr',
-          'plaintext', 'rt', 'ruby' and 'xmp' removed from elements list.
-  -->
-  <attribute name='oncontextmenu'
-             except-elements='abbr acronym base basefont br col colgroup del embed frame frameset head html iframe ins isindex link map meta noframes noscript object optgroup option param q script style title'
-             flags='internal-only'
-             pattern='Script'/>
-
-  <!--
-    See http://msdn.microsoft.com/workshop/author/dhtml/reference/properties/unselectable.asp
-    Note: nonstandard elements 'custom', 'embed', 'listing', 'marquee', 'nobr',
-          'plaintext', 'rt', 'ruby' and 'xmp' removed from elements list.
-  -->
-  <attribute name='unselectable'
-             except-elements='abbr base basefont br col colgroup embed head html link map meta noframes noscript optgroup option param script style th title tr'
-             flags='internal-only'
-             regex='^(?i)(on|off)$'/>
-
-  <!-- Attributes required for YouTube and other Flash embeds. -->
-  <attribute name='bgcolor'
-             elements='embed'
-             flags='nonstandard'
-             pattern='Color'/>
-  <attribute name='FlashVars'
-             elements='embed'/>
-  <attribute name='allowFullScreen'
-             elements='embed'
-             regex='^(true|false)$'/>             
-  <attribute name='allowScriptAccess'
-             elements='embed'
-             regex='^(always|never|sameDomain)$'/>             
-  <attribute name='wmode'
-             elements='embed'
-             flags='nonstandard'
-             regex='^(window|opaque|transparent)$'/>
-  <!--
-    Firefox 2 attribute to enable/disable spellchecking of a field
-    See http://developer.mozilla.org/en/docs/Controlling_spell_checking_in_HTML_forms
-    Documentation does not say that this is case sensitive, but confirmed with
-    Firefox 2.0.0.4 on Windows and Linux.
-  -->
-  <attribute name='spellcheck'
-             elements='input textarea'
-             flags='nonstandard'
-             regex='^(true|false)$'/>
-
-  <!-- 
-    Attribute to make an iframe transparent. Added in IE 5.5 and generally supported
-    by other browsers. Confirmed in Firefox2.
-    Also supported on frame element, but not useful there so leaving it out.
-    See http://msdn.microsoft.com/workshop/author/dhtml/reference/properties/allowtransparency.asp
-  -->
-  <attribute name='allowtransparency'
-             elements='iframe'
-             flags='nonstandard'
-             regex='^(true|false)$'/>
-
-  <!-- 
-    Attributes for WAI-ARIA 
-    http://www.w3.org/TR/aria-role/
-    Role allows assistive technologies to discover the purpose of custom widgets
-    commonly found in AJAX applications such as sliders, tree views, custom buttons, etc.
-  -->
-  <attribute name='role'
-             elements='div span'
-             flags='nonstandard'
-             pattern='Text'/>
-  <!-- 
-    Custom widgets in AJAX apps are often made out of div and/or span elements.
-    Making such widgets focusable is important in providing keyboard access to the
-    application as the user needs to be able to tab through the various widgets.
-  -->
-  <attribute name='tabindex'
-             elements='div span'
-             flags='nonstandard'
-             pattern='NUMBER'/>
-
-  <!-- 
-    Required for Chrome to create desktop shortcuts for web applications.
-    See http://wiki/Main/ChromeDesktopShortcuts
-  -->
-  <attribute name='sizes'
-             elements='link'
-             flags='nonstandard'/>
 </schema>
