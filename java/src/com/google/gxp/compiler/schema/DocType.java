@@ -120,12 +120,15 @@ public final class DocType implements Serializable {
 
   private static String toMarkup(String rootElement, String publicId,
                                  String systemId) {
-    return "<!DOCTYPE "
-        + Preconditions.checkNotNull(rootElement)
-        + ((publicId == null)
-           ? " SYSTEM" : (" PUBLIC \"" + publicId + "\""))
-        + " \"" + Preconditions.checkNotNull(systemId) + "\""
-        + ">";
+    StringBuffer sb = new StringBuffer("<!DOCTYPE ");
+    sb.append(Preconditions.checkNotNull(rootElement))
+        .append((publicId == null)
+            ? " SYSTEM" : publicId.isEmpty()
+                ? "" : " PUBLIC \"" + publicId + "\"")
+        .append(Preconditions.checkNotNull(systemId).isEmpty()
+            ? "" : " \"" + systemId + "\"")
+        .append(">");
+    return sb.toString();
   }
 
   @Override
