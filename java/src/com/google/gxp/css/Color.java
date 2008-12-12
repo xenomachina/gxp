@@ -17,10 +17,12 @@
 package com.google.gxp.css;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.google.gxp.base.GxpContext;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -136,9 +138,62 @@ public final class Color implements CssClosure {
                        Integer.parseInt(m.group(2), 16),
                        Integer.parseInt(m.group(3), 16));
     }
+    Color color = KEYWORD_MAP.get(s);
+    if (color != null) {
+      return color;
+    }
     throw new IllegalArgumentException("Can't parse \"" + s
                                        + "\" as a CSS color.");
   }
+
+  // constants for a subset of css predefined colors taken from this list:
+  // http://www.w3.org/TR/css3-color/#svg-color
+  //
+  // additional colors can be added on request
+  public static final Color AQUA = new Color(0, 255, 255);
+  public static final Color BLACK = new Color(0, 0, 0);
+  public static final Color BLUE = new Color(0, 0, 255);
+  public static final Color FUCHSIA = new Color(255, 0, 255);
+  public static final Color GRAY = new Color(128, 128, 128);
+  public static final Color GREEN = new Color(0, 128, 0);
+  public static final Color GREY = new Color(128, 128, 128);
+  public static final Color INDIGO = new Color(75, 0, 130);
+  public static final Color LIME = new Color(0, 255, 0);
+  public static final Color MAROON = new Color(128, 0, 0);
+  public static final Color NAVY = new Color(0, 0, 128);
+  public static final Color OLIVE = new Color(128, 128, 0);
+  public static final Color ORANGE = new Color(255, 165, 0);
+  public static final Color PURPLE = new Color(128, 0, 128);
+  public static final Color RED = new Color(255, 0, 0);
+  public static final Color SILVER = new Color(192, 192, 192);
+  public static final Color TEAL = new Color(0, 128, 128);
+  public static final Color VIOLET = new Color(238, 130, 238);
+  public static final Color WHITE = new Color(255, 255, 255);
+  public static final Color YELLOW = new Color(255, 255, 0);
+
+  private static final Map<String, Color> KEYWORD_MAP =
+    new ImmutableMap.Builder<String, Color>()
+      .put("aqua", AQUA)
+      .put("black", BLACK)
+      .put("blue", BLUE)
+      .put("fuchsia", FUCHSIA)
+      .put("gray", GRAY)
+      .put("green", GREEN)
+      .put("grey", GREY)
+      .put("indigo", INDIGO)
+      .put("lime", LIME)
+      .put("maroon", MAROON)
+      .put("navy", NAVY)
+      .put("olive", OLIVE)
+      .put("orange", ORANGE)
+      .put("purple", PURPLE)
+      .put("red", RED)
+      .put("silver", SILVER)
+      .put("teal", TEAL)
+      .put("violet", VIOLET)
+      .put("white", WHITE)
+      .put("yellow", YELLOW)
+      .build();
 
   private static final Pattern THREE_DIGIT_PATTERN =
       Pattern.compile("#([0-9a-f])([0-9a-f])([0-9a-f])",

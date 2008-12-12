@@ -104,6 +104,7 @@ public class AllTests extends TestCase {
     suite.addTestSuite(com.google.gxp.compiler.functests.closures.JavaCodeTest.class);
     suite.addTestSuite(com.google.gxp.compiler.functests.i18n.JavaCodeTest.class);
     suite.addTestSuite(com.google.gxp.compiler.functests.instantiable.JavaCodeTest.class);
+    suite.addTestSuite(com.google.gxp.compiler.functests.multilingual.JavaCodeTest.class);
 
     // dynamic tests
     suite.addTestSuite(com.google.gxp.compiler.dynamictests.JavaCodeTest.class);
