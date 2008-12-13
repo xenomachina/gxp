@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * A C++ Library Import. The internal implementation of
- * {@code <cpp:include library='library' /> which is equivliant to
+ * {@code <cpp:include library='library' />} which is equivliant to
  * {@code #include <library>}.
  */
 public class CppLibraryImport extends Import {

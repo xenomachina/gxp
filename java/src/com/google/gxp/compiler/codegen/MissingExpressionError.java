@@ -19,6 +19,7 @@ package com.google.gxp.compiler.codegen;
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.Expression;
+import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.OutputLanguage;
 
 /**

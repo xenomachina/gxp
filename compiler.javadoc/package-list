@@ -17,6 +17,7 @@ com.google.gxp.compiler.i18ncheck
 com.google.gxp.compiler.ifexpand
 com.google.gxp.compiler.io
 com.google.gxp.compiler.java
+com.google.gxp.compiler.js
 com.google.gxp.compiler.msgextract
 com.google.gxp.compiler.parser
 com.google.gxp.compiler.phinsert
