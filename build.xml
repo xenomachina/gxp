@@ -123,7 +123,7 @@
     <javadoc packagenames="com.google.gxp.compiler.*,com.google.gxp.transconsole.*"
              destdir="${build.dir}/compiler.javadoc"
              protected="true"
-             windowtitle="GXP Compiler ${version} (BETA)">
+             windowtitle="GXP Compiler ${version}">
       <sourcepath>
         <pathelement location="${src.dir}"/>
       </sourcepath>
