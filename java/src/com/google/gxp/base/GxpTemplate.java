@@ -90,7 +90,6 @@ public class GxpTemplate {
    * implementations.
    *
    * @see com.google.gxp.compiler.java.JavaCodeGenerator
-   * @see OnceClosure
    */
   protected abstract static class AnonymousGxpClosure
       extends TunnelingGxpClosure {
