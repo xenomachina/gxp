@@ -16,7 +16,9 @@
 
 package com.google.gxp.text;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.CharEscapers;
+import com.google.gxp.base.GxpClosure;
+import com.google.gxp.base.GxpClosures;
 import com.google.gxp.base.GxpContext;
 import com.google.i18n.Localizable;
 
@@ -32,20 +34,21 @@ public class PlaintextClosures {
       public void write(Appendable out, GxpContext context) {}
     };
 
-  public static final PlaintextClosure fromPlaintext(final String text) {
-    Preconditions.checkNotNull(text);
-    return new PlaintextClosure() {
-        public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          out.append(text);
-        }
-      };
+  public static PlaintextClosure fromPlaintext(final String text) {
+    return wrap(GxpClosures.fromString(text));
   }
 
-  public static final PlaintextClosure fromLocalizable(final Localizable value) {
-    Preconditions.checkNotNull(value);
+  public static PlaintextClosure fromLocalizable(final Localizable value) {
+    return wrap(GxpClosures.fromLocalizable(value, CharEscapers.nullEscaper()));
+  }
+
+  /**
+   * Wrap a {@code GxpClosure} with a {@code PlaintextClosure}.
+   */
+  private static PlaintextClosure wrap(final GxpClosure closure) {
     return new PlaintextClosure() {
         public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          out.append(value.toString(gxpContext.getLocale()));
+          closure.write(out, gxpContext);
         }
       };
   }

@@ -16,7 +16,8 @@
 
 package com.google.gxp.rss;
 
-import com.google.common.base.Preconditions;
+import com.google.gxp.base.GxpClosure;
+import com.google.gxp.base.GxpClosures;
 import com.google.gxp.base.GxpContext;
 
 import java.io.IOException;
@@ -35,11 +36,17 @@ public class RssClosures {
    * Convert a rss String into a {@code RssClosure} that emits the
    * String without any escaping.
    */
-  public static final RssClosure fromRss(final String rss) {
-    Preconditions.checkNotNull(rss);
+  public static RssClosure fromRss(final String rss) {
+    return wrap(GxpClosures.fromString(rss));
+  }
+
+  /**
+   * Wrap a {@code GxpClosure} with a {@code RssClosure}.
+   */
+  private static RssClosure wrap(final GxpClosure closure) {
     return new RssClosure() {
         public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          out.append(rss);
+          closure.write(out, gxpContext);
         }
       };
   }

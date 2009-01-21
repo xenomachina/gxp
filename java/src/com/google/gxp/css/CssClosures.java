@@ -16,7 +16,8 @@
 
 package com.google.gxp.css;
 
-import com.google.common.base.Preconditions;
+import com.google.gxp.base.GxpClosure;
+import com.google.gxp.base.GxpClosures;
 import com.google.gxp.base.GxpContext;
 
 import java.io.IOException;
@@ -35,11 +36,39 @@ public class CssClosures {
    * @return a {@code CssClosure} that renders {@code css} as literal
    * CSS
    */
-  public static final CssClosure fromCss(final String css) {
-    Preconditions.checkNotNull(css);
+  public static CssClosure fromCss(final String css) {
+    return wrap(GxpClosures.fromString(css));
+  }
+
+  /**
+   * Renders a sequence of {@link CssClosure} instances by calling
+   * their write methods in order.
+   *
+   * @param closures A list of {@code CssClosure} objects to be rendered
+   * @return A new {@code CssClosure} that renders the list
+   */
+  public static CssClosure concat(final Iterable<? extends CssClosure> closures) {
+    return wrap(GxpClosures.concat(closures));
+  }
+
+  /**
+   * Renders a sequence of {@link CssClosure} instances by calling their
+   * write methods in order. Varargs form of {@link #concat(Iterable)}.
+   *
+   * @param closures a series of closure objects to be rendered in order
+   * @return A new {@code CssClosure} that renders the closures in order
+   */
+  public static CssClosure concat(final CssClosure... closures) {
+    return wrap(GxpClosures.concat(closures));
+  }
+
+  /**
+   * Wrap a {@code GxpClosure} with a {@code CssClosure}.
+   */
+  private static CssClosure wrap(final GxpClosure closure) {
     return new CssClosure() {
         public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          out.append(css);
+          closure.write(out, gxpContext);
         }
       };
   }

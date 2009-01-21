@@ -16,7 +16,8 @@
 
 package com.google.gxp.js;
 
-import com.google.common.base.Preconditions;
+import com.google.gxp.base.GxpClosure;
+import com.google.gxp.base.GxpClosures;
 import com.google.gxp.base.GxpContext;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ import java.io.IOException;
 /**
  * Creates Javascript specific GXP Closures
  */
-public class JavascriptClosures {
+public final class JavascriptClosures {
   private JavascriptClosures() {}
 
   public static final JavascriptClosure EMPTY = new JavascriptClosure() {
@@ -35,11 +36,39 @@ public class JavascriptClosures {
    * @return a {@code JavascriptClosure} that renders {@code js} as literal
    * Javascript
    */
-  public static final JavascriptClosure fromJavascript(final String js) {
-    Preconditions.checkNotNull(js);
+  public static JavascriptClosure fromJavascript(final String js) {
+    return wrap(GxpClosures.fromString(js));
+  }
+
+  /**
+   * Renders a sequence of {@link JavascriptClosure} instances by calling
+   * their write methods in order.
+   *
+   * @param closures A list of {@code JavascriptClosure} objects to be rendered
+   * @return A new {@code JavascriptClosure} that renders the list
+   */
+  public static JavascriptClosure concat(final Iterable<? extends JavascriptClosure> closures) {
+    return wrap(GxpClosures.concat(closures));
+  }
+
+  /**
+   * Renders a sequence of {@link JavascriptClosure} instances by calling their
+   * write methods in order. Varargs form of {@link #concat(Iterable)}.
+   *
+   * @param closures a series of closure objects to be rendered in order
+   * @return A new {@code JavascriptClosure} that renders the closures in order
+   */
+  public static JavascriptClosure concat(final JavascriptClosure... closures) {
+    return wrap(GxpClosures.concat(closures));
+  }
+
+  /**
+   * Wrap a {@code GxpClosure} with a {@code JavascriptClosure}.
+   */
+  private static JavascriptClosure wrap(final GxpClosure closure) {
     return new JavascriptClosure() {
         public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          out.append(js);
+          closure.write(out, gxpContext);
         }
       };
   }

@@ -18,18 +18,20 @@ package com.google.gxp.html;
 
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.Characters;
+import com.google.gxp.base.GxpClosure;
+import com.google.gxp.base.GxpClosures;
 import com.google.gxp.base.GxpContext;
 import com.google.i18n.Localizable;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.nio.charset.Charset;
 
 /**
  * Utility {@code HtmlClosure}s
  */
-public class HtmlClosures {
+public final class HtmlClosures {
   private HtmlClosures() {}
 
   public static final HtmlClosure EMPTY = new HtmlClosure() {
@@ -40,29 +42,19 @@ public class HtmlClosures {
    * Convert an html String into a {@code HtmlClosure} that emits the
    * String without any escaping.
    */
-  public static final HtmlClosure fromHtml(final String html) {
-    Preconditions.checkNotNull(html);
-    return new HtmlClosure() {
-        public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          out.append(html);
-        }
-      };
+  public static HtmlClosure fromHtml(final String html) {
+    return wrap(GxpClosures.fromString(html));
   }
 
   /**
    * Convert a plaintext String into a {@code HtmlClosure} that emits the
    * HTML-escaped form of the String.
    *
-   * If you are using this in a GXP, you are doing something wrong.  GXP is
+   * If you are using this in a GXP, you are doing something wrong. GXP is
    * designed to handle all escaping for you.
    */
-  public static final HtmlClosure fromPlaintext(final String text) {
-    Preconditions.checkNotNull(text);
-    return new HtmlClosure() {
-        public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          CharEscapers.asciiHtmlEscaper().escape(out).append(text);
-        }
-      };
+  public static HtmlClosure fromPlaintext(final String text) {
+    return wrap(GxpClosures.fromString(text, CharEscapers.asciiHtmlEscaper()));
   }
 
   /**
@@ -70,31 +62,16 @@ public class HtmlClosures {
    *
    * The contents of the Localizable will be escaped on output.
    */
-  public static final HtmlClosure fromLocalizable(final Localizable value) {
-    Preconditions.checkNotNull(value);
-    return new HtmlClosure() {
-        public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          CharEscapers.asciiHtmlEscaper().escape(out).append(value.toString(gxpContext.getLocale()));
-        }
-      };
+  public static HtmlClosure fromLocalizable(final Localizable value) {
+    return wrap(GxpClosures.fromLocalizable(value, CharEscapers.asciiHtmlEscaper()));
   }
 
   /**
    * Create a {@code HtmlClosure} that will emit all the data avaliable from the
    * {@code File} at the time the closure is evaluated.
    */
-  public static final HtmlClosure fromFile(final File file, final Charset charset) {
-    Preconditions.checkNotNull(file);
-    Preconditions.checkNotNull(charset);
-    return new HtmlClosure() {
-        public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          FileInputStream fis = new FileInputStream(file);
-          InputStreamReader isr = new InputStreamReader(fis, charset);
-          Characters.copy(isr, out);
-          isr.close();
-          fis.close();
-        }
-      };
+  public static HtmlClosure fromFile(final File file, final Charset charset) {
+    return wrap(GxpClosures.fromFile(file, charset));
   }
 
   /**
@@ -103,18 +80,8 @@ public class HtmlClosures {
    * once, {@code reset()} will be called to reset the stream back to its origin
    * on all evaluations but the first.
    */
-  public static final HtmlClosure fromReader(final Reader reader) throws IOException {
-    Preconditions.checkNotNull(reader);
-    return new HtmlClosure() {
-        private boolean firstCall = true;
-        public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          if (!firstCall) {
-            reader.reset();
-          }
-          firstCall = false;
-          Characters.copy(reader, out);
-        }
-      };
+  public static HtmlClosure fromReader(final Reader reader) throws IOException {
+    return wrap(GxpClosures.fromReader(reader));
   }
 
   /**
@@ -124,16 +91,8 @@ public class HtmlClosures {
    * @param closures A list of {@code HtmlClosure} objects to be rendered
    * @return A new {@code HtmlClosure} that renders the list
    */
-  public static final HtmlClosure concat(final Iterable<? extends HtmlClosure> closures) {
-    Preconditions.checkContentsNotNull(closures);
-    final Iterable<HtmlClosure> closuresCopy = ImmutableList.copyOf(closures);
-    return new HtmlClosure() {
-        public void write(Appendable out, GxpContext gxpContext) throws IOException {
-          for (HtmlClosure closure : closuresCopy) {
-            closure.write(out, gxpContext);
-          }
-        }
-      };
+  public static HtmlClosure concat(final Iterable<? extends HtmlClosure> closures) {
+    return wrap(GxpClosures.concat(closures));
   }
 
   /**
@@ -143,7 +102,18 @@ public class HtmlClosures {
    * @param closures a series of closure objects to be rendered in order
    * @return A new {@code HtmlClosure} that renders the closures in order
    */
-  public static final HtmlClosure concat(final HtmlClosure... closures) {
-    return concat(ImmutableList.of(closures));
+  public static HtmlClosure concat(final HtmlClosure... closures) {
+    return wrap(GxpClosures.concat(closures));
+  }
+
+  /**
+   * Wrap a {@code GxpClosure} with a {@code HtmlClosure}.
+   */
+  private static HtmlClosure wrap(final GxpClosure closure) {
+    return new HtmlClosure() {
+        public void write(Appendable out, GxpContext gxpContext) throws IOException {
+          closure.write(out, gxpContext);
+        }
+      };
   }
 }
