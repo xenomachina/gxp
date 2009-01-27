@@ -32,9 +32,4 @@ public class UnqualifiedCallNamespace extends CallNamespace {
   protected String getTagName(String tagName) {
     return tagName;
   }
-
-  @Override
-  protected boolean areAllAttrsExpr() {
-    return false;
-  }
 }

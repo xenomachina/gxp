@@ -41,9 +41,4 @@ public class QualifiedCallNamespace extends CallNamespace {
   protected String getTagName(String tagName) {
     return packageName + tagName;
   }
-
-  @Override
-  protected boolean areAllAttrsExpr() {
-    return false;
-  }
 }

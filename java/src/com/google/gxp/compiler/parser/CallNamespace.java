@@ -35,39 +35,30 @@ public abstract class CallNamespace implements Namespace {
                                      List<ParsedElement> children) {
     return new CallElement(sourcePosition, displayName,
                            getTagName(tagName),
-                           attrs, areAllAttrsExpr(), children);
+                           attrs, children);
   }
 
   public abstract String getUri();
 
   protected abstract String getTagName(String tagName);
 
-  protected abstract boolean areAllAttrsExpr();
-
   /**
    * Parsed representation of a {@code <call:*>} element.
    */
   public static class CallElement extends ParsedElement {
     private final String tagName;
-    private final boolean allAttrsAreExpr;
 
     public String getTagName() {
       return tagName;
-    }
-
-    public boolean allAttrsAreExpr() {
-      return allAttrsAreExpr;
     }
 
     public CallElement(SourcePosition sourcePosition,
                        String displayName,
                        String tagName,
                        List<ParsedAttribute> attrs,
-                       boolean allAttrsAreExpr,
                        List<ParsedElement> children) {
       super(sourcePosition, displayName, attrs, children);
       this.tagName = tagName;
-      this.allAttrsAreExpr = allAttrsAreExpr;
     }
 
     public <T> T acceptVisitor(ParsedElementVisitor<T> visitor) {
@@ -77,7 +68,7 @@ public abstract class CallNamespace implements Namespace {
     @Override
     protected CallElement withChildrenImpl(List<ParsedElement> children) {
       return new CallElement(getSourcePosition(), getDisplayName(), tagName,
-                             getAttributes(), allAttrsAreExpr, children);
+                             getAttributes(), children);
     }
   }
 

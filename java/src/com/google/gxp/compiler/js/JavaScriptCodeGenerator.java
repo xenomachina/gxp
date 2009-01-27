@@ -671,14 +671,6 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         return null;
       }
 
-      // TODO(harrh): delete this when unsafe-eval goes away. This is needed
-      //              for unsafe-eval of attribute bundle parameters
-      @Override
-      public Void visitNativeExpression(NativeExpression value) {
-        // TODO
-        return null;
-      }
-
       @Override
       public Void visitStringConstant(StringConstant value) {
         if (value.getSchema() == null) {
