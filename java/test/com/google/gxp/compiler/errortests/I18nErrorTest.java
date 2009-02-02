@@ -47,7 +47,7 @@ public class I18nErrorTest extends BaseTestCase {
   }
 
   public void testMsg_dynamicContentOutsidePlaceholder() throws Exception {
-    compile("<gxp:msg><gxp:eval expr='1'/></gxp:msg>");
+    compile("<gxp:msg><gxp:eval expr='1+1'/></gxp:msg>");
     assertAlert(new BadNodePlacementError(pos(2, 10), "<gxp:eval>", "inside <gxp:msg>"));
     assertNoUnexpectedAlerts();
   }
@@ -305,7 +305,7 @@ public class I18nErrorTest extends BaseTestCase {
   public void testPlaceholderStart_exampleMissing() throws Exception {
     compile("<gxp:msg>",
             "<gxp:ph name='foo'/>",
-            "<gxp:eval expr='x'/>",
+            "<gxp:eval expr='x+1'/>",
             "<gxp:eph/>",
             "</gxp:msg>");
     assertAlert(new PlaceholderRequiresExampleError(pos(3, 1), "<gxp:ph>"));

@@ -69,6 +69,14 @@ public class NativeExpression extends Expression {
     return nativeCode.getDefault();
   }
 
+  /**
+   * @return {@code true} if this expression is a simple evaluation of a
+   * single variable.
+   */
+  public boolean isTrivialEval() {
+    return nativeCode.isTrivialEval();
+  }
+
   public String getExample() {
     return example;
   }

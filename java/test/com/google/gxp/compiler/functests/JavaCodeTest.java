@@ -108,6 +108,11 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
     }
   }
 
+  public void testShortEval() throws Exception {
+    ShortEvalGxp.write(out, gxpContext, "abc123");
+    assertOutputEquals("foo abc123 bar");
+  }
+
   public void testStringExpr() throws Exception {
     StringExprGxp.write(out, gxpContext, "abc123");
     assertOutputEquals("click <a href=\"abc123\">here</a>.");

@@ -16,14 +16,15 @@
 
 package com.google.gxp.compiler.parser;
 
+import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
+import com.google.gxp.compiler.alerts.common.UnknownAttributeError;
 
-import java.util.*;
+import java.util.List;
 
 /**
- * The http://google.com/2001/gxp/expressions (aka "expr:") namespace. Can only
- * be used for attributes, not elements.
+ * The http://google.com/2001/gxp/expressions (aka "expr:") namespace.
  */
 public class ExprNamespace implements Namespace {
   private ExprNamespace(){}
@@ -40,8 +41,21 @@ public class ExprNamespace implements Namespace {
                                      String tagName,
                                      List<ParsedAttribute> attrs,
                                      List<ParsedElement> children) {
-    alertSink.add(new UnknownElementError(sourcePosition, this, displayName));
-    return null;
+    // <expr:s /> -> <gxp:eval expr='s' />
+    List<ParsedAttribute> newAttrs = Lists.newArrayList();
+    for (ParsedAttribute attr : attrs) {
+      if (attr.getName().equals("expr")) {
+        alertSink.add(new UnknownAttributeError(displayName, sourcePosition,
+                                                attr.getDisplayName()));
+      } else {
+        newAttrs.add(attr);
+      }
+    }
+    newAttrs.add(new ParsedAttribute(sourcePosition, NullNamespace.INSTANCE, "expr",
+                                     tagName, "expr"));
+
+    return new GxpNamespace.GxpElement(sourcePosition, displayName, newAttrs,
+                                       children, GxpNamespace.ElementType.EVAL);
   }
 
   public <T> T acceptVisitor(NamespaceVisitor<T> visitor) {

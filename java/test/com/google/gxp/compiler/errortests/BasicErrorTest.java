@@ -71,6 +71,12 @@ public class BasicErrorTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
   }
 
+  public void testShortEval_withExprAttr() throws Exception {
+    compile("<expr:x expr='x' />");
+    assertAlert(new UnknownAttributeError("<expr:x>", pos(2,1), "'expr' attribute"));
+    assertNoUnexpectedAlerts();
+  }
+
   public void testAbbr_badContentInExpr() throws Exception {
     compile("<gxp:abbr name='a' content-type='text/plain'>",
             "  <gxp:attr name='expr'>",

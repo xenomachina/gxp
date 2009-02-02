@@ -29,6 +29,7 @@ import com.google.gxp.compiler.base.OutputElement;
 import com.google.gxp.compiler.base.PlaceholderStart;
 import com.google.gxp.compiler.base.PlaceholderEnd;
 import com.google.gxp.compiler.base.Root;
+import com.google.gxp.compiler.base.UnextractedMessage;
 import com.google.gxp.compiler.base.Util;
 import com.google.gxp.compiler.collapse.SpaceCollapsedTree;
 import com.google.gxp.compiler.schema.Schema;
@@ -51,6 +52,8 @@ public class PlaceholderInserter implements Function<SpaceCollapsedTree, Placeho
 
   private static class Visitor extends ExhaustiveExpressionVisitor {
     private final AlertSink alertSink;
+    private boolean insideMsg = false;
+    private boolean insidePh = false;
 
     Visitor(AlertSink alertSink) {
       this.alertSink = Preconditions.checkNotNull(alertSink);
@@ -59,6 +62,11 @@ public class PlaceholderInserter implements Function<SpaceCollapsedTree, Placeho
     @Override
     public Expression visitNativeExpression(NativeExpression expr) {
       String phName = expr.getPhName();
+
+      if (phName == null && insideMsg && !insidePh && expr.isTrivialEval()) {
+        phName = expr.getDefaultNativeCode();
+      }
+
       if (phName == null) {
         return expr;
       }
@@ -70,8 +78,7 @@ public class PlaceholderInserter implements Function<SpaceCollapsedTree, Placeho
       values.add(expr);
       values.add(new PlaceholderEnd(expr, exprSchema));
 
-      return Concatenation.create(expr.getSourcePosition(), exprSchema,
-                                  values);
+      return Concatenation.create(expr.getSourcePosition(), exprSchema, values);
     }
 
     @Override
@@ -97,15 +104,40 @@ public class PlaceholderInserter implements Function<SpaceCollapsedTree, Placeho
                                                phName + "_end", null));
         Expression content = Concatenation.create(element.getSourcePosition(),
                                                   null, contentValues);
+        boolean oldInsidePh = insidePh;
+        insidePh = true;
         values.add(element.withAttributesAndContent(
-                       Util.map(element.getAttributes(),
-                                getAttributeFunction()),
+                       Util.map(element.getAttributes(), getAttributeFunction()),
                        content));
+        insidePh = oldInsidePh;
       }
       values.add(new PlaceholderEnd(element, elementSchema));
 
-      return Concatenation.create(element.getSourcePosition(), elementSchema,
-                                  values);
+      return Concatenation.create(element.getSourcePosition(), elementSchema, values);
+    }
+
+    @Override
+    public Expression visitUnextractedMessage(UnextractedMessage msg) {
+      boolean oldInsideMsg = insideMsg;
+      boolean oldInsidePh = insidePh;
+      insideMsg = true;
+      insidePh = false;
+      Expression result = super.visitUnextractedMessage(msg);
+      insideMsg = oldInsideMsg;
+      insidePh = oldInsidePh;
+      return result;
+    }
+
+    @Override
+    public Expression visitPlaceholderStart(PlaceholderStart phStart) {
+      insidePh = true;
+      return super.visitPlaceholderStart(phStart);
+    }
+
+    @Override
+    public Expression visitPlaceholderEnd(PlaceholderEnd phEnd) {
+      insidePh = false;
+      return super.visitPlaceholderEnd(phEnd);
     }
   }
 }

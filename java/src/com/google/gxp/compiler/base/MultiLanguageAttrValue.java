@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * An attribute that can be specified with varying language namespace prefixes
@@ -54,6 +55,13 @@ public class MultiLanguageAttrValue implements Serializable {
 
   public boolean isEmpty() {
     return map.isEmpty() && (defaultValue == null);
+  }
+
+  private static final Pattern TRIVIAL_EVAL = Pattern.compile("\\w+");
+
+  public boolean isTrivialEval() {
+    return map.isEmpty() && defaultValue != null &&
+        TRIVIAL_EVAL.matcher(defaultValue).matches();
   }
 
   @Override

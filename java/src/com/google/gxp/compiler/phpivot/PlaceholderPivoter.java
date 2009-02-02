@@ -62,8 +62,11 @@ public class PlaceholderPivoter implements Function<ContentFlattenedTree, Placeh
 
   private static class Worker {
     private final AlertSink alertSink;
+    private final GetExampleVisitor getExampleVisitor;
+
     Worker(AlertSink alertSink) {
       this.alertSink = Preconditions.checkNotNull(alertSink);
+      this.getExampleVisitor = new GetExampleVisitor(alertSink);
     }
 
     private final ExhaustiveExpressionVisitor defaultVisitor =
@@ -135,10 +138,9 @@ public class PlaceholderPivoter implements Function<ContentFlattenedTree, Placeh
         if (phStart == null) {
           alertSink.add(new EphMissingPhError(node));
         } else {
-          Expression content =
-              Concatenation.create(phStart.getSourcePosition(),
-                                   concat.getSchema(),
-                                   phChildren);
+          Expression content = Concatenation.create(phStart.getSourcePosition(),
+                                                    concat.getSchema(),
+                                                    phChildren);
           if (content.alwaysEmpty()) {
             alertSink.add(new EmptyPlaceholderError(phStart));
           } else {
@@ -146,8 +148,7 @@ public class PlaceholderPivoter implements Function<ContentFlattenedTree, Placeh
             if (example == null) {
               example = createExample(alertSink, phStart, content);
             }
-            values.add(new PlaceholderNode(phStart, phStart.getName(), example,
-                                           content));
+            values.add(new PlaceholderNode(phStart, phStart.getName(), example, content));
           }
           phStart = null;
           destination = values;
@@ -164,10 +165,10 @@ public class PlaceholderPivoter implements Function<ContentFlattenedTree, Placeh
       }
     }
 
-    private static String createExample(AlertSink alertSink,
-                                        PlaceholderStart phStart,
-                                        Expression content) {
-      String result = content.acceptVisitor(GET_EXAMPLE_VISITOR);
+    private String createExample(AlertSink alertSink,
+                                 PlaceholderStart phStart,
+                                 Expression content) {
+      String result = content.acceptVisitor(getExampleVisitor);
       if (result == null) {
         alertSink.add(new PlaceholderRequiresExampleError(phStart));
         result = "<var>" + phStart.getName() + "</var>";
@@ -176,11 +177,13 @@ public class PlaceholderPivoter implements Function<ContentFlattenedTree, Placeh
     }
   }
 
-  private static final GetExampleVisitor GET_EXAMPLE_VISITOR =
-      new GetExampleVisitor();
+  private static class GetExampleVisitor extends DefaultingExpressionVisitor<String> {
+    private final AlertSink alertSink;
 
-  private static class GetExampleVisitor
-      extends DefaultingExpressionVisitor<String> {
+    public GetExampleVisitor(AlertSink alertSink) {
+      this.alertSink = Preconditions.checkNotNull(alertSink);
+    }
+
     public String defaultVisitExpression(Expression value) {
       if (value.hasStaticString()) {
         return value.getStaticString(null, null);
@@ -194,7 +197,17 @@ public class PlaceholderPivoter implements Function<ContentFlattenedTree, Placeh
     }
 
     public String visitNativeExpression(NativeExpression expr) {
-      return expr.getExample();
+      if (expr.getExample() != null) {
+        return expr.getExample();
+      }
+
+      // native expressions that are a trivial evaluation get a default example
+      if (expr.isTrivialEval()) {
+        alertSink.add(new GeneratedPlaceholderExampleAlert(expr));
+        return expr.getDefaultNativeCode();
+      }
+
+      return null;
     }
 
     public String visitNoMessage(NoMessage noMsg) {

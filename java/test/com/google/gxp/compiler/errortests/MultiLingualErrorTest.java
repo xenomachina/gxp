@@ -78,6 +78,12 @@ public class MultiLingualErrorTest extends BaseTestCase {
                                              "<gxp:eval>", "<gxp:eval>", 2, 1);
   }
 
+  public void testShortEval() throws Exception {
+    compile("<expr:x java:expr='x' />");
+    assertAlert(new UnknownAttributeError("<expr:x>", pos(2,1), "'java:expr' attribute"));
+    assertNoUnexpectedAlerts();
+  }
+
   public void testIf() throws Exception {
     assertInvalidExpressionAttributeDetected("<gxp:if", "cond", "/>",
                                              "<gxp:if>", "'cond' attribute", 2, 1);
