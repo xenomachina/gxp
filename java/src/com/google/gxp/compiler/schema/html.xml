@@ -15,7 +15,8 @@
                       com.google.gxp.html.*
                       com.google.gxp.js.*
                       com.google.gxp.text.*'
-        javascript-type='goog.gxp.html.HtmlClosure'>
+        javascript-type='goog.gxp.html.HtmlClosure'
+        javascript-imports='goog.gxp.html'>
 
   <!-- ## DOCTYPES ####################################################### -->
   <!--

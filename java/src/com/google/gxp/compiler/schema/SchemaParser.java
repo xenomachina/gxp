@@ -93,6 +93,7 @@ public final class SchemaParser {
     private List<String> schemaJavaImports = Lists.newArrayList();
 
     private String schemaJavaScriptType;
+    private List<String> schemaJavaScriptImports = Lists.newArrayList();
 
     private boolean schemaDefaultsToSgml;
     private String schemaSgmlContentType;
@@ -114,7 +115,7 @@ public final class SchemaParser {
                         schemaDefaultsToSgml, schemaSgmlContentType, schemaTagPrefix,
                         schemaCppType, schemaCppAppender, schemaCppImports,
                         schemaJavaType, schemaJavaAppender, schemaJavaImports,
-                        schemaJavaScriptType,
+                        schemaJavaScriptType, schemaJavaScriptImports,
                         elementBuilders.values(), schemaAllowedSchemaRefs, null);
     }
 
@@ -199,6 +200,12 @@ public final class SchemaParser {
         }
 
         schemaJavaScriptType = attrMap.remove("javascript-type");
+        String javaScriptImportsStr = attrMap.remove("javascript-imports");
+        if (javaScriptImportsStr != null) {
+          for (String javaScriptImport : split(javaScriptImportsStr)) {
+            schemaJavaScriptImports.add(javaScriptImport);
+          }
+        }
 
         schemaDefaultsToSgml = "true".equals(attrMap.remove("default-to-sgml"));
         schemaSgmlContentType = attrMap.remove("sgml-content-type");

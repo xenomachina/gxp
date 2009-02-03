@@ -60,6 +60,7 @@ public final class Schema extends SerializableAbstractNode implements Comparable
   private final String javaAppender;
   private final ImmutableList<String> javaImports;
   private final String javaScriptType;
+  private final ImmutableList<String> javaScriptImports;
   private final ContentFamily contentFamily;
   private final ImmutableList<SchemaRef> allowedSchemaRefs;
   private final Schema msgSchema;
@@ -168,6 +169,14 @@ public final class Schema extends SerializableAbstractNode implements Comparable
   }
 
   /**
+   * @return a {@code List} of additional imports that should be declared in
+   * every javascript file of this schema type.
+   */
+  public List<String> getJavaScriptImports() {
+    return javaScriptImports;
+  }
+
+  /**
    * @return the {@code ContentFamily} of this Schema.
    */
   public ContentFamily getContentFamily() {
@@ -229,6 +238,7 @@ public final class Schema extends SerializableAbstractNode implements Comparable
                 String javaAppender,
                 List<String> javaImports,
                 String javaScriptType,
+                List<String> javaScriptImports,
                 Iterable<ElementBuilder> elementBuilders,
                 Collection<SchemaRef> allowedSchemaRefs,
                 Schema msgSchema) {
@@ -246,6 +256,7 @@ public final class Schema extends SerializableAbstractNode implements Comparable
     this.javaAppender = javaAppender;
     this.javaImports = ImmutableList.copyOf(Preconditions.checkNotNull(javaImports));
     this.javaScriptType = javaScriptType;
+    this.javaScriptImports = ImmutableList.copyOf(Preconditions.checkNotNull(javaScriptImports));
     this.contentFamily = ContentFamily.fromContentTypeName(
         getCanonicalContentType());
 
@@ -290,6 +301,7 @@ public final class Schema extends SerializableAbstractNode implements Comparable
         && Objects.equal(getJavaAppender(), that.getJavaAppender())
         && Objects.equal(getJavaImports(), that.getJavaImports())
         && Objects.equal(getJavaScriptType(), that.getJavaScriptType())
+        && Objects.equal(getJavaScriptImports(), that.getJavaScriptImports())
         && Objects.equal(getContentFamily(), that.getContentFamily())
         && Objects.equal(allowedSchemaRefs, that.allowedSchemaRefs)
         && Objects.equal(validatorMap, that.validatorMap)
@@ -313,6 +325,7 @@ public final class Schema extends SerializableAbstractNode implements Comparable
         getJavaAppender(),
         getJavaImports(),
         getJavaScriptType(),
+        getJavaScriptImports(),
         getContentFamily(),
         allowedSchemaRefs,
         validatorMap,

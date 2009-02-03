@@ -60,6 +60,7 @@ import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.NullRoot;
 import com.google.gxp.compiler.base.ObjectConstant;
 import com.google.gxp.compiler.base.Parameter;
+import com.google.gxp.compiler.base.Root;
 import com.google.gxp.compiler.base.RootVisitor;
 import com.google.gxp.compiler.base.StringConstant;
 import com.google.gxp.compiler.base.Template;
@@ -145,13 +146,19 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       appendLine();
       formatLine("goog.provide('%s');", getClassName(template.getName()));
       appendLine();
+      appendImports(template);
+      appendLine();
       appendConstructor();
       appendLine();
       appendWriteMethod();
       appendLine();
+      appendWriteWithObjMethod(false);
+      appendLine();
       appendGetGxpClosureMethod(false);
       appendLine();
       appendStaticWriteMethod();
+      appendLine();
+      appendWriteWithObjMethod(true);
       appendLine();
       appendGetGxpClosureMethod(true);
       appendGetDefaultMethods();
@@ -192,6 +199,12 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       Join.join(sb, ", ", Iterables.transform(params, parameterToName));
       sb.append(") {");
       return sb.toString();
+    }
+
+    private void appendImports(Root root) {
+      for (String imp : root.getSchema().getJavaScriptImports()) {
+        formatLine("goog.require('%s');", imp);
+      }
     }
 
     private void appendConstructor() {
@@ -239,19 +252,20 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           : template.getParameters();
 
       appendLine(getGetGxpClosureMethodSignature(isStatic));
-      String selfVar = createVarName("self");
       if (!isStatic) {
-        formatLine("var %s = this;", selfVar);
+        for (Parameter param : template.getConstructor().getParameters()) {
+          formatLine("var %s = this.%s;", param.getPrimaryName(), param.getPrimaryName());
+        }
       }
       formatLine("return new %s(function(%s) {",
                  template.getSchema().getJavaScriptType(), GXP_SIG);
 
       StringBuilder sb = new StringBuilder();
-      sb.append(isStatic ? getClassName(template.getName()) : selfVar);
+      sb.append(getClassName(template.getName()));
       sb.append(".write(");
       Join.join(sb, ", ", Iterables.concat(
                     ImmutableSet.of(GXP_SIG),
-                    Iterables.transform(params, parameterToName)));
+                    Iterables.transform(template.getAllParameters(), parameterToName)));
       sb.append(");");
       appendLine(sb);
       formatLine("return %s;", GXP_OUT_VAR);
@@ -262,6 +276,61 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
     private void appendStaticWriteMethod() {
       appendLine(getWriteMethodSignature(true));
       template.getContent().acceptVisitor(statementVisitor);
+      appendLine("};");
+    }
+
+    private void extractMapParameters(boolean isStatic) {
+      String baseName = isStatic ? getClassName(template.getName()) : "this";
+      Iterable<Parameter> params = isStatic
+          ? template.getAllParameters()
+          : template.getParameters();
+
+      for (Parameter param : params) {
+        if (param.getDefaultValue() != null) {
+          formatLine(param.getSourcePosition(),
+                     "var %s = %s.%s || %s.%s();",
+                     param.getPrimaryName(),
+                     GXP_PARAM_VAR, param.getPrimaryName(),
+                     baseName, getDefaultMethodName(param));
+        } else {
+          formatLine(param.getSourcePosition(), "var %s = %s.%s;",
+                     param.getPrimaryName(), GXP_PARAM_VAR, param.getPrimaryName());
+        }
+      }
+    }
+
+    private void appendWriteWithObjMethod(boolean isStatic) {
+      StringBuilder sb = new StringBuilder();
+      sb.append(getClassName(template.getName()));
+      if (!isStatic) {
+        sb.append(".prototype");
+      }
+      sb.append(".writeWithObj = function(");
+      sb.append(GXP_PARAM_SIG);
+      sb.append(") {");
+      appendLine(sb);
+
+      extractMapParameters(isStatic);
+
+      sb = new StringBuilder(getClassName(template.getName()));
+      sb.append(".write(");
+      if (isStatic) {
+        Join.join(sb, ", ", Iterables.concat(
+                      ImmutableSet.of(GXP_SIG),
+                      Iterables.transform(template.getAllParameters(), parameterToName)));
+      } else {
+        // varargs + generics = spurious unchecked warning.  OK to suppress.
+        @SuppressWarnings("unchecked")
+        Iterable<String> methodParameters = Iterables.concat(
+            ImmutableSet.of(GXP_SIG),
+            Iterables.transform(template.getConstructor().getParameters(), parameterToMemberName),
+            Iterables.transform(template.getParameters(), parameterToName));
+
+        Join.join(sb, ", ", methodParameters);
+      }
+      sb.append(");");
+
+      appendLine(sb);
       appendLine("};");
     }
 
@@ -327,7 +396,11 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
     private static final String GXP_OUT_VAR = "gxp$out";
     private static final String GXP_CONTEXT_VAR = "gxp_context";
+    private static final String GXP_PARAM_VAR = "gxp_param_map";
+
     private static final String GXP_SIG = Join.join(", ", GXP_OUT_VAR, GXP_CONTEXT_VAR);
+    private static final String GXP_PARAM_SIG = Join.join(", ", GXP_OUT_VAR, GXP_CONTEXT_VAR,
+                                                          GXP_PARAM_VAR);
 
     /**
      * Creates a unique (to this Worker) variable name.
@@ -625,7 +698,9 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         Matcher m = PARAM_PATTERN.matcher(original);
         int cur = 0;
         while (m.find(cur)) {
-          parts.add(JAVASCRIPT.toStringLiteral(original.substring(cur, m.start())));
+          if (cur != m.start()) {
+            parts.add(JAVASCRIPT.toStringLiteral(original.substring(cur, m.start())));
+          }
           char ch = original.charAt(m.start() + 1);
           if (m.group(1).equals("%")) {
             parts.add("'%'");
@@ -634,7 +709,9 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           }
           cur = m.end();
         }
-        parts.add(JAVASCRIPT.toStringLiteral(original.substring(cur, original.length())));
+        if (cur != original.length()) {
+          parts.add(JAVASCRIPT.toStringLiteral(original.substring(cur, original.length())));
+        }
 
         return Join.join("+", parts);
       }
