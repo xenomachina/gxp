@@ -339,7 +339,7 @@ public class GxpcTestCase extends TestCase {
                                            List<ParsedAttribute> attrs,
                                            List<ParsedElement> children) {
     return new CallNamespace.CallElement(pos(), "<call:" + tagName + ">",
-                                         tagName, attrs, true, children);
+                                         tagName, attrs, children);
   }
 
   public CallNamespace.CallElement newCall(
@@ -347,7 +347,7 @@ public class GxpcTestCase extends TestCase {
       List<ParsedElement> children) {
     return new CallNamespace.CallElement(pos(),
                                          "<" + nsName + ":" + tagName + ">",
-                                         tagName, attrs, false, children);
+                                         tagName, attrs, children);
   }
 
   public StringConstant str(String value) {
