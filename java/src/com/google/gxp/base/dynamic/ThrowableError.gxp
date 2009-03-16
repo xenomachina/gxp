@@ -25,6 +25,11 @@
   <gxp:attr name="title">
     <gxp:msg>Throwable</gxp:msg>
   </gxp:attr>
+  <h2>
+    <gxp:msg>
+      Unexpected error encountered during runtime GXP compilation.
+    </gxp:msg>
+  </h2>
   <pre>
     <gxp:eval expr='new ThrowableClosure(t)' />
   </pre>

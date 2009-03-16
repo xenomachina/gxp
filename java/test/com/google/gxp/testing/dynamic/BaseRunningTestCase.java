@@ -136,9 +136,9 @@ public abstract class BaseRunningTestCase extends BaseBuildingTestCase {
     }
   }
 
-  protected void assertOutputEquals(String expected) throws Throwable {
+  protected void assertOutputEquals(String expected, Object... params) throws Throwable {
     StringBuilder sb = new StringBuilder();
-    invoke(sb, new GxpContext(Locale.US));
+    invoke(sb, new GxpContext(Locale.US), params);
     assertEquals(expected, sb.toString());
   }
 
@@ -174,13 +174,31 @@ public abstract class BaseRunningTestCase extends BaseBuildingTestCase {
     }
   }
 
+  protected void assertGxpParamChangeError(Object... params) throws Throwable {
+    // precall isTopLevalCall() so the exception isn't caught internally
+    GxpContext gxpContext = new GxpContext(Locale.US);
+    gxpContext.isTopLevelCall();
+
+    try {
+      invoke(new StringBuilder(), gxpContext, params);
+      fail("should have thrown a gxp param change exception.");
+    } catch (com.google.gxp.base.dynamic.GxpCompilationException.GxpParamChange e) {
+      // good!
+    }
+  }
+
   protected void assertCompilationCountEquals(int count) {
     assertEquals(count, countingJavaCompiler.getCompilationCount());
   }
 
-  protected void invoke(Appendable appendable, GxpContext gxpContext) throws Throwable {
+  protected void invoke(Appendable appendable, GxpContext gxpContext, Object... rest)
+      throws Throwable {
     try {
-      writeMethod.invoke(null, new Object[] { appendable, gxpContext });
+      Object[] params = new Object[2 + rest.length];
+      params[0] = appendable;
+      params[1] = gxpContext;
+      System.arraycopy(rest, 0, params, 2, rest.length);
+      writeMethod.invoke(null, params);
     } catch (InvocationTargetException e) {
       throw e.getCause();
     }

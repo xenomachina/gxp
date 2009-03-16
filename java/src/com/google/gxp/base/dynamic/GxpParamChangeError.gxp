@@ -14,35 +14,27 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<gxp:template name="com.google.gxp.base.dynamic.JavaCompilationError"
+<gxp:template name="com.google.gxp.base.dynamic.GxpParamChangeError"
               xmlns="http://www.w3.org/1999/xhtml"
               xmlns:call="http://google.com/2001/gxp/call"
               xmlns:gxp="http://google.com/2001/gxp">
 
-<gxp:import class='java.util.List' />
-<gxp:import class='javax.tools.Diagnostic' />
-<gxp:import class='javax.tools.JavaFileObject' />
-
-<gxp:param name='diagnostics' type='List{Diagnostic{? extends JavaFileObject}}' />
+<gxp:param name='iae' type='IllegalArgumentException' />
 
 <call:Chrome>
   <gxp:attr name="title">
-    <gxp:msg>Java compilation error</gxp:msg>
+    <gxp:msg>&lt;gxp:param&gt; change error</gxp:msg>
   </gxp:attr>
   <h2>
     <gxp:msg>
-      The following errors were encountered during java compilation:
+      Either the number or type of &lt;gxp:param&gt;s in one of your GXPs has changed.
+      This kind of change is not supported by runtime gxp compilation. Shut down and
+      recompile to continue.
     </gxp:msg>
   </h2>
-  <gxp:loop var='diagnostic' type='Diagnostic{? extends JavaFileObject}' iterable='diagnostics'>
-    <div class="code">
-      <gxp:eval expr='diagnostic.getMessage(gxp_locale)' />
-    </div>
-    <div class="file">
-      <gxp:eval expr='new FilePrinter(diagnostic.getSource().openReader(true),
-                                      diagnostic.getLineNumber())' />
-    </div>
-  </gxp:loop>
+  <pre>
+    <gxp:eval expr='new ThrowableClosure(iae)' />
+  </pre>
 </call:Chrome>
 
 </gxp:template>

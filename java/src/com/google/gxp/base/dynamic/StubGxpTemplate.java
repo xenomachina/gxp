@@ -268,12 +268,19 @@ public class StubGxpTemplate extends GxpTemplate {
     return failures;
   }
 
+  // TODO(harryh): Consider strategies for detecting and generating an error
+  //               when, at runtime, two parameters of the same type but different
+  //               names are swapped. Name mangling of the method name with a
+  //               parameters name list might be a good way to do this.
+
   protected static Object exec(Map<String, Method> methods, String function,
                                Object[] args) throws Throwable {
     try {
       return methods.get(function).invoke(null, args);
     } catch (InvocationTargetException e) {
       throw e.getCause();
+    } catch (IllegalArgumentException e) {
+      throw new GxpCompilationException.GxpParamChange(e);
     } catch (Exception e) {
       throw new GxpCompilationException.Throw(e);
     }

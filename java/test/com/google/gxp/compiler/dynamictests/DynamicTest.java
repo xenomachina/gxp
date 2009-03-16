@@ -119,6 +119,45 @@ public class DynamicTest extends BaseRunningTestCase {
     assertCompilationCountEquals(1);
   }
 
+  public void testDynamicCompilationParamChange() throws Throwable {
+    FileRef gxp = createFile("TestGxp4",
+                             "<gxp:param name='name' type='String' />",
+                             "",
+                             "Hello <expr:name />!");
+    compileAndLoad(gxp, String.class);
+    assertOutputEquals("Hello World!", "World");
+
+    // change # of parameters
+    createFile("TestGxp4",
+               "<gxp:param name='name' type='String' />",
+               "<gxp:param name='age'  type='Integer' />",
+               "",
+               "Hello <expr:name />!",
+               "You are <expr:age/> years old.");
+    assertGxpParamChangeError("World");
+
+    // go back and make it work again
+    createFile("TestGxp4",
+               "<gxp:param name='name' type='String' />",
+               "",
+               "Hello <expr:name />!");
+    assertOutputEquals("Hello Bob!", "Bob");
+
+    // change parameter type
+    createFile("TestGxp4",
+               "<gxp:param name='age' type='Integer' />",
+               "",
+               "You are <expr:age /> years old.");
+    assertGxpParamChangeError("Bob");
+
+    // go back and make it work again
+    createFile("TestGxp4",
+               "<gxp:param name='name' type='String' />",
+               "",
+               "Hello <expr:name />!");
+    assertOutputEquals("Hello Alice!", "Alice");
+  }
+
   public void testPackagePrivate() throws Throwable {
     FileRef gxp = createFile("PackagePrivateGxp", "hello, world!");
     compileAndLoad(gxp);

@@ -66,6 +66,15 @@ public abstract class GxpCompilationException extends RuntimeException implement
     }
   }
 
+  public static class GxpParamChange extends GxpCompilationException {
+    private final IllegalArgumentException iae;
+
+    public GxpParamChange(IllegalArgumentException iae) {
+      super(GxpParamChangeError.getGxpClosure(iae));
+      this.iae = Preconditions.checkNotNull(iae);
+    }
+  }
+
   public static class Throw extends GxpCompilationException {
     private final Throwable throwable;
 
