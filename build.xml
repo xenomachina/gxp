@@ -13,7 +13,7 @@
 
   <path id="classpath.jars">
     <pathelement location="${lib.dir}/ant.jar" />
-    <pathelement location="${lib.dir}/args4j-2.0.9.jar" />
+    <pathelement location="${lib.dir}/args4j-2.0.11.jar" />
     <pathelement location="${lib.dir}/easymock.jar" />
     <pathelement location="${lib.dir}/json.jar" />
     <pathelement location="${lib.dir}/junit-4.4.jar" />
@@ -95,7 +95,7 @@
         <attribute name="Main-Class" value="com.google.gxp.compiler.cli.Gxpc" />
       </manifest>
       <fileset dir="${build.dir}/classes" />
-      <zipfileset src="${lib.dir}/args4j-2.0.9.jar" />
+      <zipfileset src="${lib.dir}/args4j-2.0.11.jar" />
       <zipfileset src="${lib.dir}/json.jar" />
       <zipfileset src="${lib.dir}/xercesImplNoMetaInf.jar" />
       <zipfileset src="${lib.dir}/google-collect-snapshot-20080820.jar" />
