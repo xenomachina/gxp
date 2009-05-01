@@ -1045,7 +1045,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
 
       @Override
       public String visitIsXmlExpression(IsXmlExpression ixe) {
-        return GXP_CONTEXT_VAR + ".isUsingXmlSyntax()";
+        return GXP_CONTEXT_VAR + ".isForcingXmlSyntax()";
       }
 
       @Override

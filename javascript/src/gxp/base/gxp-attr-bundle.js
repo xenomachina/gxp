@@ -42,7 +42,7 @@ goog.gxp.base.GxpAttrBundle = function(method, attrs, booleanAttrs) {
     for (var attr in booleanAttrs) {
       out.append(' ');
       out.append(booleanAttrs[attr]);
-      if (gxpContext.isUsingXmlSyntax()) {
+      if (gxpContext.isForcingXmlSyntax()) {
         out.append('="');
         out.append(booleanAttrs[attr]);
         out.append('"');

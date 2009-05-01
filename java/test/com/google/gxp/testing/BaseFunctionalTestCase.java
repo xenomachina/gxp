@@ -43,8 +43,12 @@ public abstract class BaseFunctionalTestCase extends TestCase {
     super(name);
   }
 
-  protected GxpContext createGxpContext(Locale locale, boolean useXmlSyntax) {
-    return new GxpContext(locale, useXmlSyntax);
+  protected GxpContext createGxpContext(Locale locale, boolean forceXmlSyntax) {
+    GxpContext.Builder builder = GxpContext.builder(locale);
+    if (forceXmlSyntax) {
+      builder.forceXmlSyntax();
+    }
+    return builder.build();
   }
 
   protected void assertOutputEquals(String expected) {

@@ -22,22 +22,22 @@ goog.provide('goog.gxp.base.GxpContext');
  * sub-templates.
  *
  * @this {goog.gxp.base.GxpContext} instance
- * @param {boolean} opt_useXmlSyntax flag indicating if gxp should generate XML
+ * @param {boolean} opt_forceXmlSyntax flag indicating if gxp should generate XML
  *                  (instead of SGML).  Defaults to false.
  */
-goog.gxp.base.GxpContext = function(opt_useXmlSyntax) {
+goog.gxp.base.GxpContext = function(opt_forceXmlSyntax) {
   /**
    * @type {boolean}
    * @private
    */
-  this.useXmlSyntax_ = opt_useXmlSyntax == true;
+  this.forceXmlSyntax_ = opt_forceXmlSyntax == true;
 };
 
 /**
  * @return {boolean} Whether this context renders strict xml compliant output
  */
-goog.gxp.base.GxpContext.prototype.isUsingXmlSyntax = function() {
-  return this.useXmlSyntax_;
+goog.gxp.base.GxpContext.prototype.isForcingXmlSyntax = function() {
+  return this.forceXmlSyntax_;
 };
 
 /**

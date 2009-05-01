@@ -50,7 +50,7 @@ public class GxpAttrBundle<T extends MarkupClosure> {
     for (String booleanAttr : booleanAttrs) {
       out.append(' ');
       out.append(booleanAttr);
-      if (gxpContext.isUsingXmlSyntax()) {
+      if (gxpContext.isForcingXmlSyntax()) {
         out.append("=\"");
         out.append(booleanAttr);
         out.append('"');

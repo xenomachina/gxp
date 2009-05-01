@@ -345,7 +345,7 @@ public class CppCodeGenerator extends BaseCppCodeGenerator<MessageExtractedTree>
 
       @Override
       public String visitIsXmlExpression(IsXmlExpression ixe) {
-        return "gxp_context.IsUsingXmlSyntax()";
+        return "gxp_context.IsForcingXmlSyntax()";
       }
 
       @Override

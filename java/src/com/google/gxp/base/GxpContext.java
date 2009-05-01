@@ -25,39 +25,71 @@ import java.util.Locale;
 
 /**
  * This is a context used for expanding GXP templates.  The context is
- * effectively a collection of parameters that are implicitely passed to all
+ * effectively a collection of parameters that are implicitly passed to all
  * sub-templates. Future additions to this should preferably be made in an
  * application-neutral way.
  */
 public final class GxpContext {
   private final Locale locale;
-  private final boolean useXmlSyntax;
+  private final boolean forcingXmlSyntax;
   private final Charset charset;
+
+  /**
+   * Builder for {@code GxpContext}. Typical usage pattern is:
+   * <pre>
+   * GxpContext gc = GxpContext.builder(myLocale).setCharset(myCharset).build();
+   * </pre>
+   */
+  public static final class Builder {
+    private final Locale locale;
+    private boolean forcingXmlSyntax = false;
+    private Charset charset = Charsets.US_ASCII;
+
+    private Builder(Locale locale) {
+      this.locale = Preconditions.checkNotNull(locale);
+    }
+
+    /**
+     * Builds a {@code GxpContext} based on the state of this builder.
+     */
+    public GxpContext build() {
+      return new GxpContext(this);
+    }
+
+    public Builder forceXmlSyntax() {
+      this.forcingXmlSyntax = true;
+      return this;
+    }
+
+    public Builder setCharset(Charset charset) {
+      this.charset = Preconditions.checkNotNull(charset);
+      return this;
+    }
+  }
+
+  /**
+   * Creates a {@code GxpContext.Builder}.
+   *
+   * @param locale {@link Locale} to use in {@code GxpContext}.
+   */
+  public static Builder builder(Locale locale) {
+    return new Builder(locale);
+  }
+
+  /**
+   * Creates a {@code GxpContext} from a {@code Builder}.
+   */
+  private GxpContext(Builder builder) {
+    this.locale = Preconditions.checkNotNull(builder.locale);
+    this.forcingXmlSyntax = builder.forcingXmlSyntax;
+    this.charset = Preconditions.checkNotNull(builder.charset);
+  }
 
   /**
    * @param locale the Locale to use when writing a {@code GxpTemplate}
    */
   public GxpContext(Locale locale) {
-    this(locale, false, Charsets.US_ASCII);
-  }
-
-  /**
-   * @param locale the Locale to use when writing a {@code GxpTemplate}
-   * @param useXmlSyntax flag indicating if gxp should generate XML (instead of SGML)
-   */
-  public GxpContext(Locale locale, boolean useXmlSyntax) {
-    this(locale, useXmlSyntax, Charsets.US_ASCII);
-  }
-
-  /**
-   * @param locale the Locale to use when writing a {@code GxpTemplate}
-   * @param useXmlSyntax flag indicating if gxp should generate XML (instead of SGML)
-   * @param charset the {@code Charset} to escape output into
-   */
-  public GxpContext(Locale locale, boolean useXmlSyntax, Charset charset) {
-    this.locale = Preconditions.checkNotNull(locale);
-    this.useXmlSyntax = useXmlSyntax;
-    this.charset = Preconditions.checkNotNull(charset);
+    this(builder(locale));
   }
 
   /**
@@ -68,15 +100,15 @@ public final class GxpContext {
   }
 
   /**
-   * @return {@code true} if this context renders strict xml compliant output
+   * @return {@code true} if this context always renders strict xml compliant output (even for
+   * schemas that support SGML)
    */
-  public boolean isUsingXmlSyntax() {
-    return useXmlSyntax;
+  public boolean isForcingXmlSyntax() {
+    return forcingXmlSyntax;
   }
 
   /**
-   * @return the {@code Charset} into which output should be escaped
-   * into.
+   * @return the {@code Charset} which this context renders output in
    */
   public Charset getCharset() {
     return charset;

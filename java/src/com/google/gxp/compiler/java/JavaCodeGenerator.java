@@ -914,7 +914,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
 
       @Override
       public String visitIsXmlExpression(IsXmlExpression ixe) {
-        return "gxp_context.isUsingXmlSyntax()";
+        return "gxp_context.isForcingXmlSyntax()";
       }
     }
 

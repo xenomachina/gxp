@@ -17,6 +17,7 @@
 package com.google.gxp;
 
 import com.google.gxp.compiler.errortests.*;
+import com.google.gxp.base.GxpContextTest;
 import com.google.gxp.css.ColorTest;
 import com.google.gxp.css.CssAppenderTest;
 import com.google.gxp.html.HtmlClosuresTest;
@@ -40,6 +41,7 @@ public class AllTests extends TestCase {
     // Rutime Library Tests
     ////////////////////////////////////////////////////////////////////////////////
 
+    suite.addTestSuite(GxpContextTest.class);
     suite.addTestSuite(ColorTest.class);
     suite.addTestSuite(CssAppenderTest.class);
     suite.addTestSuite(HtmlClosuresTest.class);

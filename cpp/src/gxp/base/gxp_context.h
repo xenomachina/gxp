@@ -22,10 +22,10 @@
 //
 class GxpContext {
   public:
-    GxpContext(bool is_using_xml_syntax);
-    bool IsUsingXmlSyntax() const;
+    GxpContext(bool is_forcing_xml_syntax);
+    bool IsForcingXmlSyntax() const;
   private:
-    const bool is_using_xml_syntax_;
+    const bool is_forcing_xml_syntax_;
 };
 
 #endif  // GXP_BASE_GXP_CONTEXT_H__

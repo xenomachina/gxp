@@ -14,10 +14,10 @@
 
 #include "gxp/base/gxp_context.h"
 
-GxpContext::GxpContext(bool is_using_xml_syntax)
-    : is_using_xml_syntax_(is_using_xml_syntax) {
+GxpContext::GxpContext(bool is_forcing_xml_syntax)
+    : is_forcing_xml_syntax_(is_forcing_xml_syntax) {
 }
 
-bool GxpContext::IsUsingXmlSyntax() const {
-  return is_using_xml_syntax_;
+bool GxpContext::IsForcingXmlSyntax() const {
+  return is_forcing_xml_syntax_;
 }
