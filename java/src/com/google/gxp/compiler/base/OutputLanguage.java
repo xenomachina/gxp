@@ -90,12 +90,10 @@ public enum OutputLanguage {
   /**
    * @return the suffix associated with this {@code OutputLanguage}.
    */
-  public String getSuffix() {
-    return suffix;
-  }
-
-  public boolean suffixIncludesVersion() {
-    return suffixIncludesVersion;
+  public String getSuffix(long compilationVersion) {
+    return suffixIncludesVersion
+        ? String.format(suffix, compilationVersion)
+        : suffix;
   }
 
   public String validateExpression(AlertSink alertSink, NativeExpression expr) {

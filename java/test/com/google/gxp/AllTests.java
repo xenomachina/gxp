@@ -16,17 +16,6 @@
 
 package com.google.gxp;
 
-import com.google.gxp.compiler.errortests.*;
-import com.google.gxp.base.GxpContextTest;
-import com.google.gxp.css.ColorTest;
-import com.google.gxp.css.CssAppenderTest;
-import com.google.gxp.html.HtmlClosuresTest;
-import com.google.gxp.js.JavascriptAppenderTest;
-import com.google.gxp.js.JavascriptClosuresTest;
-import com.google.gxp.text.PlaintextAppenderTest;
-import com.google.gxp.text.PlaintextClosuresTest;
-
-import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
@@ -34,21 +23,21 @@ import junit.framework.TestSuite;
  * GXP Test Suite Builder
  */
 public class AllTests extends TestCase {
-  public static Test suite() {
+  public static TestSuite suite() {
     TestSuite suite = new TestSuite();
 
     ////////////////////////////////////////////////////////////////////////////////
     // Rutime Library Tests
     ////////////////////////////////////////////////////////////////////////////////
 
-    suite.addTestSuite(GxpContextTest.class);
-    suite.addTestSuite(ColorTest.class);
-    suite.addTestSuite(CssAppenderTest.class);
-    suite.addTestSuite(HtmlClosuresTest.class);
-    suite.addTestSuite(JavascriptAppenderTest.class);
-    suite.addTestSuite(JavascriptClosuresTest.class);
-    suite.addTestSuite(PlaintextAppenderTest.class);
-    suite.addTestSuite(PlaintextClosuresTest.class);
+    suite.addTestSuite(com.google.gxp.base.GxpContextTest.class);
+    suite.addTestSuite(com.google.gxp.css.ColorTest.class);
+    suite.addTestSuite(com.google.gxp.css.CssAppenderTest.class);
+    suite.addTestSuite(com.google.gxp.html.HtmlClosuresTest.class);
+    suite.addTestSuite(com.google.gxp.js.JavascriptAppenderTest.class);
+    suite.addTestSuite(com.google.gxp.js.JavascriptClosuresTest.class);
+    suite.addTestSuite(com.google.gxp.text.PlaintextAppenderTest.class);
+    suite.addTestSuite(com.google.gxp.text.PlaintextClosuresTest.class);
 
     ////////////////////////////////////////////////////////////////////////////////
     // Compiler Tests

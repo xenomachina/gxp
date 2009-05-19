@@ -47,6 +47,12 @@ public interface Configuration {
   Set<OutputLanguage> getOutputLanguages();
 
   /**
+   * @return the compilation version to use if we are executing
+   * a runtime compilation.
+   */
+  long getCompilationVersion();
+
+  /**
    * @return the {@code CodeGeneratorFactory} to use.
    */
   CodeGeneratorFactory getCodeGeneratorFactory();
@@ -54,9 +60,9 @@ public interface Configuration {
   /**
    * @return The set of output files we're allowed to generate, or empty if all
    * possible outputs are allowed. Note that it's an error to allow outputs
-   * that aren't actually possible,
+   * that aren't actually possible.
    */
-  Set<FileRef> getAllowedOutputFileRefs();
+  Set<FileRef> getAllowedOutputFiles();
 
   /**
    * @return where dependency information can be cached, or null.

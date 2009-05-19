@@ -229,11 +229,15 @@ public class GxpcTask extends Task implements Configuration {
     return outputLanguages;
   }
 
+  public long getCompilationVersion() {
+    return 0;
+  }
+
   public CodeGeneratorFactory getCodeGeneratorFactory() {
     return codeGeneratorFactory;
   }
 
-  public Set<FileRef> getAllowedOutputFileRefs() {
+  public Set<FileRef> getAllowedOutputFiles() {
     return ImmutableSet.<FileRef>of();
   }
 

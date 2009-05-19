@@ -176,10 +176,7 @@ public class CompilationSet {
       SourcePosition sourcePosition = new SourcePosition(sourceFileRef);
 
       for (OutputLanguage language : outputLanguages) {
-        String suffix = language.getSuffix();
-        if (language.suffixIncludesVersion()) {
-          suffix = String.format(suffix, compilationVersion);
-        }
+        String suffix = language.getSuffix(compilationVersion);
         FileRef outputFileRef = sourceFileRef.removeExtension().addSuffix(suffix);
 
         if (allowedOutputPredicate.apply(outputFileRef)) {

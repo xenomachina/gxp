@@ -203,7 +203,7 @@ public class GxpcFlagsTest extends TestCase {
 
   public void testGetAllowedOutputFilenames() throws Exception {
     Configuration config = createConfig();
-    assertTrue(config.getAllowedOutputFileRefs().isEmpty());
+    assertTrue(config.getAllowedOutputFiles().isEmpty());
     FileSystem fs;
 
     config = createConfig(
@@ -211,7 +211,7 @@ public class GxpcFlagsTest extends TestCase {
         "--output", "my_out_dir/ford.java",
         "--output", "my_out_dir/zaphod.java");
     assertContentsAnyOrder(
-        Iterables.transform(config.getAllowedOutputFileRefs(), GET_NAME),
+        Iterables.transform(config.getAllowedOutputFiles(), GET_NAME),
         "/my_out_dir/ford.java",
         "/my_out_dir/zaphod.java");
 
@@ -221,7 +221,7 @@ public class GxpcFlagsTest extends TestCase {
         "--output", "my_out_dir/ford.java",
         "--output", "my_out_dir/zaphod.java");
     assertContentsAnyOrder(
-        Iterables.transform(config.getAllowedOutputFileRefs(), GET_NAME),
+        Iterables.transform(config.getAllowedOutputFiles(), GET_NAME),
         "/ford.java",
         "/zaphod.java");
 
@@ -231,7 +231,7 @@ public class GxpcFlagsTest extends TestCase {
         "--output", "my_out_dir/ford.java",
         "--output", "my_out_dir/zaphod.java");
     assertContentsAnyOrder(
-        Iterables.transform(config.getAllowedOutputFileRefs(), GET_NAME),
+        Iterables.transform(config.getAllowedOutputFiles(), GET_NAME),
         "/ford.java",
         "/zaphod.java");
   }

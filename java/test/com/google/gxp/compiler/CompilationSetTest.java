@@ -121,7 +121,8 @@ public class CompilationSetTest extends TestCase {
   }
 
   private String generateCode(String gxpSource, AlertSet expectedAlerts,
-        OutputLanguage outputLanguage) throws Exception, IOException {
+                              OutputLanguage outputLanguage)
+      throws Exception {
 
     // Generate the code
     AlertSetBuilder builder = new AlertSetBuilder();
@@ -133,7 +134,7 @@ public class CompilationSetTest extends TestCase {
 
     // Get output.
     String outputSystemFilename =
-        "inmemory/gxp/test/Main" + outputLanguage.getSuffix();
+        "inmemory/gxp/test/Main" + outputLanguage.getSuffix(0);
     String code = getCodeFor(outputSystemFilename);
     return code;
   }

@@ -167,11 +167,11 @@ public class SourcePathFileSystem implements FileSystem {
       public FileRef apply(FileRef fnam) {
         FileRef result = wrappedFsToSpFsSourceFileRef.get(fnam);
         if (result == null) {
-          if (outDir.isAncestorOf(fnam)) {
+          // can't do outDir.isAncenstorOf(fnam) because FileSystems of fnam and outDir can differ
+          if (outDir.getName().equals("/") || fnam.getName().startsWith(outDir.getName() + "/")) {
             return chop(outDir, fnam);
           } else {
-            throw new IllegalArgumentException(fnam + " not in " + outDir
-                                               + " or in source list");
+            throw new IllegalArgumentException(fnam + " not in " + outDir + " or in source list");
           }
         }
         return result;

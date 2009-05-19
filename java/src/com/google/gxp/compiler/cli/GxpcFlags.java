@@ -54,7 +54,7 @@ class GxpcFlags implements Configuration {
   private final ImmutableSet<FileRef> schemaFiles;
   private final ImmutableSet<OutputLanguage> outputLanguages;
   private final DefaultCodeGeneratorFactory codeGeneratorFactory;
-  private final ImmutableSet<FileRef> allowedOutputFileRefs;
+  private final ImmutableSet<FileRef> allowedOutputFiles;
   private final FileRef dependencyFile;
   private final FileRef propertiesFile;
   private final boolean isVerboseEnabled;
@@ -103,7 +103,7 @@ class GxpcFlags implements Configuration {
     }
     outputLanguages = ImmutableSet.copyOf(tmpOutputLanguages);
 
-    allowedOutputFileRefs = getFileRefs(sourcePathFs, commandLine.FLAG_output);
+    allowedOutputFiles = getFileRefs(sourcePathFs, commandLine.FLAG_output);
 
     alertPolicy = computeAlertPolicy(commandLine.FLAG_warn, commandLine.FLAG_error);
 
@@ -226,12 +226,16 @@ class GxpcFlags implements Configuration {
     return outputLanguages;
   }
 
+  public long getCompilationVersion() {
+    return 0;
+  }
+
   public CodeGeneratorFactory getCodeGeneratorFactory() {
     return codeGeneratorFactory;
   }
 
-  public Set<FileRef> getAllowedOutputFileRefs() {
-    return allowedOutputFileRefs;
+  public Set<FileRef> getAllowedOutputFiles() {
+    return allowedOutputFiles;
   }
 
   public FileRef getDependencyFile() {

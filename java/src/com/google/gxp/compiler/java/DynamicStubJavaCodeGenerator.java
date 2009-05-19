@@ -189,9 +189,9 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
       appendLine("private static final String CLASS$BASE =");
       formatLine("  %s;", classBase);
 
-      appendStaticFileRefList("SRC$GXPS",    sourceFiles);
-      appendStaticFileRefList("SRC$SCHEMAS", schemaFiles);
-      appendStaticFileRefList("SRC$PATHS",   sourcePaths);
+      appendStaticFileRefSet("SRC$GXPS",    sourceFiles);
+      appendStaticFileRefSet("SRC$SCHEMAS", schemaFiles);
+      appendStaticFileRefSet("SRC$PATHS",   sourcePaths);
 
       appendLine();
       appendLine("private static com.google.gxp.compiler.fs.FileRef JAVA$FILE = null;");
@@ -201,25 +201,9 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
       formatLine("  getMethodMap(%s.class);",
                  innerWorker.getClassName(template.getName()));
       appendLine();
-    }
 
-    private void appendStaticFileRefList(String varName,
-                                         Iterable<FileRef> files) {
-      appendLine();
-      formatLine(
-          (SourcePosition) null,
-          "private static final java.util.List<com.google.gxp.compiler.fs.FileRef> %s =",
-          varName);
-      appendLine(null, "  parseFilenameList(");
-      List<String> parseFiles = Lists.newArrayList();
-      for (FileRef file : files) {
-        parseFiles.add("    " + JAVA.toStringLiteral(file.toFilename()));
-      }
-      appendLine(null, Join.join(",\n", parseFiles));
-      appendLine(null, "  );");
-    }
-
-    private void appendReload() {
+      // recompile method
+      appendLine("private static final void recompile() {");
       appendLine("long LAST$CHECKSUM = SRC$GXP.getChecksum();");
       appendLine("if ((LAST$CHECKSUM != 0 && LAST$CHECKSUM != COMPILATION$CHECKSUM)");
       appendLine("    || METHODS$ == null) {");
@@ -231,6 +215,19 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
       appendLine("METHODS$ = compileJava(MEM$FS, CLASS$BASE, COMPILATION$VERSION);");
       appendLine("COMPILATION$CHECKSUM = LAST$CHECKSUM;");
       appendLine("}");
+      appendLine("}");
+      appendLine();
+    }
+
+    private void appendStaticFileRefSet(String varName, Iterable<FileRef> files) {
+      appendLine();
+      formatLine("private static final java.util.Set<com.google.gxp.compiler.fs.FileRef> %s = " +
+                 "parseFilenames(", varName);
+      List<String> parseFiles = Lists.newArrayList();
+      for (FileRef file : files) {
+        parseFiles.add("    " + JAVA.toStringLiteral(file.toFilename()));
+      }
+      appendLine(Join.join(",\n", parseFiles) + ");");
     }
 
     /**
@@ -244,7 +241,7 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
           String paramType = toJavaType(param.getType());
           appendLine();
           formatLine("public static %s %s() {", paramType, methodName);
-          appendReload();
+          appendLine("recompile();");
           formatLine("return %s.<%s>execNoExceptions(METHODS$, \"%s\", new Object[] {});",
                      getBaseClassName(), toReferenceType(paramType), methodName);
           appendLine("}");
@@ -263,7 +260,7 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
           String paramName = param.getPrimaryName();
           appendLine();
           formatLine("public static %s %s(String %s) {", paramType, methodName, paramName);
-          appendReload();
+          appendLine("recompile();");
           formatLine("return %s.<%s>execNoExceptions(METHODS$, \"%s\", new Object[] { %s });",
                      getBaseClassName(), toReferenceType(paramType), methodName, paramName);
           appendLine("}");
@@ -314,7 +311,7 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
       throwsTypes.add("java.lang.RuntimeException");
 
       appendLine(getWriteMethodSignature(Access._private, true, "writeImpl") + " {");
-      appendReload();
+      appendLine("recompile();");
       appendLine("try {");
       StringBuilder sb = new StringBuilder("exec(METHODS$, \"write\", ");
       sb.append("new Object[] {");
