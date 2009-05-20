@@ -18,8 +18,8 @@ package com.google.gxp.compiler.fs;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.io.Bytes;
-import com.google.common.io.Characters;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 
 import java.io.*;
 import java.net.URI;
@@ -98,7 +98,7 @@ public final class FileRef implements FileObject {
     try {
       Adler32 checksum = new Adler32();
       InputStream is = openInputStream();
-      checksum.update(Bytes.toByteArray(is));
+      checksum.update(ByteStreams.toByteArray(is));
       is.close();
       return checksum.getValue();
     } catch (IOException e) {
@@ -164,7 +164,7 @@ public final class FileRef implements FileObject {
   }
 
   public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-    return Characters.toString(openReader(ignoreEncodingErrors));
+    return CharStreams.toString(openReader(ignoreEncodingErrors));
   }
 
   /**

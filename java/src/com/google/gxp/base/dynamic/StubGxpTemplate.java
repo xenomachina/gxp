@@ -21,8 +21,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.io.Characters;
-import com.google.common.io.Bytes;
+import com.google.common.io.CharStreams;
+import com.google.common.io.ByteStreams;
 import com.google.gxp.base.GxpTemplate;
 import com.google.gxp.compiler.Compiler;
 import com.google.gxp.compiler.Configuration;
@@ -172,7 +172,7 @@ public class StubGxpTemplate extends GxpTemplate {
           String outputClassName = javaFileManager.inferBinaryName(StandardLocation.CLASS_OUTPUT,
                                                                    new JavaFileRef(fileRef));
           if (outputClassName.equals(className) || outputClassName.startsWith(className + "$")) {
-            classFiles.add(Bytes.toByteArray(fileRef.openInputStream()));
+            classFiles.add(ByteStreams.toByteArray(fileRef.openInputStream()));
           }
         }
       }
@@ -340,7 +340,7 @@ public class StubGxpTemplate extends GxpTemplate {
             String sourceName = parts[parts.length-3] + ".gxp";
 
             // get source line
-            String line = Characters
+            String line = CharStreams
                 .readLines(sourceFile.openReader(Charsets.UTF_8))
                 .get(stackTrace[i].getLineNumber() - 1);
             Matcher m = LINE_DIRECTIVE.matcher(line);

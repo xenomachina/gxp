@@ -18,7 +18,7 @@ package com.google.gxp.compiler.fs;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Join;
-import com.google.common.io.Characters;
+import com.google.common.io.CharStreams;
 import com.google.gxp.testing.MoreAsserts;
 
 import junit.framework.TestCase;
@@ -71,7 +71,7 @@ public class SystemFileSystemTest extends TestCase {
 
     Reader reader = new InputStreamReader(fnam.openInputStream(),
                                           "ISO-8859-1");
-    String result = Characters.toString(reader);
+    String result = CharStreams.toString(reader);
     reader.close();
 
     assertEquals("Lorem ipsum dolor sit amet\n", result);
@@ -127,7 +127,7 @@ public class SystemFileSystemTest extends TestCase {
 
     Reader reader =
         new InputStreamReader(new FileInputStream(fnam.toFilename()));
-    String result = Characters.toString(reader);
+    String result = CharStreams.toString(reader);
     reader.close();
 
     assertEquals(content, result);

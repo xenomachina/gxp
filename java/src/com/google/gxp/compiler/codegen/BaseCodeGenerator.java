@@ -18,7 +18,7 @@ package com.google.gxp.compiler.codegen;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
-import com.google.common.io.Characters;
+import com.google.common.io.CharStreams;
 import com.google.gxp.compiler.base.FormalParameter;
 import com.google.gxp.compiler.base.Parameter;
 import com.google.gxp.compiler.base.Root;
@@ -47,7 +47,7 @@ public abstract class BaseCodeGenerator<T extends Tree<Root>> implements CodeGen
       if (stream == null) {
         throw new FileNotFoundException("Can't load resource " + resourceName);
       }
-      return Characters.toString(new InputStreamReader(stream, Charsets.US_ASCII)).trim();
+      return CharStreams.toString(new InputStreamReader(stream, Charsets.US_ASCII)).trim();
     } catch (IOException e) {
       // If this happens then something is seriously broken.
       throw new RuntimeException(e);

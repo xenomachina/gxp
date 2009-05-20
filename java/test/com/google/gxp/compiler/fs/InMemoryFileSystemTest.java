@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.fs;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.Bytes;
+import com.google.common.io.ByteStreams;
 
 import junit.framework.TestCase;
 
@@ -91,9 +91,9 @@ public class InMemoryFileSystemTest extends TestCase {
     goodbye = fs.parseFilename("/snarf/quux");
 
     MoreAsserts.assertEquals(helloText.getBytes(),
-                             Bytes.toByteArray(hello.openInputStream()));
+                             ByteStreams.toByteArray(hello.openInputStream()));
     MoreAsserts.assertEquals(goodbyeText.getBytes(),
-                             Bytes.toByteArray(goodbye.openInputStream()));
+                             ByteStreams.toByteArray(goodbye.openInputStream()));
   }
 
   public void testOpenWriter_overwriteExistingFile() throws Exception {
@@ -104,14 +104,14 @@ public class InMemoryFileSystemTest extends TestCase {
     out.write(oldText);
     out.close();
     MoreAsserts.assertEquals(oldText.getBytes(),
-                             Bytes.toByteArray(fnam.openInputStream()));
+                             ByteStreams.toByteArray(fnam.openInputStream()));
 
     String newText = "this is now";
     out = fnam.openWriter(Charsets.US_ASCII);
     out.write(newText);
     out.close();
     MoreAsserts.assertEquals(newText.getBytes(),
-                             Bytes.toByteArray(fnam.openInputStream()));
+                             ByteStreams.toByteArray(fnam.openInputStream()));
   }
 
   public void testToFilename() throws Exception {

@@ -20,7 +20,7 @@ import com.google.common.base.CharEscaper;
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Characters;
+import com.google.common.io.CharStreams;
 import com.google.i18n.Localizable;
 
 import java.io.*;
@@ -82,7 +82,7 @@ public final class GxpClosures {
         public void write(Appendable out, GxpContext gxpContext) throws IOException {
           FileInputStream fis = new FileInputStream(file);
           InputStreamReader isr = new InputStreamReader(fis, charset);
-          Characters.copy(isr, out);
+          CharStreams.copy(isr, out);
           isr.close();
           fis.close();
         }
@@ -104,7 +104,7 @@ public final class GxpClosures {
             reader.reset();
           }
           firstCall = false;
-          Characters.copy(reader, out);
+          CharStreams.copy(reader, out);
         }
       };
   }

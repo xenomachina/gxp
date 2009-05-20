@@ -18,7 +18,7 @@ package com.google.gxp.compiler;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Bytes;
+import com.google.common.io.ByteStreams;
 import com.google.gxp.compiler.alerts.Alert.Severity;
 import com.google.gxp.compiler.alerts.AlertSet;
 import com.google.gxp.compiler.alerts.AlertSetBuilder;
@@ -147,7 +147,7 @@ public class CompilationSetTest extends TestCase {
 
   private String getCodeFor(String systemFilename) throws IOException {
     FileRef fileRef = fs.parseFilename(systemFilename);
-    String code = new String(Bytes.toByteArray(fileRef.openInputStream()));
+    String code = new String(ByteStreams.toByteArray(fileRef.openInputStream()));
     return code;
   }
 

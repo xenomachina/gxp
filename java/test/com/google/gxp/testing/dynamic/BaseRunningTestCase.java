@@ -20,7 +20,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
-import com.google.common.io.Bytes;
+import com.google.common.io.ByteStreams;
 import com.google.gxp.base.GxpContext;
 import com.google.gxp.base.dynamic.StubGxpTemplate;
 import com.google.gxp.compiler.codegen.DefaultCodeGeneratorFactory;
@@ -223,7 +223,7 @@ public abstract class BaseRunningTestCase extends BaseBuildingTestCase {
         if (file == null) {
           throw new FileNotFoundException();
         }
-        byte[] bytes = Bytes.toByteArray(file.openInputStream());
+        byte[] bytes = ByteStreams.toByteArray(file.openInputStream());
         return defineClass(name, bytes, 0, bytes.length);
       } catch (IOException e) {
         throw new ClassNotFoundException();
