@@ -17,7 +17,6 @@
 package com.google.gxp.compiler.cpp;
 
 import com.google.common.base.Function;
-import com.google.common.base.Join;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.gxp.compiler.alerts.AlertSink;
@@ -141,9 +140,9 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
                    getWriteMethodSignature(extraOutType.getOutType(), false, isStatic) + " {");
         formatLine(pos, "%s gxp_wrapper(%s);", extraOutType.getOutWrapper(), GXP_OUT_VAR);
         StringBuilder sb = new StringBuilder("Write(");
-        Join.join(sb, ", ", Iterables.concat(
-            Collections.singleton("&gxp_wrapper, " + GXP_CONTEXT_VAR),
-            Iterables.transform(params, paramToCallName)));
+        COMMA_JOINER.appendTo(sb, Iterables.concat(
+                                  ImmutableSet.of("&gxp_wrapper, " + GXP_CONTEXT_VAR),
+                                  Iterables.transform(params, paramToCallName)));
         sb.append(");");
         appendLine(pos, sb);
         appendLine("}");
@@ -183,11 +182,11 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
       appendLine(pos, sb);
       appendLine("public:");
       sb = new StringBuilder("Instance(");
-      Join.join(sb, ", ", Iterables.transform(cParams, parameterToCallName));
+      COMMA_JOINER.appendTo(sb, Iterables.transform(cParams, parameterToCallName));
       sb.append(")");
       if (!cParams.isEmpty()) {
         sb.append("\n  : ");
-        Join.join(sb, ", ", Iterables.transform(cParams, parameterToInitializer));
+        COMMA_JOINER.appendTo(sb, Iterables.transform(cParams, parameterToInitializer));
       }
       sb.append(" {");
       appendLine(sb);
@@ -197,8 +196,8 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
       appendLine(getWriteMethodSignature(false, false) + " {");
       sb = new StringBuilder(getClassName(template.getName()));
       sb.append("::Write(");
-      Join.join(sb, ", ", Iterables.concat(
-          Collections.singleton(GXP_OUT_VAR + ", " + GXP_CONTEXT_VAR),
+      COMMA_JOINER.appendTo(sb, Iterables.concat(
+          ImmutableSet.of(GXP_OUT_VAR + ", " + GXP_CONTEXT_VAR),
           Iterables.transform(template.getAllParameters(), paramToCallName)));
       sb.append(");");
       appendLine(pos, sb);
@@ -209,8 +208,8 @@ public class CppHeaderCodeGenerator extends BaseCppCodeGenerator<MessageExtracte
       sb = new StringBuilder("return ");
       sb.append(getClassName(template.getName()));
       sb.append("::GetGxpClosure(");
-      Join.join(sb, ", ", Iterables.transform(template.getAllParameters(),
-          paramToCallName));
+      COMMA_JOINER.appendTo(sb, Iterables.transform(template.getAllParameters(),
+                                                    paramToCallName));
       sb.append(");");
       appendLine(pos, sb);
       appendLine("}");

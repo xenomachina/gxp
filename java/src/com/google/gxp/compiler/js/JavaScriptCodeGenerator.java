@@ -20,7 +20,7 @@ import static com.google.gxp.compiler.base.OutputLanguage.JAVASCRIPT;
 
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Function;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -178,9 +178,8 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         sb.append(".prototype");
       }
       sb.append(".write = function(");
-      Join.join(sb, ", ", Iterables.concat(
-                    ImmutableSet.of(GXP_SIG),
-                    Iterables.transform(params, parameterToName)));
+      COMMA_JOINER.appendTo(sb, Iterables.concat(ImmutableSet.of(GXP_SIG),
+                                                 Iterables.transform(params, parameterToName)));
       sb.append(") {");
       return sb.toString();
     }
@@ -196,7 +195,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
         sb.append(".prototype");
       }
       sb.append(".getGxpClosure = function(");
-      Join.join(sb, ", ", Iterables.transform(params, parameterToName));
+      COMMA_JOINER.appendTo(sb, Iterables.transform(params, parameterToName));
       sb.append(") {");
       return sb.toString();
     }
@@ -216,7 +215,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       StringBuilder sb = new StringBuilder();
       sb.append(getClassName(template.getName()));
       sb.append(" = function(");
-      Join.join(sb, ", ", Iterables.transform(params, parameterToName));
+      COMMA_JOINER.appendTo(sb, Iterables.transform(params, parameterToName));
       sb.append(") {");
       appendLine(sb);
       for (Parameter param : params) {
@@ -240,7 +239,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       StringBuilder sb = new StringBuilder();
       sb.append(getClassName(template.getName()));
       sb.append(".write(");
-      Join.join(sb, ", ", methodParameters);
+      COMMA_JOINER.appendTo(sb, methodParameters);
       sb.append(");");
       appendLine(sb);
       appendLine("};");
@@ -263,9 +262,9 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       StringBuilder sb = new StringBuilder();
       sb.append(getClassName(template.getName()));
       sb.append(".write(");
-      Join.join(sb, ", ", Iterables.concat(
-                    ImmutableSet.of(GXP_SIG),
-                    Iterables.transform(template.getAllParameters(), parameterToName)));
+      COMMA_JOINER.appendTo(sb, Iterables.concat(ImmutableSet.of(GXP_SIG),
+                                                 Iterables.transform(template.getAllParameters(),
+                                                                     parameterToName)));
       sb.append(");");
       appendLine(sb);
       formatLine("return %s;", GXP_OUT_VAR);
@@ -315,9 +314,9 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       sb = new StringBuilder(getClassName(template.getName()));
       sb.append(".write(");
       if (isStatic) {
-        Join.join(sb, ", ", Iterables.concat(
-                      ImmutableSet.of(GXP_SIG),
-                      Iterables.transform(template.getAllParameters(), parameterToName)));
+        COMMA_JOINER.appendTo(sb, Iterables.concat(ImmutableSet.of(GXP_SIG),
+                                                   Iterables.transform(template.getAllParameters(),
+                                                                       parameterToName)));
       } else {
         // varargs + generics = spurious unchecked warning.  OK to suppress.
         @SuppressWarnings("unchecked")
@@ -326,7 +325,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
             Iterables.transform(template.getConstructor().getParameters(), parameterToMemberName),
             Iterables.transform(template.getParameters(), parameterToName));
 
-        Join.join(sb, ", ", methodParameters);
+        COMMA_JOINER.appendTo(sb, methodParameters);
       }
       sb.append(");");
 
@@ -398,9 +397,9 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
     private static final String GXP_CONTEXT_VAR = "gxp_context";
     private static final String GXP_PARAM_VAR = "gxp_param_map";
 
-    private static final String GXP_SIG = Join.join(", ", GXP_OUT_VAR, GXP_CONTEXT_VAR);
-    private static final String GXP_PARAM_SIG = Join.join(", ", GXP_OUT_VAR, GXP_CONTEXT_VAR,
-                                                          GXP_PARAM_VAR);
+    private static final String GXP_SIG = COMMA_JOINER.join(GXP_OUT_VAR, GXP_CONTEXT_VAR);
+    private static final String GXP_PARAM_SIG = COMMA_JOINER.join(GXP_OUT_VAR, GXP_CONTEXT_VAR,
+                                                                  GXP_PARAM_VAR);
 
     /**
      * Creates a unique (to this Worker) variable name.
@@ -646,8 +645,8 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           StringBuilder sb = new StringBuilder("var ");
           sb.append(paramVar);
           sb.append(" = [");
-          Join.join(sb, ", ", Iterables.transform(msg.getParameters(),
-                                                  expressionToEscapedString));
+          COMMA_JOINER.appendTo(sb, Iterables.transform(msg.getParameters(),
+                                                        expressionToEscapedString));
           sb.append("];");
           appendLine(sb);
         }
@@ -713,7 +712,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           parts.add(JAVASCRIPT.toStringLiteral(original.substring(cur, original.length())));
         }
 
-        return Join.join("+", parts);
+        return Joiner.on("+").join(parts);
       }
 
       @Override
@@ -1114,7 +1113,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
           public Void visitCallable(Callable callable) {
             sb.append(callee.getName().toString());
             sb.append(".getGxpClosure(");
-            sb.append(Join.join(", ", getCallArguments(callee, call.getAttributes())));
+            COMMA_JOINER.appendTo(sb, getCallArguments(callee, call.getAttributes()));
             sb.append(")");
             return null;
           }

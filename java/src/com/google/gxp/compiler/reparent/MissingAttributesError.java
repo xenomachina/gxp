@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.reparent;
 
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.base.Node;
@@ -30,7 +30,7 @@ public class MissingAttributesError extends ErrorAlert {
   public MissingAttributesError(SourcePosition pos, String displayName,
                                 String... attributes) {
     super(pos, displayName + " must have one of the folllowing attributes: "
-          + Join.join(", ", attributes) + ".");
+          + Joiner.on(", ").join(attributes) + ".");
   }
 
   public MissingAttributesError(Node node, String... attributes) {

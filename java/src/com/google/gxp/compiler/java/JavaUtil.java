@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.java;
 
 import com.google.common.base.CharEscapers;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -302,7 +302,7 @@ public class JavaUtil extends OutputLanguageUtil {
       subTypes.add(validateType(alertSink, new NativeType(type, subType)));
     }
 
-    return Join.join(" & ", subTypes);
+    return Joiner.on(" & ").join(subTypes);
   }
 
   /**

@@ -20,8 +20,8 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
 
 import junit.framework.Assert;
@@ -60,7 +60,7 @@ public final class MoreAsserts {
    */
   public static void assertEquals(byte[] expected, byte[] actual) {
     if (expected.length != actual.length) {
-      Assert.fail("expected array length:<" + expected.length 
+      Assert.fail("expected array length:<" + expected.length
                   + "> but was:<" + actual.length + '>');
     }
     for (int i = 0; i < expected.length; i++) {
@@ -114,7 +114,8 @@ public final class MoreAsserts {
   public static void assertContentsAnyOrder(String message,
                                             Iterable<?> actual, Object... expected) {
     Assert.assertEquals(message,
-                        Multisets.newHashMultiset(expected), Multisets.newHashMultiset(actual));
+                        HashMultiset.create(Arrays.asList(expected)),
+                        HashMultiset.create(actual));
   }
 
   /**

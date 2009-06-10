@@ -17,7 +17,8 @@
 package com.google.gxp.compiler.fs;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 import com.google.gxp.testing.MoreAsserts;
 
@@ -38,7 +39,7 @@ public class SystemFileSystemTest extends TestCase {
    * the last parameter to have the result end with the separator.
    */
   private static String path(String first, String... rest) {
-    return Join.join(File.separator, first, (Object[]) rest);
+    return Joiner.on(File.separator).join(Lists.asList(first, rest));
   }
 
   /**

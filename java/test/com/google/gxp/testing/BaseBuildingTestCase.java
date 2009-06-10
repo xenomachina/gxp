@@ -18,7 +18,7 @@ package com.google.gxp.testing;
 
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Charsets;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -86,7 +86,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
    */
   protected final FileRef createFileNoHeader(String name, String... lines)
       throws Exception {
-    return createFileNoHeader(name, Join.join("\n", lines));
+    return createFileNoHeader(name, Joiner.on("\n").join(lines));
   }
 
   /**
@@ -112,7 +112,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
    */
   protected final FileRef createFile(String name, String... lines)
       throws Exception {
-    return createFile(name, Join.join("\n", lines));
+    return createFile(name, Joiner.on("\n").join(lines));
   }
 
   /**
@@ -166,7 +166,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
    */
   protected final FileRef createInterfaceFile(String name, String... lines)
       throws Exception {
-    return createInterfaceFile(name, Join.join("\n", lines));
+    return createInterfaceFile(name, Joiner.on("\n").join(lines));
   }
 
   /**
@@ -222,7 +222,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
    */
   protected final FileRef createSchemaFile(String name, String... lines)
       throws Exception {
-    return createSchemaFile(name, Join.join("\n", lines));
+    return createSchemaFile(name, Joiner.on("\n").join(lines));
   }
 
   protected final FileRef createFileFromParts(String name, String header,
@@ -340,7 +340,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
   }
 
   protected final void compileNoHeader(String... lines) throws Exception {
-    compileNoHeader(Join.join("\n", lines));
+    compileNoHeader(Joiner.on("\n").join(lines));
   }
 
   protected final void compileNoHeader(String contents) throws Exception {
@@ -352,11 +352,11 @@ public abstract class BaseBuildingTestCase extends TestCase {
    * Convenience method for compiling multiple lines.
    */
   protected final void compile(String... lines) throws Exception {
-    compile(Join.join("\n", lines));
+    compile(Joiner.on("\n").join(lines));
   }
 
   protected final void compileInterface(String... lines) throws Exception {
-    compileInterface(Join.join("\n", lines));
+    compileInterface(Joiner.on("\n").join(lines));
   }
 
   /**

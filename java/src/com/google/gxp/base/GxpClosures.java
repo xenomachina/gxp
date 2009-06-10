@@ -117,7 +117,6 @@ public final class GxpClosures {
    * @return A new {@code GxpClosure} that renders the list
    */
   public static GxpClosure concat(final Iterable<? extends GxpClosure> closures) {
-    Preconditions.checkContentsNotNull(closures);
     final Iterable<GxpClosure> closuresCopy = ImmutableList.copyOf(closures);
     return new GxpClosure() {
         public void write(Appendable out, GxpContext gxpContext) throws IOException {

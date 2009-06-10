@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.cpp;
 
 import com.google.common.base.Function;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ImmutableList;
@@ -93,7 +93,7 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
     }
 
     protected String getQualifiedClassName(TemplateName name) {
-      return Join.join("::", name.toString().split("\\."));
+      return Joiner.on("::").join(name.toString().split("\\."));
     }
 
     private String getIfdefGuard(TemplateName templateName) {
@@ -161,7 +161,7 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
     protected static final String GXP_CONTEXT_VAR = "gxp_context";
 
     protected static final String GXP_SIG =
-        Join.join(", ", "%s " + GXP_OUT_VAR, "const GxpContext& " + GXP_CONTEXT_VAR);
+        COMMA_JOINER.join("%s " + GXP_OUT_VAR, "const GxpContext& " + GXP_CONTEXT_VAR);
 
     protected static final String DEFAULT_GXP_OUT_TYPE = "Appendable*";
 
@@ -255,7 +255,7 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
           sb.append("template");
         }
         sb.append("<");
-        Join.join(sb, ", ", toBoundedTypeDecls(isDeclaration, formalTypeParameters));
+        COMMA_JOINER.appendTo(sb, toBoundedTypeDecls(isDeclaration, formalTypeParameters));
         sb.append(">");
       }
     }
@@ -346,9 +346,9 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
         sb.append("::");
       }
       sb.append("Write(");
-      Join.join(sb, ", ", Iterables.concat(
-          Collections.singleton(String.format(GXP_SIG, outType)),
-          Iterables.transform(params, parameterToCallName)));
+      COMMA_JOINER.appendTo(sb, Iterables.concat(
+                                ImmutableList.of(String.format(GXP_SIG, outType)),
+                                Iterables.transform(params, parameterToCallName)));
       sb.append(")");
       return sb.toString();
     }
@@ -376,7 +376,7 @@ public abstract class BaseCppCodeGenerator<T extends Tree<Root>> extends BracesC
         sb.append("::");
       }
       sb.append("GetGxpClosure(");
-      Join.join(sb, ", ", Iterables.transform(params, parameterToCallName));
+      COMMA_JOINER.appendTo(sb, Iterables.transform(params, parameterToCallName));
       sb.append(")");
       return sb.toString();
     }

@@ -19,7 +19,6 @@ package com.google.gxp.compiler.java;
 import static com.google.gxp.compiler.base.OutputLanguage.JAVA;
 
 import com.google.common.base.CharEscapers;
-import com.google.common.base.Join;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gxp.compiler.alerts.AlertSink;
@@ -732,7 +731,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
         for (String includeAttr : bundle.getIncludeAttrs()) {
           includeAttrs.add(JAVA.toStringLiteral(includeAttr));
         }
-        Join.join(sb, ", ", includeAttrs);
+        COMMA_JOINER.appendTo(sb, includeAttrs);
         sb.append(')');
         for (Map.Entry<AttributeValidator, Attribute> entry : bundle.getAttrs().entrySet()) {
           AttributeValidator validator = entry.getKey();
@@ -885,7 +884,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
           public Void visitCallable(Callable callable) {
             sb.append(callee.getName().toString());
             sb.append(".getGxpClosure(");
-            sb.append(Join.join(", ", getCallArguments(callee, call.getAttributes())));
+            COMMA_JOINER.appendTo(sb, getCallArguments(callee, call.getAttributes()));
             sb.append(")");
             return null;
           }

@@ -18,8 +18,9 @@ package com.google.gxp.compiler.fs;
 
 import com.google.common.base.Function;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +28,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public class SourcePathFileSystem implements FileSystem {
   // These maps contain the (bi-directional) mapping for source files.
-  private final BiMap<FileRef, FileRef> spFsToWrappedFsSourceFileRef = Maps.newHashBiMap();
+  private final BiMap<FileRef, FileRef> spFsToWrappedFsSourceFileRef = HashBiMap.create();
 
   private final BiMap<FileRef, FileRef> wrappedFsToSpFsSourceFileRef =
       spFsToWrappedFsSourceFileRef.inverse();
@@ -54,7 +54,7 @@ public class SourcePathFileSystem implements FileSystem {
                               FileRef outDir) {
     this.outDir = outDir;
     this.wrappedFs = wrappedFs;
-    List<FileRef> sortedSourcePath = Lists.sortedCopy(sourcePath, FILEREF_LENGTH_COMPARATOR);
+    List<FileRef> sortedSourcePath = FILEREF_LENGTH_ORDERING.sortedCopy(sourcePath);
     for (FileRef sourceFile : sourceFiles) {
       FileRef baseDir = findBaseDir(sourceFile, sortedSourcePath);
       if (baseDir == null) {
@@ -74,7 +74,7 @@ public class SourcePathFileSystem implements FileSystem {
     return null;
   }
 
-  private static final Comparator<FileRef> FILEREF_LENGTH_COMPARATOR = new Comparator<FileRef>() {
+  private static final Ordering<FileRef> FILEREF_LENGTH_ORDERING = new Ordering<FileRef>() {
     public int compare(FileRef f1, FileRef f2) {
       int len1 = f1.getName().length();
       int len2 = f2.getName().length();

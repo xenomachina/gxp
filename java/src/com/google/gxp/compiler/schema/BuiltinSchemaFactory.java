@@ -17,7 +17,6 @@
 package com.google.gxp.compiler.schema;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.DefaultAlertPolicy;
@@ -96,8 +95,7 @@ public class BuiltinSchemaFactory extends FileBackedSchemaFactory {
                                cppType, cppAppender, ImmutableList.of(cppImport),
                                javaType, javaAppender, ImmutableList.of(javaImport),
                                javaScriptType, ImmutableList.of(javaScriptImport),
-                               Iterables.<ElementBuilder>emptyIterable(),
-                               Collections.<SchemaRef>emptySet(),
+                               ImmutableList.<ElementBuilder>of(), ImmutableList.<SchemaRef>of(),
                                msgSchema);
     nonMarkupSchemas.put(contentType, schema);
 

@@ -19,7 +19,6 @@ package com.google.gxp.compiler.schema;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.MapConstraints;
 import com.google.common.collect.Maps;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.fs.FileRef;
@@ -47,8 +46,8 @@ public class FileBackedSchemaFactory implements SchemaFactory {
   public FileBackedSchemaFactory(AlertSink alertSink,
                                  Iterable<FileRef> schemaRefs) {
     this.alertSink = Preconditions.checkNotNull(alertSink);
-    this.byNamespaceUri = createMap();
-    this.byContentTypeName = createMap();
+    this.byNamespaceUri = Maps.newHashMap();
+    this.byContentTypeName = Maps.newHashMap();
     for (FileRef ref : schemaRefs) {
       addSchema(ref);
     }
@@ -56,11 +55,6 @@ public class FileBackedSchemaFactory implements SchemaFactory {
 
   public FileBackedSchemaFactory(AlertSink alertSink) {
     this(alertSink, Collections.<FileRef>emptySet());
-  }
-
-  private static <K, V> Map<K, V> createMap() {
-    Map<K, V> map = Maps.newHashMap();
-    return MapConstraints.constrainedMap(map, MapConstraints.NOT_NULL);
   }
 
   /**

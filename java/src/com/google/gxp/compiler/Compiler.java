@@ -17,7 +17,7 @@
 package com.google.gxp.compiler;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
@@ -214,7 +214,7 @@ public class Compiler {
         throw new InvalidConfigException(
             "The following are listed as allowed output files but are not"
             + " possible given the specified inputs: "
-            + Join.join(", ", impossibleOutputs));
+            + Joiner.on(", ").join(impossibleOutputs));
       }
     }
   }

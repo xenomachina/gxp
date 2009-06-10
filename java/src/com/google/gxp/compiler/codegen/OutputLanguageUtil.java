@@ -17,7 +17,7 @@
 package com.google.gxp.compiler.codegen;
 
 import com.google.common.base.CharEscaper;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -177,7 +177,7 @@ public abstract class OutputLanguageUtil {
 
   // compile all the patterns into a giant or Expression;
   protected static Pattern compileUnionPattern(String... patterns) {
-    return Pattern.compile(Join.join("|", patterns));
+    return Pattern.compile(Joiner.on("|").join(patterns));
   }
 
   /**

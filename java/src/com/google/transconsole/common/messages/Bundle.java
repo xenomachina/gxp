@@ -20,12 +20,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * The Bundle class is a container for {@link BaseMessage} objects.
@@ -80,15 +80,17 @@ public abstract class Bundle <T extends BaseMessage> implements Iterable<T> {
     return messages.containsKey(messageId);
   }
 
+  private final Ordering<T> MESSAGE_ORDERING = new Ordering<T>() {
+    public int compare(T m1, T m2) {
+      return m1.getId().compareTo(m2.getId());
+    }
+  };
+
   /**
    * @return a sorted immutable list of the Message objects in this bundle
    */
   public List<T> getMessages() {
-    return ImmutableList.copyOf(Lists.sortedCopy(messages.values(), new Comparator<T>() {
-      public int compare(T m1, T m2) {
-        return m1.getId().compareTo(m2.getId());
-      }
-    }));
+    return ImmutableList.copyOf(MESSAGE_ORDERING.sortedCopy(messages.values()));
   }
 
   /**

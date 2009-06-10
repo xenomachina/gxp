@@ -19,7 +19,6 @@ package com.google.gxp.compiler.java;
 import static com.google.gxp.compiler.base.OutputLanguage.JAVA;
 
 import com.google.common.base.Function;
-import com.google.common.base.Join;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -177,16 +176,15 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
       for (ThrowsDeclaration throwsDeclaration : throwsDeclarations) {
         excTypes.add(throwsDeclaration.getExceptionType());
       }
-      Join.join(sb, ", ", excTypes);
+      COMMA_JOINER.appendTo(sb, excTypes);
     }
 
     protected static final String GXP_OUT_VAR = "gxp$out";
     protected static final String GXP_CONTEXT_VAR = "gxp_context";
 
     protected static final String GXP_SIG =
-      Join.join(", ",
-                "final java.lang.Appendable " + GXP_OUT_VAR,
-                "final com.google.gxp.base.GxpContext " + GXP_CONTEXT_VAR);
+      COMMA_JOINER.join("final java.lang.Appendable " + GXP_OUT_VAR,
+                        "final com.google.gxp.base.GxpContext " + GXP_CONTEXT_VAR);
 
     protected String getClassName(TemplateName name) {
       return (name == null) ? null : name.getBaseName();
@@ -254,8 +252,8 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
         List<FormalTypeParameter> formalTypeParameters) {
       if (!formalTypeParameters.isEmpty()) {
         sb.append("<");
-        Join.join(sb, ", ", toBoundedTypeDecls(includeExtends,
-                                               formalTypeParameters));
+        COMMA_JOINER.appendTo(sb, toBoundedTypeDecls(includeExtends,
+                                                     formalTypeParameters));
         sb.append(">");
       }
     }
@@ -324,10 +322,10 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
       StringBuilder sb = new StringBuilder();
       sb.append(iface.getSchema().getJavaType());
       sb.append(" getGxpClosure(");
-      Join.join(sb, ", ",
-                Iterables.transform(Iterables.filter(iface.getParameters(),
-                                                     Implementable.NOT_INSTANCE_PARAM),
-                    parameterToCallName));
+      COMMA_JOINER.appendTo(sb, Iterables.transform(
+                                Iterables.filter(iface.getParameters(),
+                                                 Implementable.NOT_INSTANCE_PARAM),
+                                parameterToCallName));
       sb.append(");");
       return sb.toString();
     }
@@ -428,8 +426,8 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
         List<ImplementsDeclaration> implementsDeclarations) {
       if (!implementsDeclarations.isEmpty()) {
         sb.append(" extends ");
-        Join.join(sb, ", ", Iterables.transform(implementsDeclarations,
-                                                getInterfaceFromImplementsDeclaration));
+        COMMA_JOINER.appendTo(sb, Iterables.transform(implementsDeclarations,
+                                                      getInterfaceFromImplementsDeclaration));
       }
     }
 
@@ -496,7 +494,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
         sb.append("java.util.Collections.emptyList();");
       } else {
         sb.append("java.util.Collections.unmodifiableList(java.util.Arrays.asList(");
-        Join.join(sb, ", ", parameterNames);
+        COMMA_JOINER.appendTo(sb, parameterNames);
         sb.append("));");
       }
       appendLine();
@@ -571,7 +569,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
       sb.append(" ");
       sb.append(template.getSchema().getJavaType());
       sb.append(" getGxpClosure(");
-      Join.join(sb, ", ", Iterables.transform(params, parameterToCallName));
+      COMMA_JOINER.appendTo(sb, Iterables.transform(params, parameterToCallName));
       sb.append(")");
       return sb.toString();
     }
@@ -630,7 +628,7 @@ public abstract class BaseJavaCodeGenerator<T extends Tree<Root>> extends Braces
       appendLine();
       appendAnnotations(constructor.getJavaAnnotations());
       sb = new StringBuilder("public Instance(");
-      Join.join(sb, ", ", Iterables.transform(cParams, parameterToAnnotatedCallParameter));
+      COMMA_JOINER.appendTo(sb, Iterables.transform(cParams, parameterToAnnotatedCallParameter));
       sb.append(") {");
       appendLine(sb);
       for (Parameter param : cParams) {

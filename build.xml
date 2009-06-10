@@ -18,7 +18,7 @@
     <pathelement location="${lib.dir}/json.jar" />
     <pathelement location="${lib.dir}/junit-4.4.jar" />
     <pathelement location="${lib.dir}/xercesImplNoMetaInf.jar" />
-    <pathelement location="${lib.dir}/google-collect-snapshot-20080820.jar" />
+    <pathelement location="${lib.dir}/google-collect-1.0-rc2.jar" />
     <pathelement location="${lib.dir}/google-base-extra.jar" />
     <pathelement location="${lib.dir}/google-io-extra.jar" />
   </path>
@@ -98,7 +98,7 @@
       <zipfileset src="${lib.dir}/args4j-2.0.11.jar" />
       <zipfileset src="${lib.dir}/json.jar" />
       <zipfileset src="${lib.dir}/xercesImplNoMetaInf.jar" />
-      <zipfileset src="${lib.dir}/google-collect-snapshot-20080820.jar" />
+      <zipfileset src="${lib.dir}/google-collect-1.0-rc2.jar" />
       <zipfileset src="${lib.dir}/google-base-extra.jar" />
       <zipfileset src="${lib.dir}/google-io-extra.jar" />
       <rule pattern="org.apache.xerces.**"  result="com.google.gxp.org.apache.xerces.@1" />

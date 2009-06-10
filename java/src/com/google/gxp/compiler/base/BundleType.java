@@ -16,7 +16,7 @@
 
 package com.google.gxp.compiler.base;
 
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -95,7 +95,7 @@ public class BundleType extends Type {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder("AttributeBundle(");
-    Join.join(sb, ", ", attrMap.keySet());
+    Joiner.on(", ").appendTo(sb, attrMap.keySet());
     sb.append(")");
     return sb.toString();
   }

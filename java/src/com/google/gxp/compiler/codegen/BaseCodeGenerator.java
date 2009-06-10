@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.codegen;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 import com.google.gxp.compiler.base.FormalParameter;
@@ -30,6 +31,7 @@ import java.io.*;
  * Abstract Base Class for all {@code CodeGenerator}s.
  */
 public abstract class BaseCodeGenerator<T extends Tree<Root>> implements CodeGenerator {
+  protected static final Joiner COMMA_JOINER = Joiner.on(", ");
   protected final T tree;
 
   public BaseCodeGenerator(T tree) {

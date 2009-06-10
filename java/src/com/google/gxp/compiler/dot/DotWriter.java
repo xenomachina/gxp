@@ -18,7 +18,7 @@ package com.google.gxp.compiler.dot;
 
 import com.google.common.base.CharEscaper;
 import com.google.common.base.CharEscaperBuilder;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.io.CIndenter;
 
@@ -60,8 +60,8 @@ public class DotWriter implements GraphSink {
     out.appendLine(String.format(
         "node%s [label=\"{%s} | {%s}\",shape=Mrecord];",
         nodeId,
-        Join.join(" | ", names),
-        Join.join(" | ", values)));
+        Joiner.on(" | ").join(names),
+        Joiner.on(" | ").join(values)));
   }
 
   public void edge(String fromNodeId, String label, String toNodeId) {

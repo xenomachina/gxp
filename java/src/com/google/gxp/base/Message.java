@@ -18,7 +18,6 @@ package com.google.gxp.base;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.PrimitiveArrays;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,7 +64,12 @@ public final class Message {
     }
 
     // but save them in an array so we only unbox once
-    return PrimitiveArrays.toIntArray(locs);
+    int counter = 0;
+    int[] array = new int[locs.size()];
+    for (Integer loc : locs) {
+      array[counter++] = loc;
+    }
+    return array;
   }
 
   /**

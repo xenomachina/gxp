@@ -19,11 +19,10 @@ package com.google.gxp.compiler.java;
 import static com.google.gxp.compiler.base.OutputLanguage.JAVA;
 
 import com.google.common.base.Functions;
-import com.google.common.base.Join;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.PrimitiveArrays;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertPolicy;
 import com.google.gxp.compiler.alerts.AlertSink;
@@ -155,8 +154,11 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
         oos.writeObject(alertPolicy);
         oos.close();
         baos.close();
-        return Join.join(",", Iterables.transform(PrimitiveArrays.asList(baos.toByteArray()),
-                                                  Functions.toStringFunction()));
+        List<Byte> bytes = Lists.newArrayList();
+        for (byte b : baos.toByteArray()) {
+          bytes.add(b);
+        }
+        return Joiner.on(",").join(Iterables.transform(bytes, Functions.toStringFunction()));
       } catch (IOException e) {
         throw new RuntimeIOException(e);
       }
@@ -227,7 +229,7 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
       for (FileRef file : files) {
         parseFiles.add("    " + JAVA.toStringLiteral(file.toFilename()));
       }
-      appendLine(Join.join(",\n", parseFiles) + ");");
+      appendLine(Joiner.on(",\n").join(parseFiles) + ");");
     }
 
     /**
