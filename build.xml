@@ -13,10 +13,10 @@
 
   <path id="classpath.jars">
     <pathelement location="${lib.dir}/ant.jar" />
-    <pathelement location="${lib.dir}/args4j-2.0.11.jar" />
-    <pathelement location="${lib.dir}/easymock.jar" />
+    <pathelement location="${lib.dir}/args4j-2.0.12.jar" />
+    <pathelement location="${lib.dir}/easymock-2.5.jar" />
     <pathelement location="${lib.dir}/json.jar" />
-    <pathelement location="${lib.dir}/junit-4.4.jar" />
+    <pathelement location="${lib.dir}/junit-4.6.jar" />
     <pathelement location="${lib.dir}/xercesImplNoMetaInf.jar" />
     <pathelement location="${lib.dir}/google-collect-1.0-rc2.jar" />
     <pathelement location="${lib.dir}/google-base-extra.jar" />
@@ -89,13 +89,13 @@
 
   <target name="jar" depends="compile.runtime">
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
-             classpath="${lib.dir}/jarjar-1.0rc7.jar" />
+             classpath="${lib.dir}/jarjar-1.0.jar" />
     <jarjar jarfile="${build.dir}/gxp-${version}.jar">
       <manifest>
         <attribute name="Main-Class" value="com.google.gxp.compiler.cli.Gxpc" />
       </manifest>
       <fileset dir="${build.dir}/classes" />
-      <zipfileset src="${lib.dir}/args4j-2.0.11.jar" />
+      <zipfileset src="${lib.dir}/args4j-2.0.12.jar" />
       <zipfileset src="${lib.dir}/json.jar" />
       <zipfileset src="${lib.dir}/xercesImplNoMetaInf.jar" />
       <zipfileset src="${lib.dir}/google-collect-1.0-rc2.jar" />

@@ -122,7 +122,7 @@ class GxpcFlags implements Configuration {
     isDebugEnabled = commandLine.FLAG_g;
 
     // Compute Dot Phases
-    dotPhases = computeDotPhases(commandLine.FLAG_dot);
+    dotPhases = computeDotPhases(commandLine.getParser(), commandLine.FLAG_dot);
 
     // Compute SourceEntityResolver
     // use the sourcePathFs so that gxp:///foo/bar is resolved in a way that
@@ -186,7 +186,8 @@ class GxpcFlags implements Configuration {
     }
   }
 
-  private static ImmutableSortedSet<Phase> computeDotPhases(List<String> phaseNames)
+  private static ImmutableSortedSet<Phase> computeDotPhases(CmdLineParser parser,
+                                                            List<String> phaseNames)
       throws CmdLineException {
     SortedSet<Phase> result = Sets.newTreeSet();
     if (phaseNames.contains("*")) {
@@ -200,8 +201,7 @@ class GxpcFlags implements Configuration {
           try {
             phase = Phase.valueOf(phaseName);
           } catch (IllegalArgumentException iax) {
-            throw new CmdLineException(
-                "illegal phase name in --dot flag: " + phaseName);
+            throw new CmdLineException(parser, "illegal phase name in --dot flag: " + phaseName);
           }
           result.add(phase);
         }
@@ -280,6 +280,10 @@ class GxpcFlags implements Configuration {
     private CommandLine(String[] args) throws CmdLineException {
       parser = new CmdLineParser(this);
       parser.parseArgument(args);
+    }
+
+    public CmdLineParser getParser() {
+      return parser;
     }
 
     public String getUsage() {
