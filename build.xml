@@ -16,7 +16,7 @@
     <pathelement location="${lib.dir}/args4j-2.0.12.jar" />
     <pathelement location="${lib.dir}/easymock-2.5.jar" />
     <pathelement location="${lib.dir}/json.jar" />
-    <pathelement location="${lib.dir}/junit-4.6.jar" />
+    <pathelement location="${lib.dir}/junit-4.8.2.jar" />
     <pathelement location="${lib.dir}/xercesImplNoMetaInf.jar" />
     <pathelement location="${lib.dir}/guava-r05.jar" />
     <pathelement location="${lib.dir}/google-base-extra.jar" />
