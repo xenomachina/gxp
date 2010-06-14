@@ -29,7 +29,7 @@ public class DelegatingSchemaFactory implements SchemaFactory {
   private final List<SchemaFactory> delegates;
 
   public DelegatingSchemaFactory(SchemaFactory... delegates) {
-    this.delegates = ImmutableList.of(delegates);
+    this.delegates = ImmutableList.copyOf(delegates);
   }
 
   public Schema fromNamespaceUri(String nsUri) {

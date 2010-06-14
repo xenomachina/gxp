@@ -18,9 +18,8 @@
     <pathelement location="${lib.dir}/json.jar" />
     <pathelement location="${lib.dir}/junit-4.6.jar" />
     <pathelement location="${lib.dir}/xercesImplNoMetaInf.jar" />
-    <pathelement location="${lib.dir}/google-collect-1.0-rc2.jar" />
+    <pathelement location="${lib.dir}/guava-r05.jar" />
     <pathelement location="${lib.dir}/google-base-extra.jar" />
-    <pathelement location="${lib.dir}/google-io-extra.jar" />
   </path>
 
   <target name="clean" description="Remove generated files.">
@@ -37,6 +36,7 @@
 
   <target name="compile.compiler" depends="init">
     <javac destdir="${build.dir}/classes" debug="on">
+      <compilerarg value="-Xlint:deprecation"/>
       <src>
         <pathelement location="${src.dir}/com/google/gxp/compiler/" />
         <pathelement location="${src.dir}/com/google/transconsole/" />
@@ -73,6 +73,7 @@
       </fileset>
     </copy>
     <javac destdir="${build.dir}/classes" debug="on">
+      <compilerarg value="-Xlint:deprecation"/>
       <src>
         <pathelement location="${src.dir}/com/google/gxp/base/" />
         <pathelement location="${src.dir}/com/google/gxp/css/" />
@@ -98,9 +99,8 @@
       <zipfileset src="${lib.dir}/args4j-2.0.12.jar" />
       <zipfileset src="${lib.dir}/json.jar" />
       <zipfileset src="${lib.dir}/xercesImplNoMetaInf.jar" />
-      <zipfileset src="${lib.dir}/google-collect-1.0-rc2.jar" />
+      <zipfileset src="${lib.dir}/guava-r05.jar" />
       <zipfileset src="${lib.dir}/google-base-extra.jar" />
-      <zipfileset src="${lib.dir}/google-io-extra.jar" />
       <rule pattern="org.apache.xerces.**"  result="com.google.gxp.org.apache.xerces.@1" />
       <rule pattern="com.google.common.**"  result="com.google.gxp.com.google.common.@1" />
     </jarjar>
@@ -159,6 +159,7 @@
     </copy>
 
     <javac destdir="${build.dir}/tests" debug="true" debuglevel="lines,source">
+      <compilerarg value="-Xlint:deprecation"/>
       <src>
         <pathelement location="${test.dir}/" />
         <pathelement location="${genfiles.dir}/com/google/gxp/compiler/dynamictests/" />

@@ -78,7 +78,7 @@ public class GxpcTestCase extends TestCase {
   }
 
   public <T> List<T> list(T... items) {
-    return ImmutableList.of(items);
+    return ImmutableList.copyOf(items);
   }
 
   // used to synthesize unique (but somewhat deterministic) source positions.

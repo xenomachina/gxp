@@ -87,7 +87,7 @@ public class CompilationSetTest extends TestCase {
         .build(gxpFileRef);
 
     cSet.compile(alertSink, DefaultAlertPolicy.INSTANCE,
-                 ImmutableList.of(outputLanguages));
+                 ImmutableList.copyOf(outputLanguages));
   }
 
   /**

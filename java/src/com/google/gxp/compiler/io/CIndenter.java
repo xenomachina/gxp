@@ -50,7 +50,7 @@ public final class CIndenter {
 
   public CIndenter(Appendable out, String... halfIndentMarkers) {
     this.out = Preconditions.checkNotNull(out);
-    this.halfIndentMarkers = ImmutableList.of(halfIndentMarkers);
+    this.halfIndentMarkers = ImmutableList.copyOf(halfIndentMarkers);
   }
 
   private void appendIndent(boolean oneLessSpace) throws IOException {

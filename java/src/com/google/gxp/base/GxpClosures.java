@@ -135,6 +135,6 @@ public final class GxpClosures {
    * @return A new {@code GxpClosure} that renders the closures in order
    */
   public static GxpClosure concat(final GxpClosure... closures) {
-    return concat(ImmutableList.of(closures));
+    return concat(ImmutableList.copyOf(closures));
   }
 }

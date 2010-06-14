@@ -81,7 +81,7 @@ public class GxpAttrBundle<T extends MarkupClosure> {
 
     // in this case only specified attributes will be accepted from bundles
     public Builder(String... includeAttrs) {
-      this.includeAttrs = ImmutableSet.of(includeAttrs);
+      this.includeAttrs = ImmutableSet.copyOf(includeAttrs);
     }
 
     public Builder<T> attr(String name, T value, boolean cond) {

@@ -73,7 +73,7 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
                                      OutputLanguage... outputLanguages) {
       this.expression = expression;
       this.operator = operator;
-      this.outputLanguages = ImmutableList.of(outputLanguages);
+      this.outputLanguages = ImmutableList.copyOf(outputLanguages);
     }
 
     public String getExpression() {
