@@ -13,18 +13,15 @@ See http://www.easymock.org/.
 google-base-extra.jar - Some Google code that we haven't quite open sourced
 yet in the com.google.common.base package.
 
-google-collect-1.0-rc2.jar - A snapshot of the Google Collections
-Library. See http://code.google.com/p/google-collections/.
-
-google-io-extra.jar - Some Google code that we haven't quite open sourced
-yet in the com.google.common.io package.
+guava-r05.jar - A snapshot of the Google Core
+Libraries. See http://code.google.com/p/guava-libraries/.
 
 jarjar-1.0.jar - The JarJar tool (used only for creating the release
 jar). See http://code.google.com/p/jarjar/.
 
 json.jar - A snapshot of the JSON library. See http://www.json.org/.
 
-junit-4.6.jar - A snapshot of the junit testing library (used only by tests).
+junit-4.8.2.jar - A snapshot of the junit testing library (used only by tests).
 See http://www.junit.org/
 
 xercesImplNoMetaInf.jar - A snapshot of the xerces XML parsing library. See
