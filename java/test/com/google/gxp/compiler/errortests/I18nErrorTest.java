@@ -21,6 +21,8 @@ import com.google.gxp.compiler.alerts.common.InvalidAttributeValueError;
 import com.google.gxp.compiler.alerts.common.InvalidMessageError;
 import com.google.gxp.compiler.codegen.CodeGeneratorFactory;
 import com.google.gxp.compiler.codegen.DefaultCodeGeneratorFactory;
+import com.google.gxp.compiler.codegen.DuplicateMessageNameError;
+import com.google.gxp.compiler.codegen.IllegalNameError;
 import com.google.gxp.compiler.i18ncheck.UnnecessaryNomsgWarning;
 import com.google.gxp.compiler.java.NoMessageSourceError;
 import com.google.gxp.compiler.msgextract.TooManyDynamicPlaceholdersError;
@@ -45,10 +47,54 @@ public class I18nErrorTest extends BaseTestCase {
   protected CodeGeneratorFactory getCodeGeneratorFactory() {
     return codeGeneratorFactory;
   }
+  
+  public void testNamedMsg() throws Exception {
+    compile("<gxp:msg name='NAME'></gxp:msg>");
+    assertNoUnexpectedAlerts();
+  }
+  
+  public void testNamedMsg_javaName() throws Exception {
+    compile("<gxp:msg java:name='NAME'></gxp:msg>");
+    assertNoUnexpectedAlerts();
+  }
+  
+  public void testNamedMsg_nonJavaName() throws Exception {
+    compile("<gxp:msg cpp:name='NAME'></gxp:msg>");
+    assertNoUnexpectedAlerts();
+  }
+  
+  public void testNamedMsg_duplicateName() throws Exception {
+    compile("<gxp:msg name='ONE'></gxp:msg><gxp:msg name='ONE'></gxp:msg>");
+    assertAlert(new DuplicateMessageNameError(pos(2, 31), "ONE"));
+    assertNoUnexpectedAlerts();
+  }
+  
+  public void testNamedMsg_duplicateNameAcrossLanguages() throws Exception {
+    compile("<gxp:msg java:name='ONE'></gxp:msg><gxp:msg cpp:name='ONE'></gxp:msg>");
+    assertNoUnexpectedAlerts();
+  }
+  
+  public void testNamedMsg_duplicateNameViaDefault() throws Exception {
+    compile("<gxp:msg name='ONE'></gxp:msg><gxp:msg java:name='ONE'></gxp:msg>");
+    assertAlert(new DuplicateMessageNameError(pos(2,31), "ONE"));
+    assertNoUnexpectedAlerts();
+  }
+  
+  public void testNamedMsg_invalidName() throws Exception {
+    compile("<gxp:msg name='assert'></gxp:msg>");
+    assertAlert(new IllegalNameError(pos(2, 1), "Java", "assert"));
+    assertNoUnexpectedAlerts();
+  }
 
   public void testMsg_dynamicContentOutsidePlaceholder() throws Exception {
     compile("<gxp:msg><gxp:eval expr='1+1'/></gxp:msg>");
     assertAlert(new BadNodePlacementError(pos(2, 10), "<gxp:eval>", "inside <gxp:msg>"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testNamedMsg_dynamicContentOutsidePlaceholder() throws Exception {
+    compile("<gxp:msg name='NAME'><gxp:eval expr='1+1'/></gxp:msg>");
+    assertAlert(new BadNodePlacementError(pos(2, 22), "<gxp:eval>", "inside <gxp:msg>"));
     assertNoUnexpectedAlerts();
   }
 
@@ -58,8 +104,32 @@ public class I18nErrorTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
   }
 
+  public void testNamedMsg_insideMsg() throws Exception {
+    compile("<gxp:msg>foo <b><gxp:msg name='NAME'>bar</gxp:msg></b> baz</gxp:msg>");
+    assertAlert(new BadNodePlacementError(pos(2, 17), "<gxp:msg>", "inside <gxp:msg>"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testMsg_insideNamedMsg() throws Exception {
+    compile("<gxp:msg name='NAME'>foo <b><gxp:msg>bar</gxp:msg></b> baz</gxp:msg>");
+    assertAlert(new BadNodePlacementError(pos(2, 29), "<gxp:msg>", "inside <gxp:msg>"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testNamedMsg_insideNamedMsg() throws Exception {
+    compile("<gxp:msg name='NAME0'>foo <b><gxp:msg name='NAME1'>bar</gxp:msg></b> baz</gxp:msg>");
+    assertAlert(new BadNodePlacementError(pos(2, 30), "<gxp:msg>", "inside <gxp:msg>"));
+    assertNoUnexpectedAlerts();
+  }
+
   public void testMsg_insideNoMsg() throws Exception {
     compile("<gxp:nomsg>foo <b><gxp:msg>bar</gxp:msg></b> baz</gxp:nomsg>");
+    assertAlert(new BadNodePlacementError(pos(2, 19), "<gxp:msg>", "inside <gxp:nomsg>"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testNamedMsg_insideNoMsg() throws Exception {
+    compile("<gxp:nomsg>foo <b><gxp:msg name='NAME'>bar</gxp:msg></b> baz</gxp:nomsg>");
     assertAlert(new BadNodePlacementError(pos(2, 19), "<gxp:msg>", "inside <gxp:nomsg>"));
     assertNoUnexpectedAlerts();
   }
@@ -73,6 +143,19 @@ public class I18nErrorTest extends BaseTestCase {
 
     // Message without message source. Problem.
     compile("<gxp:msg>hello, world!</gxp:msg>");
+    assertAlert(new NoMessageSourceError(pos(2, 1), "<gxp:msg>"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testNamedMsg_noMessageSource() throws Exception {
+    codeGeneratorFactory.setRuntimeMessageSource(null);
+
+    // No messages, no problem.
+    compile("hello, world!");
+    assertNoUnexpectedAlerts();
+
+    // Message without message source. Problem.
+    compile("<gxp:msg name='NAME'>hello, world!</gxp:msg>");
     assertAlert(new NoMessageSourceError(pos(2, 1), "<gxp:msg>"));
     assertNoUnexpectedAlerts();
   }
@@ -99,51 +182,73 @@ public class I18nErrorTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
   }
 
+  public void testNamedMsg_messageBundleError() throws Exception {
+    // identical messages are okay
+    compile("<gxp:msg name='MSG_A'>",
+            "foo <gxp:ph name='x'/>bar<gxp:eph/> baz",
+            "</gxp:msg>",
+            "<gxp:msg name='MSG_B'>",
+            "foo <gxp:ph name='x'/>bar<gxp:eph/> baz",
+            "</gxp:msg>");
+    assertNoUnexpectedAlerts();
+
+    // different messages with the same ID are not
+    compile("<gxp:msg name='MSG_A'>",
+            "foo <gxp:ph name='x'/>bar<gxp:eph/> baz",
+            "</gxp:msg>",
+            "<gxp:msg name='MSG_B'>",
+            "foo <gxp:ph name='x'/>quux<gxp:eph/> baz",
+            "</gxp:msg>");
+    assertAlert(new InvalidMessageError(
+        pos(5, 1), "Cannot merge messages with different content."));
+    assertNoUnexpectedAlerts();
+  }
+
   public void testMsg_tooManyDynamicPlaceholders() throws Exception {
     // straightforward case: one dynamic parameter per placeholder
     compile("<gxp:msg>",
-            "<gxp:ph name='ph1' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph2' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph3' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph4' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph5' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph6' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph7' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph8' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph9' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph10' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
+            "<gxp:ph name='ph1' example='1'/><gxp:eval expr='x+1'/><gxp:eph/>",
+            "<gxp:ph name='ph2' example='1'/><gxp:eval expr='x+2'/><gxp:eph/>",
+            "<gxp:ph name='ph3' example='1'/><gxp:eval expr='x+3'/><gxp:eph/>",
+            "<gxp:ph name='ph4' example='1'/><gxp:eval expr='x+4'/><gxp:eph/>",
+            "<gxp:ph name='ph5' example='1'/><gxp:eval expr='x+5'/><gxp:eph/>",
+            "<gxp:ph name='ph6' example='1'/><gxp:eval expr='x+6'/><gxp:eph/>",
+            "<gxp:ph name='ph7' example='1'/><gxp:eval expr='x+7'/><gxp:eph/>",
+            "<gxp:ph name='ph8' example='1'/><gxp:eval expr='x+8'/><gxp:eph/>",
+            "<gxp:ph name='ph9' example='1'/><gxp:eval expr='x+9'/><gxp:eph/>",
+            "<gxp:ph name='ph10' example='1'/><gxp:eval expr='x+10'/><gxp:eph/>",
             "</gxp:msg>");
     assertAlert(new TooManyDynamicPlaceholdersError(pos(12, 34)));
     assertNoUnexpectedAlerts();
 
     // multiple dynamic parameters per placeholder
     compile("<gxp:msg>",
-            "<gxp:ph name='ph1' example='1'/><gxp:eval expr='x'/>"
-            + "<gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph2' example='1'/><gxp:eval expr='x'/>"
-            + "<gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph3' example='1'/><gxp:eval expr='x'/>"
-            + "<gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph4' example='1'/><gxp:eval expr='x'/>"
-            + "<gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph5' example='1'/><gxp:eval expr='x'/>"
-            + "<gxp:eval expr='x'/><gxp:eph/>",
+            "<gxp:ph name='ph1' example='1'/><gxp:eval expr='x+1'/>"
+            + "<gxp:eval expr='x+2'/><gxp:eph/>",
+            "<gxp:ph name='ph2' example='1'/><gxp:eval expr='x+3'/>"
+            + "<gxp:eval expr='x+4'/><gxp:eph/>",
+            "<gxp:ph name='ph3' example='1'/><gxp:eval expr='x+5'/>"
+            + "<gxp:eval expr='x+6'/><gxp:eph/>",
+            "<gxp:ph name='ph4' example='1'/><gxp:eval expr='x+7'/>"
+            + "<gxp:eval expr='x+8'/><gxp:eph/>",
+            "<gxp:ph name='ph5' example='1'/><gxp:eval expr='x+9'/>"
+            + "<gxp:eval expr='x+10'/><gxp:eph/>",
             "</gxp:msg>");
-    assertAlert(new TooManyDynamicPlaceholdersError(pos(7, 53)));
+    assertAlert(new TooManyDynamicPlaceholdersError(pos(7, 55)));
     assertNoUnexpectedAlerts();
 
     // more than 9 placeholders, but not too many dynamic
     compile("<gxp:msg>",
-            "<gxp:ph name='ph1' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
+            "<gxp:ph name='ph1' example='1'/><gxp:eval expr='x+1'/><gxp:eph/>",
             "<gxp:ph name='ph2'/>static<gxp:eph/>",
-            "<gxp:ph name='ph3' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
+            "<gxp:ph name='ph3' example='1'/><gxp:eval expr='x+3'/><gxp:eph/>",
             "<gxp:ph name='ph4'/>static<gxp:eph/>",
-            "<gxp:ph name='ph5' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
+            "<gxp:ph name='ph5' example='1'/><gxp:eval expr='x+5'/><gxp:eph/>",
             "<gxp:ph name='ph6'/>static<gxp:eph/>",
-            "<gxp:ph name='ph7' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph8' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph9' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
-            "<gxp:ph name='ph10' example='1'/><gxp:eval expr='x'/><gxp:eph/>",
+            "<gxp:ph name='ph7' example='1'/><gxp:eval expr='x+7'/><gxp:eph/>",
+            "<gxp:ph name='ph8' example='1'/><gxp:eval expr='x+8'/><gxp:eph/>",
+            "<gxp:ph name='ph9' example='1'/><gxp:eval expr='x+9'/><gxp:eph/>",
+            "<gxp:ph name='ph10' example='1'/><gxp:eval expr='x+10'/><gxp:eph/>",
             "</gxp:msg>");
     assertNoUnexpectedAlerts();
   }
@@ -154,9 +259,21 @@ public class I18nErrorTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
   }
 
+  public void testNamedMsg_badHiddenAttribute() throws Exception {
+    compile("<gxp:msg name='NAME' hidden='no'>foo</gxp:msg>");
+    assertAlert(new InvalidAttributeValueError(pos(2,1), "'hidden' attribute"));
+    assertNoUnexpectedAlerts();
+  }
+
   public void testNoMsg_insideMsg() throws Exception {
     compile("<gxp:msg><gxp:nomsg>foo</gxp:nomsg></gxp:msg>");
     assertAlert(new BadNodePlacementError(pos(2, 10), "<gxp:nomsg>", "inside <gxp:msg>"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testNoMsg_insideNamedMsg() throws Exception {
+    compile("<gxp:msg name='NAME'><gxp:nomsg>foo</gxp:nomsg></gxp:msg>");
+    assertAlert(new BadNodePlacementError(pos(2, 22), "<gxp:nomsg>", "inside <gxp:msg>"));
     assertNoUnexpectedAlerts();
   }
 
@@ -197,11 +314,18 @@ public class I18nErrorTest extends BaseTestCase {
     // dynamic content differs (even if they look the same, NativeExpressions
     // potentially eveluate to different values, so are considered "different")
     compile("<gxp:msg>",
+            "<gxp:ph name='x' example='5'/><gxp:eval expr='x.getY()'/><gxp:eph/>",
+            "<gxp:ph name='x' example='5'/><gxp:eval expr='x.getY()'/><gxp:eph/>",
+            "</gxp:msg>");
+    assertAlert(new InvalidMessageError(
+                    pos(4, 1), "Conflicting declarations of X within message"));
+    assertNoUnexpectedAlerts();
+
+    // Simple evaluations of a single variable are OK.
+    compile("<gxp:msg>",
             "<gxp:ph name='x' example='5'/><gxp:eval expr='x'/><gxp:eph/>",
             "<gxp:ph name='x' example='5'/><gxp:eval expr='x'/><gxp:eph/>",
             "</gxp:msg>");
-    assertAlert(new InvalidMessageError(
-        pos(4, 1), "Conflicting declarations of X within message"));
     assertNoUnexpectedAlerts();
 
     // dynamic content the same (<br/> is dynamic because of XML mode, but is

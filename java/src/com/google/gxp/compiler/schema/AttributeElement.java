@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.schema;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.gxp.base.AttributeHook;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -36,12 +37,12 @@ class AttributeElement {
 
   AttributeElement(String name,
                    String contentType, Pattern pattern,
-                   Set<AttributeValidator.Flag> flags,
-                   String defaultValue, String example,
+                   Set<AttributeValidator.Flag> flags, Set<AttributeHook> hooks,
+                   String defaultValue,
                    Set<String> elementNames,
                    Set<String> exceptElementNames) {
     this.attrValidator = new AttributeValidator(name, contentType, pattern,
-                                                flags, defaultValue, example);
+                                                flags, hooks, defaultValue);
     this.contentType = contentType;
     this.elementNames = ImmutableSet.copyOf(elementNames);
     this.exceptElementNames = ImmutableSet.copyOf(exceptElementNames);

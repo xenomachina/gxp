@@ -19,6 +19,7 @@ package com.google.gxp.compiler.schema;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.google.gxp.base.AttributeHook;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -42,8 +43,8 @@ public final class AttributeValidator implements Serializable {
   private final String contentType;
   private final Pattern pattern;
   private final ImmutableSet<AttributeValidator.Flag> flags;
+  private final ImmutableSet<AttributeHook> hooks;
   private final String defaultValue;
-  private final String example;
 
   public String getName() {
     return name;
@@ -65,15 +66,12 @@ public final class AttributeValidator implements Serializable {
     return defaultValue;
   }
 
-  public String getExample() {
-    return example;
-  }
-
   /**
    * @param name name of this attribute. eg: "src"
    * @param pattern attribute values should match this pattern. If null, then
    * all values are considered acceptable.
    * @param flags the set of flags which are enabled for this attribute.
+   * @param hooks the set of hooks which are enabled for this attribute.
    * @param defaultValue the value that should be used for this attribute in
    * output when no value is set in input. If null, then value may be left
    * unset in output.
@@ -83,13 +81,14 @@ public final class AttributeValidator implements Serializable {
    */
   public AttributeValidator(String name, String contentType, Pattern pattern,
                             Set<AttributeValidator.Flag> flags,
-                            String defaultValue, String example) {
+                            Set<AttributeHook> hooks,
+                            String defaultValue) {
     this.name = Preconditions.checkNotNull(name);
     this.contentType = contentType;
     this.pattern = pattern;
     this.flags = ImmutableSet.copyOf(flags);
+    this.hooks = ImmutableSet.copyOf(hooks);
     this.defaultValue = defaultValue;
-    this.example = example;
   }
 
   /**
@@ -132,6 +131,7 @@ public final class AttributeValidator implements Serializable {
         && Objects.equal(contentType, that.contentType)
         && Objects.equal(p1, p2)
         && Objects.equal(flags, that.flags)
+        && Objects.equal(hooks, that.hooks)
         && Objects.equal(defaultValue, that.defaultValue);
   }
 
@@ -143,6 +143,7 @@ public final class AttributeValidator implements Serializable {
         contentType,
         patternString,
         flags,
+        hooks,
         defaultValue);
   }
 }

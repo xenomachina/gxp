@@ -18,10 +18,10 @@ package com.google.gxp.testing;
 
 import com.google.gxp.base.GxpContext;
 
-import java.io.*;
-import java.util.*;
-
 import junit.framework.TestCase;
+
+import java.io.StringWriter;
+import java.util.Locale;
 
 /**
  * Base TestCase for gxp functional testing. Typical protocol for a test is to
@@ -30,14 +30,21 @@ import junit.framework.TestCase;
  * assertOutputEquals() with the expected output.
  */
 public abstract class BaseFunctionalTestCase extends TestCase {
-  protected StringWriter out = new StringWriter();
+  protected StringWriter out;
 
   // most tests can use this GxpContext, but some may create their own.
-  protected GxpContext gxpContext    = createGxpContext(Locale.US, false);
-  protected GxpContext xmlGxpContext = createGxpContext(Locale.US, true);
+  protected GxpContext gxpContext;
+  protected GxpContext xmlGxpContext;
 
-  public BaseFunctionalTestCase() {
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    gxpContext    = createGxpContext(Locale.US, false);
+    xmlGxpContext = createGxpContext(Locale.US, true);
+    out = new StringWriter();
   }
+
+  public BaseFunctionalTestCase() { }
 
   public BaseFunctionalTestCase(String name) {
     super(name);

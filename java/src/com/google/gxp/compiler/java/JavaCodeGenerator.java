@@ -40,6 +40,7 @@ import com.google.gxp.compiler.base.DefaultingExpressionVisitor;
 import com.google.gxp.compiler.base.EscapeExpression;
 import com.google.gxp.compiler.base.ExampleExpression;
 import com.google.gxp.compiler.base.ExceptionExpression;
+import com.google.gxp.compiler.base.ExhaustiveExpressionVisitor;
 import com.google.gxp.compiler.base.Expression;
 import com.google.gxp.compiler.base.ExpressionVisitor;
 import com.google.gxp.compiler.base.ExtractedMessage;
@@ -51,6 +52,7 @@ import com.google.gxp.compiler.base.JavaAnnotation;
 import com.google.gxp.compiler.base.LoopExpression;
 import com.google.gxp.compiler.base.NativeExpression;
 import com.google.gxp.compiler.base.ObjectConstant;
+import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.base.Parameter;
 import com.google.gxp.compiler.base.StringConstant;
 import com.google.gxp.compiler.base.Template;
@@ -58,8 +60,9 @@ import com.google.gxp.compiler.base.ThrowsDeclaration;
 import com.google.gxp.compiler.base.UnboundCall;
 import com.google.gxp.compiler.base.UnexpectedNodeException;
 import com.google.gxp.compiler.base.ValidatedCall;
-import com.google.gxp.compiler.codegen.MissingExpressionError;
+import com.google.gxp.compiler.codegen.DuplicateMessageNameError;
 import com.google.gxp.compiler.codegen.LoopMissingBothIterableAndIteratorError;
+import com.google.gxp.compiler.codegen.MissingExpressionError;
 import com.google.gxp.compiler.msgextract.MessageExtractedTree;
 import com.google.gxp.compiler.reparent.Attribute;
 import com.google.gxp.compiler.schema.AttributeValidator;
@@ -75,9 +78,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A {@code CodeGenerator} which generates Java code.
+ * A {@code CodeGenerator} that generates Java code.
  */
 public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTree> {
+
   /**
    * @param tree the MessageExtractedTree to compile.
    * @param runtimeMessageSource the message source to use at runtime, or null
@@ -88,6 +92,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
     super(tree, runtimeMessageSource);
   }
 
+  @Override
   protected TemplateWorker createTemplateWorker(Appendable appendable,
                                                 AlertSink alertSink,
                                                 Template template,
@@ -130,6 +135,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
       return "com.google.gxp.base.GxpTemplate";
     }
 
+    @Override
     protected void appendClass() {
       appendAnnotations(template.getJavaAnnotations(JavaAnnotation.Element.CLASS));
       appendClassDecl();
@@ -137,6 +143,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
       if (runtimeMessageSource != null) {
         formatLine("private static final String GXP$MESSAGE_SOURCE = %s;",
                    JAVA.toStringLiteral(runtimeMessageSource));
+        appendNamedMessageDefinitions();
         appendLine();
       }
       appendWriteMethod();
@@ -153,6 +160,11 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
     protected void appendClassDecl() {
       formatLine(template.getSourcePosition(), "public class %s extends %s {",
                  getClassName(template.getName()), getBaseClassName());
+    }
+
+    private void appendNamedMessageDefinitions() {
+      template.getContent().acceptVisitor(new DuplicateMessageNameVisitor());
+      template.getContent().acceptVisitor(new NamedExtractedMessageVisitor());
     }
 
     private String getAnonymousJavaType(Schema schema) {
@@ -318,6 +330,65 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
           return instantiatedGxps.peek();
         }
       });
+    }
+
+    /**
+     * A visitor that creates Alerts when it encounters a duplicate Java message name.
+     */
+    private class DuplicateMessageNameVisitor extends ExhaustiveExpressionVisitor {
+
+      private Set<String> names = Sets.newHashSet();
+
+      @Override
+      public Expression visitExtractedMessage(ExtractedMessage msg) {
+        if (isNamed(msg)) {
+          String name = msg.getName(OutputLanguage.JAVA);
+          if (names.contains(name)) {
+            alertSink.add(new DuplicateMessageNameError(msg, name));
+          } else {
+            names.add(name);
+          }
+        }
+        return super.visitExtractedMessage(msg);
+      }
+    }
+
+    /**
+     * A visitor that outputs MessageReference definitions to {@code out} based on the named
+     * ExtractedMessages that it visits.
+     */
+    private class NamedExtractedMessageVisitor extends ExhaustiveExpressionVisitor {
+
+      private static final String MESSAGE_REFERENCE_CLASSNAME_PREFIX
+          = "com.google.gxp.base.MessageReference";
+
+      @Override
+      public Expression visitExtractedMessage(ExtractedMessage msg) {
+        if (isNamed(msg)) {
+          validateName(msg);
+          outputNamedMessage(msg);
+        }
+        return super.visitExtractedMessage(msg);
+      }
+
+      private void validateName(ExtractedMessage msg) {
+        JAVA.validateName(alertSink, msg, msg.getName(OutputLanguage.JAVA));
+      }
+
+      private void outputNamedMessage(ExtractedMessage msg) {
+        // TODO: include msg.getParameters().size() in class name?
+        formatLine(msg.getSourcePosition(), "public static final %s %s",
+                   MESSAGE_REFERENCE_CLASSNAME_PREFIX,
+                   msg.getName(OutputLanguage.JAVA));
+        formatLine("    = new %s(GXP$MESSAGE_SOURCE, %sL);",
+                   MESSAGE_REFERENCE_CLASSNAME_PREFIX,
+                   msg.getTcMessage().getId());
+      }
+    }
+
+    private boolean isNamed(ExtractedMessage msg) {
+      String name = msg.getName(OutputLanguage.JAVA);
+      return name != null && name.trim().length() > 0;
     }
 
     /**
@@ -939,6 +1010,7 @@ public class JavaCodeGenerator extends BaseJavaCodeGenerator<MessageExtractedTre
 
       StringBuilder sb = new StringBuilder();
       appendJavaThrowsDeclaration(sb, template.getThrowsDeclarations());
+      appendLine("@Override");
       formatLine(value.getSourcePosition(),
                  "protected void writeImpl(%s) %s {",
                  GXP_SIG, sb.toString());

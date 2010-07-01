@@ -95,7 +95,7 @@ public final class GxpClosures {
    * once, {@code reset()} will be called to reset the stream back to its origin
    * on all evaluations but the first.
    */
-  public static GxpClosure fromReader(final Reader reader) throws IOException {
+  public static GxpClosure fromReader(final Reader reader) {
     Preconditions.checkNotNull(reader);
     return new GxpClosure() {
         private boolean firstCall = true;

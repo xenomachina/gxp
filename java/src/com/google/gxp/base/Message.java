@@ -30,6 +30,8 @@ import java.util.Map;
  * texts.
  */
 public final class Message {
+  private static final String[] NO_PARAMS = new String[]{};
+
   private static final Map<String, Message> messageCache = Maps.newHashMap();
   /**
    * Get an instance of Message.
@@ -70,6 +72,17 @@ public final class Message {
       array[counter++] = loc;
     }
     return array;
+  }
+
+  /**
+   * Expand the message without parameters.
+   * @return expanded message
+   * @exception IllegalArgumentException
+   *    parameter value(s) are required
+   */
+  @Override
+  public String toString() {
+    return toString(NO_PARAMS);
   }
 
   /**

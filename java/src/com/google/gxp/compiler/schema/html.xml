@@ -318,7 +318,8 @@
              elements='input'/>
   <attribute name='archive'
              elements='applet'
-             flags='loosedtd deprecated'/>
+             flags='loosedtd deprecated'
+             hook='embeds-external-resource'/>
   <attribute name='archive'
              elements='object'/>
   <attribute name='autocomplete'
@@ -334,7 +335,8 @@
   <attribute name='background'
              elements='body'
              flags='loosedtd deprecated'
-             pattern='URI'/>
+             pattern='URI'
+             hook='embeds-external-resource'/>
   <attribute name='bgcolor'
              elements='table'
              flags='loosedtd deprecated'
@@ -402,11 +404,13 @@
              flags='loosedtd deprecated'/>
   <attribute name='codebase'
              elements='object'
-             pattern='URI'/>
+             pattern='URI'
+             hook='embeds-external-resource'/>
   <attribute name='codebase'
              elements='applet'
              flags='loosedtd deprecated'
-             pattern='URI'/>
+             pattern='URI'
+             hook='embeds-external-resource'/>
   <attribute name='codetype'
              elements='object'
              pattern='ContentType'/>
@@ -447,7 +451,8 @@
              pattern='Coords'/>
   <attribute name='data'
              elements='object'
-             pattern='URI'/>
+             pattern='URI'
+             hook='embeds-external-resource'/>
   <attribute name='datetime'
              elements='del ins'
              pattern='Datetime'/>
@@ -512,8 +517,7 @@
              pattern='Length'/>
   <attribute name='href'
              elements='a area link'
-             pattern='URI'
-             example='#'/>
+             pattern='URI'/>
   <attribute name='href'
              elements='base embed'
              pattern='URI'/>
@@ -529,8 +533,11 @@
              pattern='NAME'/>
   <attribute name='id'
              except-elements='base head html meta script style title'
-             pattern='ID'
-             example=''/>
+             pattern='ID'/>
+  <attribute name='id'
+             elements='script'
+             flags='nonstandard'
+             pattern='ID'/>
   <attribute name='ismap'
              elements='img input'
              flags='boolean'
@@ -564,6 +571,8 @@
              elements='frame iframe'
              flags='framesetdtd'
              pattern='URI'/>
+  <attribute name='manifest'
+             elements='html'/>
   <attribute name='marginheight'
              elements='frame iframe'
              flags='framesetdtd'
@@ -879,21 +888,25 @@
              pattern='NUMBER'/>
   <attribute name='src'
              elements='embed'
-             pattern='URI'/>
+             pattern='URI'
+             hook='embeds-external-resource'/>
   <attribute name='src'
              elements='script'
-             pattern='URI'/>
+             pattern='URI'
+             hook='embeds-external-resource'/>
   <attribute name='src'
              elements='input'
-             pattern='URI'/>
+             pattern='URI'
+             hook='embeds-external-resource'/>
   <attribute name='src'
              elements='frame iframe'
              flags='framesetdtd'
-             pattern='URI'/>
+             pattern='URI'
+             hook='embeds-external-resource'/>
   <attribute name='src'
              elements='img'
              pattern='URI'
-             example=''/>
+             hook='embeds-external-resource'/>
   <attribute name='standby'
              elements='object'
              flags='visibletext'
@@ -913,6 +926,12 @@
   <attribute name='tabindex'
              elements='a area button input object select textarea'
              pattern='NUMBER'/>
+  <!-- Setting tabindex to -1 on iframes is an idiom for preventing invisible
+       iframes from messing up tab navigation. -->
+  <attribute name='tabindex'
+             elements='iframe'
+             flags='nonstandard'
+             pattern='NUMBER'/>
   <attribute name='target'
              elements='a area base form link'
              flags='loosedtd'
@@ -926,8 +945,7 @@
   <attribute name='title'
              except-elements='base basefont head html meta param script title'
              flags='visibletext'
-             pattern='Text'
-             example=''/>
+             pattern='Text'/>
   <attribute name='type'
              elements='a link'
              pattern='ContentType'/>
@@ -1038,4 +1056,122 @@
              elements='textarea'
              flags='nonstandard'
              regex='^(off|soft|hard)$'/>
+
+  <!--
+    See http://msdn.microsoft.com/workshop/author/dhtml/reference/properties/contenteditable.asp
+    Note: nonstandard elements 'custom', 'listing', 'marquee', 'nobr',
+          'plaintext', 'rt', 'ruby' and 'xmp'  removed from elements list.
+  -->
+  <attribute name='contenteditable'
+             except-elements='abbr applet area base basefont br caption col colgroup embed frame frameset head hr html iframe img link map meta noframes noscript object optgroup option param script select style table tbody td tfoot th thead title tr'
+             flags='internal-only'
+             regex='^(inherit|false|true)$'/>
+
+  <!--
+    See http://msdn.microsoft.com/workshop/author/dhtml/reference/events/oncontextmenu.asp
+    Note: nonstandard elements 'custom', 'embed', 'listing', 'marquee', 'nobr',
+          'plaintext', 'rt', 'ruby' and 'xmp' removed from elements list.
+  -->
+  <attribute name='oncontextmenu'
+             except-elements='abbr acronym base basefont br col colgroup del embed frame frameset head html iframe ins isindex link map meta noframes noscript object optgroup option param q script style title'
+             flags='internal-only'
+             pattern='Script'/>
+
+  <!--
+    See http://msdn.microsoft.com/workshop/author/dhtml/reference/properties/unselectable.asp
+    Note: nonstandard elements 'custom', 'embed', 'listing', 'marquee', 'nobr',
+          'plaintext', 'rt', 'ruby' and 'xmp' removed from elements list.
+  -->
+  <attribute name='unselectable'
+             except-elements='abbr base basefont br col colgroup embed head html link map meta noframes noscript optgroup option param script style th title tr'
+             flags='internal-only'
+             regex='^(?i)(on|off)$'/>
+
+  <!-- Attributes required for YouTube and other Flash embeds. -->
+  <attribute name='bgcolor'
+             elements='embed'
+             flags='nonstandard'
+             pattern='Color'/>
+  <attribute name='FlashVars'
+             elements='embed'/>
+  <attribute name='allowFullScreen'
+             elements='embed'
+             regex='^(true|false)$'/>             
+  <attribute name='allowScriptAccess'
+             elements='embed'
+             regex='^(always|never|sameDomain)$'/>             
+  <attribute name='wmode'
+             elements='embed'
+             flags='nonstandard'
+             regex='^(window|opaque|transparent)$'/>
+
+  <!-- 
+    Attribute to make an iframe transparent. Added in IE 5.5 and generally supported
+    by other browsers. Confirmed in Firefox2.
+    Also supported on frame element, but not useful there so leaving it out.
+    See http://msdn.microsoft.com/workshop/author/dhtml/reference/properties/allowtransparency.asp
+  -->
+  <attribute name='allowtransparency'
+             elements='iframe'
+             flags='nonstandard'
+             regex='^(true|false)$'/>
+
+  <!--
+    Nonstandard mobile safari attribute.
+    See https://developer.apple.com/webapps/docs/documentation/AppleApplications/Reference/SafariWebContent/DesigningForms/chapter_6_section_4.html
+  -->
+  <attribute name='autocapitalize'
+             elements='input'
+             flags='nonstandard'
+             regex='^(on|off)$'/>
+
+  <!--
+    Nonstandard mobile safari attribute.
+    See https://developer.apple.com/webapps/docs/documentation/AppleApplications/Reference/SafariWebContent/DesigningForms/chapter_6_section_4.html
+  -->
+  <attribute name='autocorrect'
+             elements='input'
+             flags='nonstandard'
+             regex='^(on|off)$'/>
+
+
+  <!-- 
+    Attributes for WAI-ARIA 
+    http://www.w3.org/TR/aria-role/
+    Role allows assistive technologies to discover the purpose of custom widgets
+    commonly found in AJAX applications such as sliders, tree views, custom buttons, etc.
+  -->
+  <attribute name='role'
+             elements='div span'
+             flags='nonstandard'
+             pattern='Text'/>
+
+  <!-- 
+    Required for Chrome to create desktop shortcuts for web applications.
+    See http://wiki/Main/ChromeDesktopShortcuts
+  -->
+  <attribute name='sizes'
+             elements='link'
+             flags='nonstandard'/>
+
+  <!--
+    Firefox 2 attribute to enable/disable spellchecking of a field
+    See http://developer.mozilla.org/en/docs/Controlling_spell_checking_in_HTML_forms
+    Documentation does not say that this is case sensitive, but confirmed with
+    Firefox 2.0.0.4 on Windows and Linux.
+  -->
+  <attribute name='spellcheck'
+             elements='input textarea'
+             flags='nonstandard'
+             regex='^(true|false)$'/>
+
+  <!-- 
+    Custom widgets in AJAX apps are often made out of div and/or span elements.
+    Making such widgets focusable is important in providing keyboard access to the
+    application as the user needs to be able to tab through the various widgets.
+  -->
+  <attribute name='tabindex'
+             elements='div span'
+             flags='nonstandard'
+             pattern='NUMBER'/>
 </schema>

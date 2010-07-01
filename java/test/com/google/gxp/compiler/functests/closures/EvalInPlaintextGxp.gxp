@@ -34,9 +34,7 @@ text
 <gxp:eval expr='6.5' java:expr='6.5d' />
 <gxp:eval expr="'c'" />
 <!-- JS doesn't have anything like Localizable, so leave it out when compiling to JS -->
-<gxp:if cond='true' js:cond='false'>
-  <gxp:eval expr='new TestLocalizable()' />
-</gxp:if>
+<gxp:eval expr='new TestLocalizable()' js:expr='""' />
 <gxp:eval expr='new MyPlaintextClosure()' />
 
 </gxp:template>

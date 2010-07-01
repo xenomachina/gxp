@@ -87,7 +87,7 @@ public final class SourcePosition implements Serializable {
   }
 
   public String getSourceName() {
-    return source.toFilename();
+    return source.toRelativeFilename();
   }
 
   /**

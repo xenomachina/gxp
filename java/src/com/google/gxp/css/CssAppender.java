@@ -18,7 +18,6 @@ package com.google.gxp.css;
 
 import com.google.common.base.CharEscaper;
 import com.google.common.base.CharEscaperBuilder;
-import com.google.common.base.CharEscapers;
 import com.google.common.base.Preconditions;
 import com.google.gxp.base.GxpContext;
 

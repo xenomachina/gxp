@@ -44,6 +44,9 @@ import com.google.gxp.compiler.validate.ValidatedTree;
 
 import java.util.*;
 
+// TODO(laurence): if schema doesn't support SGML mode, use XML mode regardless
+// of IsXmlExpression's value.
+
 /**
  * Flattens OutputElements (like HTML tags) into StringConstants.
  *
@@ -147,8 +150,7 @@ public class ContentFlattener implements Function<ValidatedTree, ContentFlattene
       }
 
       for (final Attribute attr : element.getAttributes()) {
-        AttributeValidator attrValidator =
-            elementValidator.getAttributeValidator(attr.getName());
+        AttributeValidator attrValidator = elementValidator.getAttributeValidator(attr.getName());
         Expression empty = new StringConstant(attr, elementSchema, "");
         if (attrValidator.isFlagSet(AttributeValidator.Flag.BOOLEAN)) {
           Expression attrValue = attr.getValue().acceptVisitor(this);
@@ -161,18 +163,16 @@ public class ContentFlattener implements Function<ValidatedTree, ContentFlattene
             }
             values.add(new Conditional(element, elementSchema,
                                        attrValue,
-                                       buildBooleanAttrExpression(attr,
-                                                                  element),
+                                       buildBooleanAttrExpression(attr, element),
                                        empty));
           }
         } else {
-          String example = attrValidator.getExample();
           Expression condition = attr.getCondition();
           if (condition != null) {
             values.add(new Conditional(element, elementSchema, condition,
-                                       buildAttrExpression(attr, element, example), empty));
+                                       buildAttrExpression(attr, element), empty));
           } else {
-            values.add(buildAttrExpression(attr, element, example));
+            values.add(buildAttrExpression(attr, element));
           }
         }
       }
@@ -200,8 +200,7 @@ public class ContentFlattener implements Function<ValidatedTree, ContentFlattene
         values.add(new StringConstant(element, elementSchema,
                                       element.getLocalName() + ">"));
       }
-      return Concatenation.create(element.getSourcePosition(), elementSchema,
-                                  values);
+      return Concatenation.create(element.getSourcePosition(), elementSchema, values);
     }
 
     /**
@@ -214,43 +213,29 @@ public class ContentFlattener implements Function<ValidatedTree, ContentFlattene
      * of a Placeholder an a <gxp:msg> tag
      */
     private Expression buildAttrExpression(Attribute attr,
-                                           OutputElement element,
-                                           String example) {
-      boolean surroundWithExample = false;
-
+                                           OutputElement element) {
       List<Expression> list = Lists.newArrayList();
 
       list.add(new StringConstant(attr, element.getSchema(), " " + attr.getName() + "=\""));
       Expression value = attr.getValue().acceptVisitor(this);
       if (!value.hasStaticString()) {
-        if (example != null) {
-          value = new ExampleExpression(value, example);
-        } else {
-          surroundWithExample = true;
-        }
+        value = new ExampleExpression(value, "");
       }
       list.add(value);
       list.add(new StringConstant(attr, element.getSchema(), "\""));
 
-      Expression flattenedAttr = Concatenation.create(element.getSourcePosition(),
-                                                      element.getSchema(), list);
-
-      return (surroundWithExample)
-          ? new ExampleExpression(flattenedAttr, "")
-          : flattenedAttr;
+      return Concatenation.create(element.getSourcePosition(), element.getSchema(), list);
     }
 
     /**
      * Constructs an Expression to output a boolean attribute.
      * Example: selected="selected" if in XML mode else selected
      */
-    private Expression buildBooleanAttrExpression(Attribute attr,
-                                                  OutputElement element) {
+    private Expression buildBooleanAttrExpression(Attribute attr, OutputElement element) {
       Schema elementSchema = element.getSchema();
       List<Expression> values = Lists.newArrayList();
 
-      values.add(new StringConstant(attr, elementSchema,
-                                    " " + attr.getName()));
+      values.add(new StringConstant(attr, elementSchema," " + attr.getName()));
       values.add(new Conditional(
                      attr, elementSchema,
                      new IsXmlExpression(attr, elementSchema),
@@ -258,8 +243,7 @@ public class ContentFlattener implements Function<ValidatedTree, ContentFlattene
                                         "=\"" + attr.getName() + "\""),
                      new StringConstant(attr, elementSchema, "")));
 
-      return Concatenation.create(attr.getSourcePosition(), elementSchema,
-                                  values);
+      return Concatenation.create(attr.getSourcePosition(), elementSchema, values);
     }
   }
 }

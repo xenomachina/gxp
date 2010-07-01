@@ -32,8 +32,8 @@ import com.google.gxp.compiler.base.ExampleExpression;
 import com.google.gxp.compiler.base.ExhaustiveExpressionVisitor;
 import com.google.gxp.compiler.base.Expression;
 import com.google.gxp.compiler.base.ExtractedMessage;
-import com.google.gxp.compiler.base.Node;
 import com.google.gxp.compiler.base.NoMessage;
+import com.google.gxp.compiler.base.Node;
 import com.google.gxp.compiler.base.OutputElement;
 import com.google.gxp.compiler.base.PlaceholderEnd;
 import com.google.gxp.compiler.base.PlaceholderNode;
@@ -47,7 +47,7 @@ import com.google.transconsole.common.messages.InvalidMessageException;
 import com.google.transconsole.common.messages.Message;
 import com.google.transconsole.common.messages.MessageBuilder;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Replaces message elements and contained Output nodes with validated message
@@ -228,7 +228,8 @@ public class MessageExtractor implements Function<I18nCheckedTree, MessageExtrac
       if (!invalid) {
         try {
           Message message = tcMessageBuilder.createMessage();
-          ExtractedMessage emsg = new ExtractedMessage(msg, msg.getSchema(), message, parameters);
+          ExtractedMessage emsg =
+              new ExtractedMessage(msg, msg.getSchema(), msg.getName(), message, parameters);
           outsideMessageVisitor.addMessages(emsg);
           return emsg;
         } catch (InvalidMessageException imx) {

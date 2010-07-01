@@ -210,7 +210,7 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       Iterable<Parameter> params = template.getConstructor().getParameters();
 
       appendLine("/**");
-      formatLine(" * @this {%s}", getClassName(template.getName()));
+      appendLine(" * @constructor");
       appendLine(" */");
       StringBuilder sb = new StringBuilder();
       sb.append(getClassName(template.getName()));
@@ -283,6 +283,13 @@ public class JavaScriptCodeGenerator extends BracesCodeGenerator<MessageExtracte
       Iterable<Parameter> params = isStatic
           ? template.getAllParameters()
           : template.getParameters();
+
+      // Create some stub declarations of all parameters, to tell jscompiler
+      // that it's ok if these parameters are not defined anywhere.
+      for (Parameter param : params) {
+        formatLine(
+            "/** @type {*} */ %s.%s;", GXP_PARAM_VAR, param.getPrimaryName());
+      }
 
       for (Parameter param : params) {
         if (param.getDefaultValue() != null) {

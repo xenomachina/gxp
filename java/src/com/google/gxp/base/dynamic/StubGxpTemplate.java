@@ -196,7 +196,7 @@ public class StubGxpTemplate extends GxpTemplate {
       } while (newCount != 0 && newCount != oldCount);
 
       // get the main class generated durring this compile
-      Class c = Class.forName(className);
+      Class<?> c = Class.forName(className);
 
       // get methods
       return getMethodMap(c);
@@ -207,7 +207,7 @@ public class StubGxpTemplate extends GxpTemplate {
     }
   }
 
-  protected static Map<String, Method> getMethodMap(Class c) {
+  protected static Map<String, Method> getMethodMap(Class<?> c) {
     Map<String, Method> map = Maps.newHashMap();
     for (Method method : c.getMethods()) {
       map.put(method.getName(), method);
@@ -305,13 +305,13 @@ public class StubGxpTemplate extends GxpTemplate {
    * Define a class using the SystemClassLoader so that the class has access to
    * package private items in its java package.
    */
-  private static Class defineClass(byte[] classFile)
+  private static Class<?> defineClass(byte[] classFile)
       throws Throwable {
     Object[] args = new Object[]{ null, classFile,
                                   new Integer(0), new Integer(classFile.length),
                                   PROTECTION_DOMAIN };
     try {
-      return (Class) DEFINE_CLASS.invoke(ClassLoader.getSystemClassLoader(), args);
+      return (Class<?>) DEFINE_CLASS.invoke(ClassLoader.getSystemClassLoader(), args);
     } catch (InvocationTargetException e) {
       throw e.getCause();
     }

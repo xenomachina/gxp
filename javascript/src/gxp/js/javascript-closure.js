@@ -19,7 +19,7 @@ goog.provide('goog.gxp.js.JavascriptClosure');
 /**
  * Closure for content-type: text/javascript
  *
- * @this {goog.gxp.js.JavascriptClosure} instance
+ * @constructor
  * @param {Function} writeJavascript function that will write closure
  *                   contents to a given output.
  */

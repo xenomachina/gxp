@@ -81,6 +81,7 @@ public class AllTests extends TestCase {
     suite.addTestSuite(com.google.gxp.compiler.errortests.InstantiableErrorTest.class);
     suite.addTestSuite(com.google.gxp.compiler.errortests.InterfaceErrorTest.class);
     suite.addTestSuite(com.google.gxp.compiler.errortests.LoopErrorTest.class);
+    suite.addTestSuite(com.google.gxp.compiler.errortests.MultiLingualErrorTest.class);
     suite.addTestSuite(com.google.gxp.compiler.errortests.OutputElementErrorTest.class);
     suite.addTestSuite(com.google.gxp.compiler.errortests.ParseErrorTest.class);
     suite.addTestSuite(com.google.gxp.compiler.errortests.SchemaErrorTest.class);

@@ -21,7 +21,7 @@ goog.provide('goog.gxp.base.GxpContext');
  * effectively a collection of parameters that are implicitely passed to all
  * sub-templates.
  *
- * @this {goog.gxp.base.GxpContext} instance
+ * @constructor
  * @param {boolean} opt_forceXmlSyntax flag indicating if gxp should generate XML
  *                  (instead of SGML).  Defaults to false.
  */

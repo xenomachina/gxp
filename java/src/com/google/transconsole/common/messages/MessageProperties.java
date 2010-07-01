@@ -163,14 +163,13 @@ final class MessageProperties {
 
     String mergedDescription;
     if (Objects.equal(description, that.description)
-        || (that.description == null)
-        || (that.description.trim().length() == 0)) {
+        || null == that.description) {
       mergedDescription = description;
-    } else if ((description == null) || (description.trim().length() == 0)) {
-      mergedDescription = that.description;
+    } else if (null == description) {
+        mergedDescription = that.description;
     } else {
-      throw new InvalidMessageException(
-          "Cannot merge messages with incompatible descriptions.");
+      mergedDescription = that.description.length() > description.length() ?
+          that.description : description;
     }
 
     String mergedMeaning;
@@ -182,13 +181,12 @@ final class MessageProperties {
     }
 
     String mergedName;
-    if (Objects.equal(name, that.name) || (that.name == null)) {
+    if (Objects.equal(name, that.name) || null == that.name) {
       mergedName = name;
-    } else if (name == null) {
+    } else if (null == name) {
       mergedName = that.name;
     } else {
-      throw new InvalidMessageException(
-          "Cannot merge messages with different names.");
+      mergedName = that.name.length() > name.length() ? that.name : name;
     }
 
     Set<String> mergedSources = Sets.newTreeSet();
@@ -198,9 +196,9 @@ final class MessageProperties {
     boolean mergedIsHidden = isHidden && that.isHidden;
     boolean mergedIsObsolete = isObsolete && that.isObsolete;
 
-    return new MessageProperties(mergedContentType, mergedDescription, mergedMeaning,
-                                 mergedName, mergedSources, mergedIsHidden,
-                                 mergedIsObsolete);
+    return new MessageProperties(mergedContentType, mergedDescription,
+                                 mergedMeaning, mergedName, mergedSources,
+                                 mergedIsHidden, mergedIsObsolete);
   }
 
   @Override

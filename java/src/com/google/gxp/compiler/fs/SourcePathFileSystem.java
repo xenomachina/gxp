@@ -80,6 +80,8 @@ public class SourcePathFileSystem implements FileSystem {
       int len2 = f2.getName().length();
       return (len1 > len2) ? -1 : (len1 == len2 ? 0 : 1);
     }
+
+    private static final long serialVersionUID = 0;
   };
 
   private FileRef chop(FileRef ancestor, FileRef descendant) {

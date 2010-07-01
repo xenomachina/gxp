@@ -56,9 +56,13 @@ public final class GxpContext {
       return new GxpContext(this);
     }
 
-    public Builder forceXmlSyntax() {
-      this.forcingXmlSyntax = true;
+    private Builder forceXmlSyntax(boolean forcingXmlSyntax) {
+      this.forcingXmlSyntax = forcingXmlSyntax;
       return this;
+    }
+
+    public Builder forceXmlSyntax() {
+      return forceXmlSyntax(true);
     }
 
     public Builder setCharset(Charset charset) {

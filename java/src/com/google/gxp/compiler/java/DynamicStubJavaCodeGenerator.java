@@ -24,6 +24,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Bytes;
 import com.google.gxp.compiler.alerts.AlertPolicy;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
@@ -154,11 +155,8 @@ public class DynamicStubJavaCodeGenerator extends BaseJavaCodeGenerator<MessageE
         oos.writeObject(alertPolicy);
         oos.close();
         baos.close();
-        List<Byte> bytes = Lists.newArrayList();
-        for (byte b : baos.toByteArray()) {
-          bytes.add(b);
-        }
-        return Joiner.on(",").join(Iterables.transform(bytes, Functions.toStringFunction()));
+        return Joiner.on(",").join(Iterables.transform(Bytes.asList(baos.toByteArray()),
+                                                       Functions.toStringFunction()));
       } catch (IOException e) {
         throw new RuntimeIOException(e);
       }

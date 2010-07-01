@@ -29,8 +29,7 @@ public class MessageBundle extends Bundle<Message> {
   /**
    * Constructs an empty MessageBundle.
    *
-   * @param projectId Translation Console ID of project (e.g. "gws"). This
-   * should always be a top-level project ID and not a subproject ID.
+   * @param projectId Translation Console ID of project (e.g. "gws").
    * @param languageId Translation Console ID of language (e.g. "en-US").
    */
   public MessageBundle(String projectId, String languageId) {
@@ -56,7 +55,8 @@ public class MessageBundle extends Bundle<Message> {
         messages.put(id, messages.get(id).merge(m));
       } catch (InvalidMessageException imx) {
         throw new InvalidMessageBundleException(imx.getMessage()
-                                                + " (id = " + id + ")",
+                                                + " (id = " + id
+                                                + ", source = \"" + m.getOriginal() + "\")",
                                                 imx);
       }
     } else {

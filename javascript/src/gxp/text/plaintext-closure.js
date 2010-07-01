@@ -19,7 +19,7 @@ goog.provide('goog.gxp.text.PlaintextClosure');
 /**
  * Closure for content-type: text/plaintext
  *
- * @this {goog.gxp.text.PlaintextClosure} instance
+ * @constructor
  * @param {Function} writePlaintext function that will write closure
  *                   contents to a given output.
  */

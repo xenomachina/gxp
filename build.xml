@@ -34,13 +34,28 @@
     <mkdir dir="${build.dir}/tests" />
   </target>
 
-  <target name="compile.compiler" depends="init">
+  <target name="compile.runtime" depends="init">
     <javac destdir="${build.dir}/classes" debug="on">
       <compilerarg value="-Xlint:deprecation"/>
-      <src>
-        <pathelement location="${src.dir}/com/google/gxp/compiler/" />
-        <pathelement location="${src.dir}/com/google/transconsole/" />
-      </src>
+      <src path="${src.dir}" />
+      <include name="com/google/gxp/base/**" />
+      <exclude name="com/google/gxp/base/dynamic/**" />
+      <include name="com/google/gxp/css/**" />
+      <include name="com/google/gxp/html/**" />
+      <include name="com/google/gxp/js/**" />
+      <include name="com/google/gxp/rss/**" />
+      <include name="com/google/gxp/text/**" />
+      <include name="com/google/i18n/**" />
+      <classpath refid="classpath.jars" />
+    </javac>
+  </target>
+
+  <target name="compile.compiler" depends="compile.runtime">
+    <javac destdir="${build.dir}/classes" debug="on">
+      <compilerarg value="-Xlint:deprecation"/>
+      <src path="${src.dir}" />
+      <include name="com/google/gxp/compiler/**" />
+      <include name="com/google/transconsole/**" />
       <classpath refid="classpath.jars" />
     </javac>
     <copy todir="${build.dir}/classes">
@@ -61,7 +76,7 @@
     </taskdef>
   </target>
 
-  <target name="compile.runtime" depends="compile.compiler">
+  <target name="compile.dynamic-runtime" depends="compile.compiler, compile.runtime">
     <gxpc srcdir="${src.dir}/com/google/gxp/base/dynamic/"
           srcpaths="${src.dir}"
           destdir="${genfiles.dir}"
@@ -74,21 +89,13 @@
     </copy>
     <javac destdir="${build.dir}/classes" debug="on">
       <compilerarg value="-Xlint:deprecation"/>
-      <src>
-        <pathelement location="${src.dir}/com/google/gxp/base/" />
-        <pathelement location="${src.dir}/com/google/gxp/css/" />
-        <pathelement location="${src.dir}/com/google/gxp/html/" />
-        <pathelement location="${src.dir}/com/google/gxp/js/" />
-        <pathelement location="${src.dir}/com/google/gxp/rss/" />
-        <pathelement location="${src.dir}/com/google/gxp/text/" />
-        <pathelement location="${src.dir}/com/google/i18n/" />
-        <pathelement location="${genfiles.dir}/com/google/gxp/base/dynamic/" />
-      </src>
+      <src path="${src.dir}:${genfiles.dir}" />
+      <include name="com/google/gxp/base/dynamic/**" />
       <classpath refid="classpath.jars" />
     </javac>
   </target>
 
-  <target name="jar" depends="compile.runtime">
+  <target name="jar" depends="compile.runtime, compile.dynamic-runtime">
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
              classpath="${lib.dir}/jarjar-1.0.jar" />
     <jarjar jarfile="${build.dir}/gxp-${version}.jar">
@@ -136,7 +143,8 @@
     </javadoc>
   </target>
 
-  <target name="compile.tests" depends="compile.runtime">
+  <target name="compile.tests"
+      depends="compile.runtime, compile.compiler, compile.dynamic-runtime">
     <gxpc srcdir="${test.dir}/com/google/gxp/compiler/functests/"
           srcpaths="${test.dir}"
           destdir="${genfiles.dir}"

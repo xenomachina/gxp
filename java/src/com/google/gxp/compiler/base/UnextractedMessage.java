@@ -25,15 +25,17 @@ import com.google.gxp.compiler.schema.Schema;
  * com.google.gxp.compiler.msgextract.MessageExtractor MessageExtractor}.
  */
 public class UnextractedMessage extends Expression {
+  private final MultiLanguageAttrValue name;
   private final String meaning;
   private final String comment;
   private final boolean hidden;
   private final Expression content;
 
   public UnextractedMessage(Node fromNode, Schema schema,
-                            String meaning, String comment, boolean hidden,
-                            Expression content) {
+                            MultiLanguageAttrValue name, String meaning, String comment,
+                            boolean hidden, Expression content) {
     super(fromNode, schema);
+    this.name = Preconditions.checkNotNull(name);
     this.meaning = meaning;
     this.comment = comment;
     this.hidden = hidden;
@@ -43,6 +45,10 @@ public class UnextractedMessage extends Expression {
   @Override
   public <T> T acceptVisitor(ExpressionVisitor<T> visitor) {
     return visitor.visitUnextractedMessage(this);
+  }
+  
+  public MultiLanguageAttrValue getName() {
+    return name;
   }
 
   public String getMeaning() {
@@ -64,14 +70,14 @@ public class UnextractedMessage extends Expression {
   public UnextractedMessage withContent(Expression newContent) {
     return newContent.equals(content)
         ? this
-        : new UnextractedMessage(this, getSchema(), meaning, comment, hidden, newContent);
+        : new UnextractedMessage(this, getSchema(), name, meaning, comment, hidden, newContent);
   }
 
   public UnextractedMessage withContentAndSchema(Expression newContent,
                                                  Schema newSchema) {
     return (newContent.equals(content) && Objects.equal(newSchema, getSchema()))
         ? this
-        : new UnextractedMessage(this, newSchema, meaning, comment, hidden, newContent);
+        : new UnextractedMessage(this, newSchema, name, meaning, comment, hidden, newContent);
   }
 
   @Override
@@ -83,6 +89,7 @@ public class UnextractedMessage extends Expression {
 
   public boolean equals(UnextractedMessage that) {
     return equalsExpression(that)
+        && Objects.equal(getName(),    that.getName())
         && Objects.equal(getMeaning(), that.getMeaning())
         && Objects.equal(getComment(), that.getComment())
         && Objects.equal(isHidden(),   that.isHidden())
@@ -93,6 +100,7 @@ public class UnextractedMessage extends Expression {
   public int hashCode() {
     return Objects.hashCode(
         expressionHashCode(),
+        getName(),
         getMeaning(),
         getComment(),
         isHidden(),

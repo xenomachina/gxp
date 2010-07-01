@@ -30,12 +30,16 @@ import java.util.*;
  * com.google.gxp.compiler.msgextract.MessageExtractor MessageExtractor}.
  */
 public class ExtractedMessage extends Expression {
+  private final MultiLanguageAttrValue name;
   private final Message tcMessage;
   private final ImmutableList<Expression> parameters;
 
   public ExtractedMessage(Node fromNode, Schema schema,
-                          Message tcMessage, List<Expression> parameters) {
+                          MultiLanguageAttrValue name,
+                          Message tcMessage,
+                          List<Expression> parameters) {
     super(fromNode, schema);
+    this.name = Preconditions.checkNotNull(name);
     this.tcMessage = Preconditions.checkNotNull(tcMessage);
     this.parameters = ImmutableList.copyOf(parameters);
   }
@@ -50,7 +54,7 @@ public class ExtractedMessage extends Expression {
 
   public ExtractedMessage transformParams(Function<Expression, Expression> function) {
     List<Expression> newParams = Util.map(parameters, function);
-    return new ExtractedMessage(this, this.getSchema(), tcMessage, newParams);
+    return new ExtractedMessage(this, this.getSchema(), name, tcMessage, newParams);
   }
 
   @Override
@@ -77,5 +81,14 @@ public class ExtractedMessage extends Expression {
         expressionHashCode(),
         getTcMessage(),
         getParameters());
+  }
+
+  /**
+   * @param language The desired {@link OutputLanguage}
+   * @return the name of this {@link ExtractedMessage} to use as an identifier
+   *         in generated code of the desired {@link OutputLanguage}
+   */
+  public String getName(OutputLanguage language) {
+    return name.get(language);
   }
 }

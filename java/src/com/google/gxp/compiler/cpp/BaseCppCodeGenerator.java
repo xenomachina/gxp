@@ -49,7 +49,6 @@ import com.google.gxp.compiler.base.TypeVisitor;
 import com.google.gxp.compiler.codegen.BracesCodeGenerator;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 

@@ -47,40 +47,30 @@ public abstract class GxpCompilationException extends RuntimeException implement
   }
 
   public static class Gxp extends GxpCompilationException {
-    private final AlertPolicy alertPolicy;
-    private final AlertSet alertSet;
 
     public Gxp(AlertPolicy alertPolicy, AlertSet alertSet) {
       super(GxpCompilationError.getGxpClosure(alertPolicy, alertSet));
-      this.alertPolicy = Preconditions.checkNotNull(alertPolicy);
-      this.alertSet = Preconditions.checkNotNull(alertSet);
     }
   }
 
   public static class Java extends GxpCompilationException {
-    private final List<Diagnostic<? extends JavaFileObject>> diagnostics;
 
     public Java(List<Diagnostic<? extends JavaFileObject>> diagnostics) {
       super(JavaCompilationError.getGxpClosure(diagnostics));
-      this.diagnostics = Preconditions.checkNotNull(diagnostics);
     }
   }
 
   public static class GxpParamChange extends GxpCompilationException {
-    private final IllegalArgumentException iae;
 
     public GxpParamChange(IllegalArgumentException iae) {
       super(GxpParamChangeError.getGxpClosure(iae));
-      this.iae = Preconditions.checkNotNull(iae);
     }
   }
 
   public static class Throw extends GxpCompilationException {
-    private final Throwable throwable;
 
     public Throw(Throwable throwable) {
       super(ThrowableError.getGxpClosure(throwable));
-      this.throwable = Preconditions.checkNotNull(throwable);
     }
   }
 }

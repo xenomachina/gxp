@@ -201,7 +201,8 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
           public Attribute visitMsgNamespace(MsgNamespace ns) {
             Expression str = new StringConstant(parsedAttr, null, parsedAttr.getValue());
-            Expression msg = new UnextractedMessage(parsedAttr, null, null, null, false, str);
+            Expression msg = new UnextractedMessage(
+                parsedAttr, null, new MultiLanguageAttrValue(""), null, null, false, str);
             return new Attribute(parsedAttr, NullNamespace.INSTANCE, parsedAttr.getName(),
                                  new ConvertibleToContent(msg));
           }
@@ -893,6 +894,7 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
     public Void visitMsgElement(GxpNamespace.GxpElement node) {
       AttributeMap attrMap = nodeParts.getAttributes();
+      MultiLanguageAttrValue name = attrMap.getMultiLanguageAttrValue("name");
       String meaning = attrMap.getOptional("meaning", null);
       String comment = attrMap.getOptional("comment", null);
       boolean hidden = attrMap.getBooleanValue("hidden");
@@ -902,7 +904,8 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
       ContentType contentType = createContentType(node, null);
       Schema schema = (contentType == null) ? null : contentType.getSchema();
 
-      output.accumulate(new UnextractedMessage(node, schema, meaning, comment, hidden, content));
+      output.accumulate(
+          new UnextractedMessage(node, schema, name, meaning, comment, hidden, content));
       return null;
     }
 

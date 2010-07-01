@@ -212,7 +212,7 @@ public final class Message extends BaseMessage {
       throw new InvalidMessageException(id, ive.getMessage());
     }
 
-    return new Message(super.fragments, mergedProperties);
+    return new Message(id, super.fragments, mergedProperties);
   }
 
   @Override
@@ -234,8 +234,9 @@ public final class Message extends BaseMessage {
             && Objects.equal(properties, otherMsg.properties));
   }
 
+  @Override
   public String toString() {
-    return "[" + getPresentation() + "] ["
+    return "[" + getId() + "] [" + getPresentation() + "] ["
         + getMeaning() + "] [" + getContentType() + "]";
   }
 }

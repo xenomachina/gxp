@@ -31,7 +31,6 @@ public class TranslationBundle extends Bundle<Translation> {
    * Constructs an empty {@link TranslationBundle}.
    *
    * @param projectId Translation Console ID of project (e.g. {@code "gws"}).
-   * This should always be a top-level project ID, and not a subproject ID.
    * @param languageId Translation Console ID of language
    * (e.g. {@code "en-US"}).
    */

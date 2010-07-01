@@ -187,4 +187,10 @@ public class BasicErrorTest extends BaseTestCase {
     assertIllegalExpressionDetected("<div><gxp:attr name='id' cond='",
                                     "'/></div>", 2, 6);
   }
+
+  // Regression.
+  public void testNonStandard_iframeTabindexAttr() throws Exception {
+    compile("<iframe tabindex='-1'/>");
+    assertNoUnexpectedAlerts();
+  }
 }

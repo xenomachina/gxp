@@ -16,6 +16,7 @@
 
 package com.google.gxp.compiler.cli;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.gxp.compiler.Configuration;
@@ -31,6 +32,7 @@ import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.codegen.DefaultCodeGeneratorFactory;
 import com.google.gxp.compiler.fs.FileRef;
 import com.google.gxp.compiler.fs.FileSystem;
+import com.google.gxp.compiler.fs.InMemoryFileSystem;
 import com.google.gxp.compiler.fs.SystemFileSystem;
 import com.google.gxp.compiler.i18ncheck.UnextractableContentAlert;
 
@@ -439,5 +441,25 @@ public class GxpcFlagsTest extends TestCase {
     assertEquals(Severity.WARNING, alertPolicy.getSeverity(WARNING_ALERT));
     assertEquals(Severity.INFO, alertPolicy.getSeverity(INFO_ALERT));
     assertEquals(Severity.ERROR, alertPolicy.getSeverity(I18N_ALERT));
+  }
+
+  public void testParameterFile() throws Exception {
+    InMemoryFileSystem inMemory = new InMemoryFileSystem();
+    FileRef parameterFile = inMemory.parseFilename("/here/params");
+    Writer out = parameterFile.openWriter();
+    out.write("--help");
+    out.close();
+    GxpcFlags flags = new GxpcFlags(inMemory, inMemory.parseFilename("/here"), "@params");
+    assertTrue(flags.showHelp());
+  }
+
+  public void testParameterFileIsUtf8() throws Exception {
+    InMemoryFileSystem inMemory = new InMemoryFileSystem();
+    FileRef parameterFile = inMemory.parseFilename("/here/params");
+    Writer out = parameterFile.openWriter(Charsets.UTF_8);
+    out.write("--output /here/\u00F6"); // An oe umlaut.
+    out.close();
+    GxpcFlags flags = new GxpcFlags(inMemory, inMemory.parseFilename("/here"), "@params");
+    assertEquals("/here/\u00F6", flags.getAllowedOutputFiles().iterator().next().toFilename());
   }
 }

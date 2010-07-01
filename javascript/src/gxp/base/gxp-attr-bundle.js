@@ -26,7 +26,6 @@ goog.require('goog.gxp.base.GxpContext');
  * @constructor
  * @param attrs
  * @param booleanAttrs
- * @this {goog.gxp.base.GxpAttrBundle} instance
  */
 goog.gxp.base.GxpAttrBundle = function(method, attrs, booleanAttrs) {
   this.attrs = attrs;
@@ -58,14 +57,13 @@ goog.gxp.base.GxpAttrBundle = function(method, attrs, booleanAttrs) {
  * @param method
  * @param opt_includeAttr
  * @param var_args
- * @this {goog.gxp.base.GxpAttrBundle.Builder} instance
  */
 goog.gxp.base.GxpAttrBundle.Builder = function(method, opt_includeAttr, var_args) {
   this.method = method;
   this.attrs = new Object();
   this.booleanAttrs = new Array();
   if (opt_includeAttr != null) {
-    this.includeAttrs = new Object(); 
+    this.includeAttrs = new Object();
     for (var i = 1; i < arguments.length; i++) {
       this.includeAttrs[arguments[i]] = true;
     }

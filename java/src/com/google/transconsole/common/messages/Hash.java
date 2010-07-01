@@ -55,7 +55,6 @@ import java.nio.ByteOrder;
  * <p>TODO: Add stream hashing functionality.
  *
  * @see StringHash
- * @author Spencer Kimball
  */
 public final class Hash {
   private Hash() { }

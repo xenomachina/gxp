@@ -47,6 +47,17 @@ public class EscapeExpression extends Expression {
   }
 
   @Override
+  public boolean alwaysEquals(Expression that) {
+    return (that instanceof EscapeExpression)
+        && alwaysEquals((EscapeExpression) that);
+  }
+
+  protected boolean alwaysEquals(EscapeExpression that) {
+    return Objects.equal(getSchema(), that.getSchema())
+        && getSubexpression().alwaysEquals(that.getSubexpression());
+  }
+
+  @Override
   public boolean equals(Object that) {
     return (that instanceof EscapeExpression)
         && equals((EscapeExpression) that);

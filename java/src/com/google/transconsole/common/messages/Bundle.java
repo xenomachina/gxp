@@ -16,16 +16,17 @@
 
 package com.google.transconsole.common.messages;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 /**
  * The Bundle class is a container for {@link BaseMessage} objects.
@@ -53,8 +54,7 @@ public abstract class Bundle <T extends BaseMessage> implements Iterable<T> {
   /**
    * Constructs an empty Bundle.
    *
-   * @param projectId Translation Console ID of project (e.g. "gws")  This
-   *        should always be a top-level project ID and not a subproject ID.
+   * @param projectId Translation Console ID of project (e.g. "gws").
    * @param languageId Translation Console ID of language (e.g. "en-US").
    */
   public Bundle(String projectId, String languageId) {
@@ -80,17 +80,15 @@ public abstract class Bundle <T extends BaseMessage> implements Iterable<T> {
     return messages.containsKey(messageId);
   }
 
-  private final Ordering<T> MESSAGE_ORDERING = new Ordering<T>() {
-    public int compare(T m1, T m2) {
-      return m1.getId().compareTo(m2.getId());
-    }
-  };
-
   /**
    * @return a sorted immutable list of the Message objects in this bundle
    */
   public List<T> getMessages() {
-    return ImmutableList.copyOf(MESSAGE_ORDERING.sortedCopy(messages.values()));
+    return ImmutableList.copyOf(Ordering.from(new Comparator<T>() {
+      public int compare(T m1, T m2) {
+        return m1.getId().compareTo(m2.getId());
+      }
+    }).sortedCopy(messages.values()));
   }
 
   /**

@@ -42,8 +42,12 @@ public class GxpTemplate {
    * this given Locale.
    */
   protected static String getMessage(String source, Locale locale, long id, String... parameters) {
+    return getRawMessage(source, locale, id).toString(parameters);
+  }
+
+  protected static Message getRawMessage(String source, Locale locale, long id) {
     ResourceBundle bundle = ResourceBundle.getBundle(source, locale);
-    return Message.getInstance(bundle.getString(String.valueOf(id))).toString(parameters);
+    return Message.getInstance(bundle.getString(String.valueOf(id)));
   }
 
   /**
@@ -56,9 +60,10 @@ public class GxpTemplate {
     /**
      * {@inheritDoc}
      *
-     * @throws GxpTunnelException when the underlying implementation throws a
+     * @throws GxpRuntimeException when the underlying implementation throws a
      * checked exception other than {@code IOException}.
      */
+    @Override
     public final void write(Appendable out, GxpContext gxpContext)
         throws IOException {
       try {
@@ -85,7 +90,7 @@ public class GxpTemplate {
    * Abstract base class for anonymous {@code GxpClosure}s created by the GXP
    * compiler. The equals and hashCode methods use the class's identity for
    * equality. That is, all instances of a specific {@code AnonymousGxpClosure}
-   * subclass are considered to be equal to eachother. This is required so that
+   * subclass are considered to be equal to each other. This is required so that
    * the Once template can reliably compare these anonymous GxpClosure
    * implementations.
    *

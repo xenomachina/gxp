@@ -31,4 +31,9 @@
   goodbye <expr:the_name />
 </gxp:msg>
 
+<gxp:msg>
+  <expr:the_name /> is my name,
+  my name is <expr:the_name />.
+</gxp:msg>
+
 </gxp:template>

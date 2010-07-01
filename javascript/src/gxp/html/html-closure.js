@@ -19,7 +19,7 @@ goog.provide('goog.gxp.html.HtmlClosure');
 /**
  * Closure for content-type: text/html
  *
- * @this {goog.gxp.html.HtmlClosure} instance
+ * @constructor
  * @param {Function} writeHtml function that will write closure contents
  *                   to a given output.
  */

@@ -17,10 +17,12 @@
 <gxp:template name='com.google.gxp.compiler.functests.call.CallAsEscapableExpressionGxp'
               xmlns='http://www.w3.org/1999/xhtml'
               xmlns:call='http://google.com/2001/gxp/call'
-              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:gxp='http://google.com/2001/gxp'
-              xmlns:java='http://google.com/2001/gxp/code/java'>
+              xmlns:cpp='http://google.com/2001/gxp/code/cpp'
+              xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+
 
 <gxp:param name='x' cpp:type='const char *' java:type='String' />
 
@@ -37,8 +39,9 @@
 <!-- Instance Call -->
 <div>
   <gxp:attr name='onclick'>
-    <call:DoubleParamJavascriptCalleeGxp expr:this='new DoubleParamJavascriptCalleeGxp.Instance()'
-                                         expr:x='x' />
+    <call:DoubleParamJavascriptCalleeGxp expr:x='x'
+        java:this='new DoubleParamJavascriptCalleeGxp.Instance()'
+        js:this='new com.google.gxp.compiler.functests.call.DoubleParamJavascriptCalleeGxp()' />
   </gxp:attr>
 </div>
 

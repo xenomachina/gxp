@@ -110,7 +110,8 @@ public final class Color implements CssClosure {
   }
 
   public boolean equals(Color that) {
-    return this.red == that.red
+    return that != null
+        && this.red == that.red
         && this.blue == that.blue
         && this.green == that.green;
   }
@@ -155,18 +156,18 @@ public final class Color implements CssClosure {
   public static final Color BLUE = new Color(0, 0, 255);
   public static final Color FUCHSIA = new Color(255, 0, 255);
   public static final Color GRAY = new Color(128, 128, 128);
-  public static final Color GREEN = new Color(0, 128, 0);
   public static final Color GREY = new Color(128, 128, 128);
+  public static final Color GREEN = new Color(0, 128, 0);
   public static final Color INDIGO = new Color(75, 0, 130);
   public static final Color LIME = new Color(0, 255, 0);
   public static final Color MAROON = new Color(128, 0, 0);
   public static final Color NAVY = new Color(0, 0, 128);
   public static final Color OLIVE = new Color(128, 128, 0);
-  public static final Color ORANGE = new Color(255, 165, 0);
   public static final Color PURPLE = new Color(128, 0, 128);
   public static final Color RED = new Color(255, 0, 0);
   public static final Color SILVER = new Color(192, 192, 192);
   public static final Color TEAL = new Color(0, 128, 128);
+  public static final Color ORANGE = new Color(255, 165, 0);
   public static final Color VIOLET = new Color(238, 130, 238);
   public static final Color WHITE = new Color(255, 255, 255);
   public static final Color YELLOW = new Color(255, 255, 0);
@@ -178,18 +179,18 @@ public final class Color implements CssClosure {
       .put("blue", BLUE)
       .put("fuchsia", FUCHSIA)
       .put("gray", GRAY)
-      .put("green", GREEN)
       .put("grey", GREY)
+      .put("green", GREEN)
       .put("indigo", INDIGO)
       .put("lime", LIME)
       .put("maroon", MAROON)
       .put("navy", NAVY)
       .put("olive", OLIVE)
-      .put("orange", ORANGE)
       .put("purple", PURPLE)
       .put("red", RED)
       .put("silver", SILVER)
       .put("teal", TEAL)
+      .put("orange", ORANGE)
       .put("violet", VIOLET)
       .put("white", WHITE)
       .put("yellow", YELLOW)

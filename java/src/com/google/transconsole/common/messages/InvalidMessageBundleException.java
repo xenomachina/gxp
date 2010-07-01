@@ -30,6 +30,7 @@ public class InvalidMessageBundleException extends Exception {
     super(msg, cause);
   }
 
+  @Override
   public InvalidMessageException getCause() {
     return (super.getCause() == null)
         ? null

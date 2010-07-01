@@ -29,7 +29,6 @@ import com.google.gxp.compiler.base.Template;
 import com.google.gxp.compiler.base.TemplateName;
 import com.google.gxp.compiler.msgextract.MessageExtractedTree;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 

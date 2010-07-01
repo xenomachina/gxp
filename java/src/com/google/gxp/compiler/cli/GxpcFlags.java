@@ -16,10 +16,12 @@
 
 package com.google.gxp.compiler.cli;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.io.CharStreams;
 import com.google.gxp.compiler.Configuration;
 import com.google.gxp.compiler.Phase;
 import com.google.gxp.compiler.alerts.Alert.Severity;
@@ -36,6 +38,7 @@ import com.google.gxp.compiler.parser.FileSystemEntityResolver;
 import com.google.gxp.compiler.parser.SourceEntityResolver;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.util.*;
 
@@ -76,6 +79,24 @@ class GxpcFlags implements Configuration {
    */
   GxpcFlags(FileSystem fs, FileRef defaultDir, String... args)
       throws CmdLineException, IOException {
+
+    // If there is only one argument, and it starts with an '@', then treat it
+    // as an options file, relative to the current working directory.
+    if ((args.length == 1) && (args[0].startsWith("@"))) {
+      FileRef optionsFile = defaultDir.join(args[0].substring(1));
+      Reader in = optionsFile.openReader(Charsets.UTF_8);
+      List<String> lines = CharStreams.readLines(in);
+      in.close();
+      List<String> parsedTokens = Lists.newArrayList();
+      for (String line : lines) {
+        for (String token : line.trim().split("\\s+")) {
+          if (token.length() > 0) {
+            parsedTokens.add(token);
+          }
+        }
+      }
+      args = parsedTokens.toArray(new String[parsedTokens.size()]);
+    }
 
     commandLine = new CommandLine(args);
 

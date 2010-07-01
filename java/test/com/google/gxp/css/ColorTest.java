@@ -194,6 +194,15 @@ public class ColorTest extends TestCase {
     }
   }
 
+  public void testEquals() throws Exception {
+    Color color = new Color(0x11, 0x22, 0x33);
+    assertTrue(color.equals(new Color(0x11, 0x22, 0x33)));
+    assertFalse(color.equals(new Color(0x00, 0x22, 0x33)));
+    assertFalse(color.equals(new Color(0x11, 0x00, 0x33)));
+    assertFalse(color.equals(new Color(0x11, 0x22, 0x00)));
+    assertFalse(color.equals(null));
+  }
+
   public void testFrom24BitRgb() throws Exception {
     assertEquals("#000", Color.from24BitRgb(0).toString());
     assertEquals("#800000", Color.from24BitRgb(0x800000).toString());

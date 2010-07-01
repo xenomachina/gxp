@@ -30,11 +30,9 @@ public class GxpRuntimeException extends RuntimeException {
    * RuntimeException in which case cause itself is returned.
    */
   public static RuntimeException wrap(Exception cause) {
-    if (cause instanceof RuntimeException) {
-      return (RuntimeException) cause;
-    } else {
-      return new GxpRuntimeException(cause);
-    }
+    return (cause instanceof RuntimeException)
+        ? (RuntimeException) cause
+        : new GxpRuntimeException(cause);
   }
 
   /**

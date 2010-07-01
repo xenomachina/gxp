@@ -61,6 +61,7 @@ public class PropertiesBundleWriter {
    * and non ascii characters for a java properties file.
    */
   private static final CharEscaper MESSAGE_ESCAPER = new CharEscaper() {
+      @Override
       public char[] escape(char c) {
         switch(c) {
           case '\\':

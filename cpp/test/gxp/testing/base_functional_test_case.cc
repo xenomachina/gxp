@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <iostream>
+#include <stdlib.h>
 #include "gxp/base/gxp_context.h"
 #include "gxp/testing/base_functional_test_case.h"
 

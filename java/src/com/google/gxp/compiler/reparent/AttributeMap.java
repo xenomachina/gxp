@@ -92,6 +92,20 @@ class AttributeMap {
   }
 
   /**
+   * Converts any remaining unprefixed attributes to {@code NativeExpression}s.
+   */
+  public void convertAllAttributesToExpressions() {
+    for (Map.Entry<AttributeName, Attribute> entry : namesToAttrs.entrySet()) {
+      Attribute attr = entry.getValue();
+      Expression value = attr.getValue();
+      if ((attr.getNamespace() instanceof NullNamespace) && value instanceof StringConstant) {
+        String s = ((StringConstant) value).evaluate();
+        entry.setValue(attr.withValue(new NativeExpression(value, new MultiLanguageAttrValue(s))));
+      }
+    }
+  }
+
+  /**
    * @return a (new) list containing all of the unused {@code Attribute}s in
    * the order they were specified. Note that this marks all attributes as
    * "used", so the caller is responsible for reporting unused attributes on

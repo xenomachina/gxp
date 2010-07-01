@@ -136,6 +136,8 @@ public class SchemaParserTest extends TestCase {
     assertTrue(imgAltAttr.isFlagSet(AttributeValidator.Flag.REQUIRED));
     assertTrue(imgAltAttr.isFlagSet(AttributeValidator.Flag.VISIBLETEXT));
     assertTrue(onpagehideAttr.isFlagSet(AttributeValidator.Flag.NONSTANDARD));
+    assertTrue(oncontextmenuAttr.isFlagSet(
+        AttributeValidator.Flag.INTERNAL_ONLY));
 
     assertFalse(onpagehideAttr.isFlagSet(AttributeValidator.Flag.BOOLEAN));
     assertFalse(imgAltAttr.isFlagSet(AttributeValidator.Flag.DEPRECATED));
@@ -152,10 +154,6 @@ public class SchemaParserTest extends TestCase {
 
     assertEquals("application/x-www-form-urlencoded",
                  enctypeAttr.getDefaultValue());
-
-    // Test examples
-    assertEquals(null, classAttr.getExample());
-    assertEquals("#", hrefAttr.getExample());
 
     // test doctypes
     DocType docType = htmlTag.getDocType("strict");

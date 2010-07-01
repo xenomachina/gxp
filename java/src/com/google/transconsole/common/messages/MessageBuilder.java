@@ -55,6 +55,8 @@ public class MessageBuilder {
    * Sets up the builder with an empty message data and sets the policy for
    * whitespace surrounding the content of the message.
    *
+   * Setting the parameter to false may result in empty messages.
+   *
    * @param preserveWhitespace If true, the whitespaces around the message will
    * be preserved.
    */
@@ -134,6 +136,18 @@ public class MessageBuilder {
     }
 
     fragments.add(p);
+    return this;
+  }
+
+  /**
+   * Appends the specified fragment to the existing content of the
+   * message.
+   *
+   * @param fragment fragment to add to the end of the message.
+   * @return A reference to this instance.
+   */
+  public MessageBuilder appendFragment(MessageFragment fragment) {
+    fragments.add(fragment);
     return this;
   }
 
@@ -322,21 +336,42 @@ public class MessageBuilder {
    * This method assumes a non-emtpy list.
    */
   private void stripSpacesFromFragments() {
-    MessageFragment fragment = fragments.get(0);
-    if (fragment instanceof TextFragment) {
-      String presentation = trimLeft(fragment.getPresentation());
-      fragments.set(0, new TextFragment(presentation));
-    }
+    trimLeftFragments();
+    trimRightFragments();
+  }
 
-    int lastIndex = fragments.size() - 1;
-    fragment = fragments.get(lastIndex);
-    if (fragment instanceof TextFragment) {
-      String presentation = trimRight(fragment.getPresentation());
-      fragments.set(lastIndex, new TextFragment(presentation));
+  private void trimLeftFragments() {
+    if (fragments.size() != 0) {
+      MessageFragment fragment = fragments.get(0);
+      if (fragment instanceof TextFragment) {
+        String presentation = trimLeft(fragment.getPresentation());
+        if (presentation.length() == 0) {
+          fragments.remove(0);
+          trimLeftFragments();
+        } else {
+          fragments.set(0, new TextFragment(presentation));
+        }
+      }
     }
   }
 
-  private static String trimLeft(String s) {
+  private void trimRightFragments() {
+    if (fragments.size() != 0) {
+      int lastIndex = fragments.size() - 1;
+      MessageFragment fragment = fragments.get(lastIndex);
+      if (fragment instanceof TextFragment) {
+        String presentation = trimRight(fragment.getPresentation());
+        if (presentation.length() == 0) {
+          fragments.remove(lastIndex);
+          trimRightFragments();
+        } else {
+          fragments.set(lastIndex, new TextFragment(presentation));
+        }
+      }
+    }
+  }
+
+  private String trimLeft(String s) {
     int i = 0;
     int limit = s.length() - 1;
     while (i <= limit && Character.isWhitespace(s.charAt(i))) {
@@ -345,7 +380,7 @@ public class MessageBuilder {
     return s.substring(i);
   }
 
-  private static String trimRight(String s) {
+  private String trimRight(String s) {
     int i = s.length() - 1;
     while (i >= 0 && Character.isWhitespace(s.charAt(i))) {
       i--;

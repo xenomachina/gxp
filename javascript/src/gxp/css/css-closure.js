@@ -19,7 +19,7 @@ goog.provide('goog.gxp.css.CssClosure');
 /**
  * Closure for content-type: text/css
  *
- * @this {goog.gxp.css.CssClosure} instance
+ * @constructor
  * @param {Function} writeCss function that will write closure contents
  *                   to a given output.
  */

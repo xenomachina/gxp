@@ -37,8 +37,8 @@ public class NativeExpression extends Expression {
     this.phName = phName;
   }
 
-  public NativeExpression(Node fromNode, MultiLanguageAttrValue nativeCode,
-                          String example, String phName) {
+  public NativeExpression(Node fromNode,
+                          MultiLanguageAttrValue nativeCode, String example, String phName) {
     super(fromNode, null);
     this.nativeCode = Preconditions.checkNotNull(nativeCode);
     this.example = example;
@@ -93,6 +93,18 @@ public class NativeExpression extends Expression {
   @Override
   public <T> T acceptVisitor(ExpressionVisitor<T> visitor) {
     return visitor.visitNativeExpression(this);
+  }
+
+  @Override
+  public boolean alwaysEquals(Expression that) {
+    return (that instanceof NativeExpression)
+        && alwaysEquals((NativeExpression) that);
+  }
+
+  protected boolean alwaysEquals(NativeExpression that) {
+    return isTrivialEval()
+        && Objects.equal(getExample(), that.getExample())
+        && Objects.equal(nativeCode, that.nativeCode);
   }
 
   @Override

@@ -16,8 +16,8 @@
 
 package com.google.gxp.compiler.base;
 
-import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.common.base.Preconditions;
+import com.google.gxp.compiler.alerts.SourcePosition;
 
 /**
  * Represents a declaration that the enclosing template implements a native

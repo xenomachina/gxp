@@ -17,6 +17,7 @@
 package com.google.gxp.compiler.functests.i18n;
 
 import com.google.gxp.testing.BaseFunctionalTestCase;
+import java.util.Locale;
 
 /**
  * Functional tests related to i18n functionallity in gxp
@@ -26,10 +27,45 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
     OneMsgGxp.write(out, gxpContext);
     assertOutputEquals("<b>hello, world!</b>");
   }
+  
+  public void testNamedMsg() throws Exception {
+    NamedMsgGxp.write(out, gxpContext, "Joseph");
+    assertOutputEquals("<b>hello, world!</b>\n<b>hello, Joseph</b>");
+    assertEquals("<b>hello, world!</b>", NamedMsgGxp.ARGS_0.getMessage(Locale.US).toString());
+    assertEquals("<b>hello, Peter</b>",
+        NamedMsgGxp.ARGS_1.getMessage(Locale.US).toString("Peter"));
+  }
+  
+  public void testLanguageNamedMsg() throws Exception {
+    LanguageNamedMsgGxp.write(out, gxpContext, "Joseph");
+    assertOutputEquals("<b>hello, world!</b>\n<b>hello, Joseph</b>\n<b>cool</b>\n<b>cold</b>");
+    assertMessageFieldWasNotCreated(LanguageNamedMsgGxp.class, "CPP");
+    assertEquals("<b>hello, Peter</b>",
+        LanguageNamedMsgGxp.JAVA.getMessage(Locale.US).toString("Peter"));
+    assertMessageFieldWasNotCreated(LanguageNamedMsgGxp.class, "JS");
+    assertMessageFieldWasNotCreated(LanguageNamedMsgGxp.class, "XMB");
+  }
+  
+  private void assertMessageFieldWasNotCreated(Class<?> gxpClass, String fieldName) {
+    try {
+      gxpClass.getDeclaredField(fieldName);
+      fail(String.format("Message field %s should not be defined for GXP %s.",
+          fieldName, gxpClass.getName()));
+    } catch (NoSuchFieldException expected) {
+      // expected
+    }
+  }
 
   public void testNestedMsgs() throws Exception {
     NestedMsgsGxp.write(out, gxpContext);
     assertOutputEquals("baz &lt; bot");
+  }
+
+  public void testNamedNestedMsgs() throws Exception {
+    NamedNestedMsgsGxp.write(out, gxpContext);
+    assertOutputEquals("baz &lt; bot");
+    assertEquals("asdf", NamedNestedMsgsGxp.ONE.getMessage(Locale.US).toString("asdf"));
+    assertEquals("baz &lt; bot", NamedNestedMsgsGxp.TWO.getMessage(Locale.US).toString());
   }
 
   public void testMessageMetaChars() throws Exception {
@@ -102,5 +138,11 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
   public void testAttrInsideMsg() throws Exception {
     AttrInsideMsgGxp.write(out, gxpContext);
     assertOutputEquals("<div class=\"foo\"></div>");
+  }
+  
+  public void testAttrInsideNamedMsg() throws Exception {
+    AttrInsideNamedMsgGxp.write(out, gxpContext);
+    assertOutputEquals("<div class=\"foo\"></div>");
+    assertNotNull(AttrInsideNamedMsgGxp.NAME);
   }
 }

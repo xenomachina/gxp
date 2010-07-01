@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * Appendable. It has a different interface from Appendable though, so it
  * doesn't implement Appendable.
  *
- * <p>It performs the following transoformations on the input before passing it
+ * <p>It performs the following transformations on the input before passing it
  * through to the underlying Appendable:
  * <ul>
  * <li>adds newlines. CIndenter is line based.

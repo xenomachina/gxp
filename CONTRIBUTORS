@@ -27,6 +27,15 @@ read from the local filesystem at compile time.
 Some work on the runtime libraries was done by Mihai Parparita, Bradley Hawkes,
 and Mike Bostock.
 
+Support for named gxp:msg tags was added by Robert Dionne.
+
+Initial support for attribute hooks was added by Nick Kralevich.
+
+Support for parameter files added to the gxpc command-line tool by Ulf
+Ochsenfahrt.
+
+Some improvements to JavaScript code generation were made by Nick Santos.
+
 Sage wisdom on the design of the language was dispensed by Amit Patel,
 Eric Veach, Ning Mosberger, David P. Baker, and Luiz-Otavio Zorzella.
 

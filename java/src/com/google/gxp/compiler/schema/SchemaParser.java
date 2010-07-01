@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gxp.base.AttributeHook;
 import com.google.gxp.compiler.alerts.Alert.Severity;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
@@ -29,14 +30,18 @@ import com.google.gxp.compiler.fs.FileRef;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -339,7 +344,7 @@ public final class SchemaParser {
       String regex = attrMap.remove("regex");
       String flagNames = attrMap.remove("flags");
       String defaultValue = attrMap.remove("default");
-      String example = attrMap.remove("example");
+      String hookNames = attrMap.remove("hook");
       assertNoMoreAttrs(attrMap);
 
       if (patternName != null) {
@@ -359,8 +364,16 @@ public final class SchemaParser {
         }
       }
 
-      return new AttributeElement(name, contentType, pattern, flags,
-                                  defaultValue, example,
+      EnumSet<AttributeHook> hooks =
+          EnumSet.noneOf(AttributeHook.class);
+      if (hooks != null) {
+        for (String hookName : split(hookNames)) {
+          hooks.add(AttributeHook.valueOf(xmlToEnum(hookName)));
+        }
+      }
+
+      return new AttributeElement(name, contentType, pattern, flags, hooks,
+                                  defaultValue,
                                   Sets.newHashSet(split(elementNames)),
                                   Sets.newHashSet(split(exceptElementNames)));
     }
