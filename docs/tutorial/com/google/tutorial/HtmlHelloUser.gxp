@@ -1,0 +1,9 @@
+<!-- com/google/tutorial/HtmlHelloUser.gxp -->
+<gxp:template
+  name='com.google.tutorial.HtmlHelloUser'
+  xmlns:gxp='http://google.com/2001/gxp'
+  xmlns='http://www.w3.org/1999/xhtml'>
+  <gxp:param name='userName' type='String'/>
+
+  <b>Hello, <br/> <gxp:eval expr='userName'/>!</b>
+</gxp:template>

@@ -1,0 +1,15 @@
+<!-- com/google/tutorial/BadExample.gxp -->
+<gxp:template
+  name='com.google.tutorial.BadExample'
+  xmlns:gxp='http://google.com/2001/gxp'
+  xmlns='http://www.w3.org/1999/xhtml'>
+  <tabel>
+    <tr>
+      <td>I'm in a table!</td>
+    </tr>
+  </tabel>
+  <img scr="foo.gif"/>
+  <br>
+    This is a test.
+  </br>
+</gxp:template>

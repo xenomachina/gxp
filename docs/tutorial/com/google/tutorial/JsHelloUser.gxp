@@ -1,0 +1,12 @@
+<!-- com/google/tutorial/JsHelloUser.gxp -->
+<gxp:template
+  name='com.google.tutorial.JsHelloUser'
+  xmlns:gxp='http://google.com/2001/gxp'
+  xmlns='http://www.w3.org/1999/xhtml'>
+  <gxp:param name='userName' type='String'/>
+
+  <script type='text/javascript'>
+    var userName = <gxp:eval expr='userName'/>;
+    alert('Hello, ' + userName);
+  </script>
+</gxp:template>

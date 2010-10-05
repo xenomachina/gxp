@@ -1,0 +1,7 @@
+<!-- com/google/tutorial/HtmlHelloWorld.gxp -->
+<gxp:template
+  name='com.google.tutorial.HtmlHelloWorld'
+  xmlns:gxp='http://google.com/2001/gxp'
+  xmlns='http://www.w3.org/1999/xhtml'>
+<b>Hello, <br/> World!</b>
+</gxp:template>

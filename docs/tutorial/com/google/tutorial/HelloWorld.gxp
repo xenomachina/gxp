@@ -1,0 +1,6 @@
+<!-- com/google/tutorial/HelloWorld.gxp -->
+<gxp:template
+  name='com.google.tutorial.HelloWorld'
+  xmlns:gxp='http://google.com/2001/gxp'>
+  Hello, World!
+</gxp:template>
