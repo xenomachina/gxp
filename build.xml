@@ -35,7 +35,7 @@
   </target>
 
   <target name="compile.runtime" depends="init">
-    <javac destdir="${build.dir}/classes" debug="on">
+    <javac destdir="${build.dir}/classes" debug="on" includeAntRuntime="false">
       <compilerarg value="-Xlint:deprecation"/>
       <src path="${src.dir}" />
       <include name="com/google/gxp/base/**" />
@@ -51,7 +51,7 @@
   </target>
 
   <target name="compile.compiler" depends="compile.runtime">
-    <javac destdir="${build.dir}/classes" debug="on">
+    <javac destdir="${build.dir}/classes" debug="on" includeAntRuntime="false">
       <compilerarg value="-Xlint:deprecation"/>
       <src path="${src.dir}" />
       <include name="com/google/gxp/compiler/**" />
@@ -87,7 +87,7 @@
         <include name="com/google/gxp/base/dynamic/*.properties" />
       </fileset>
     </copy>
-    <javac destdir="${build.dir}/classes" debug="on">
+    <javac destdir="${build.dir}/classes" debug="on" includeAntRuntime="false">
       <compilerarg value="-Xlint:deprecation"/>
       <src path="${src.dir}:${genfiles.dir}" />
       <include name="com/google/gxp/base/dynamic/**" />
@@ -166,7 +166,7 @@
       </fileset>
     </copy>
 
-    <javac destdir="${build.dir}/tests" debug="true" debuglevel="lines,source">
+    <javac destdir="${build.dir}/tests" debug="true" debuglevel="lines,source" includeAntRuntime="false">
       <compilerarg value="-Xlint:deprecation"/>
       <src>
         <pathelement location="${test.dir}/" />
