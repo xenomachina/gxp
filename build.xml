@@ -97,7 +97,7 @@
 
   <target name="jar" depends="compile.runtime, compile.dynamic-runtime">
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
-             classpath="${lib.dir}/jarjar-1.0.jar" />
+             classpath="${lib.dir}/jarjar-1.1.jar" />
     <jarjar jarfile="${build.dir}/gxp-${version}.jar">
       <manifest>
         <attribute name="Main-Class" value="com.google.gxp.compiler.cli.Gxpc" />
