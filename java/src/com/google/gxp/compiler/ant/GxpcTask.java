@@ -63,6 +63,7 @@ public class GxpcTask extends Task implements Configuration {
   //               we can write some real tests
   private final FileScanner fileScanner = new DirectoryScanner();
 
+  private FileRef outputDir;
   private ImmutableSet<FileRef> sourceFiles;
   private ImmutableSet<FileRef> schemaFiles;
   private ImmutableSet<OutputLanguage> outputLanguages;
@@ -96,6 +97,7 @@ public class GxpcTask extends Task implements Configuration {
     AlertCounter counter = new AlertCounter(alertSink, getAlertPolicy());
 
     try {
+      log("Compiling "+sourceFiles.size()+" source files to "+outputDir.toFilename());
       new Compiler(this).call(counter);
     } catch (InvalidConfigException e) {
       throw new BuildException(e);
@@ -124,7 +126,7 @@ public class GxpcTask extends Task implements Configuration {
       log("Attribute 'destdir' was not set, the current working directory will be used.",
           Project.MSG_WARN);
     }
-    FileRef outputDir = (destdir == null)
+    outputDir = (destdir == null)
         ? cwd
         : fs.parseFilename(destdir);
 
