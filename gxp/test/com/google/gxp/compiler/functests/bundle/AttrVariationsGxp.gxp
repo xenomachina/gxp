@@ -1,0 +1,79 @@
+<!DOCTYPE gxp:template SYSTEM "http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent">
+<!--
+ Copyright (C) 2008 Google Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<gxp:template name='com.google.gxp.compiler.functests.bundle.AttrVariationsGxp'
+              xmlns='http://www.w3.org/1999/xhtml'
+              xmlns:my='http://google.com/2001/gxp/call/com/google/gxp/compiler/functests/bundle'
+              xmlns:gxp='http://google.com/2001/gxp'
+              xmlns:expr='http://google.com/2001/gxp/expressions'>
+
+<!-- TODO(harryh): Add some tests having to do with javascript escaping and
+                   markup tags appearing in the attributes. Even if things
+                   don't work correctly just now, best to track where we are.
+ -->
+
+<my:BooleanCalleeGxp class="theclass">
+  body
+</my:BooleanCalleeGxp>
+
+<my:BooleanCalleeGxp expr:class='"theclass"'>
+  body
+</my:BooleanCalleeGxp>
+
+<my:BooleanCalleeGxp>
+  <gxp:attr name="class">
+    <gxp:msg>theclass</gxp:msg>
+  </gxp:attr>
+  body
+</my:BooleanCalleeGxp>
+
+<my:BooleanCalleeGxp>
+  <gxp:attr name="class">
+    the<gxp:msg>class</gxp:msg>
+  </gxp:attr>
+  body
+</my:BooleanCalleeGxp>
+
+<my:BooleanCalleeGxp class="&lt;&gt;">
+  body
+</my:BooleanCalleeGxp>
+
+<my:BooleanCalleeGxp expr:class='"&lt;&gt;"'>
+  body
+</my:BooleanCalleeGxp>
+
+<my:BooleanCalleeGxp>
+  <gxp:attr name="class">
+    &lt;&gt;
+  </gxp:attr>
+  body
+</my:BooleanCalleeGxp>
+
+<my:BooleanCalleeGxp>
+  <gxp:attr name="class">
+    <gxp:msg>&lt;&gt;</gxp:msg>
+  </gxp:attr>
+  body
+</my:BooleanCalleeGxp>
+
+<my:BooleanCalleeGxp>
+  <gxp:attr name="class">
+    &lt;<gxp:msg>&gt;</gxp:msg>
+  </gxp:attr>
+  body
+</my:BooleanCalleeGxp>
+
+</gxp:template>

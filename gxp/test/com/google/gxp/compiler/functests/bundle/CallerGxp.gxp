@@ -1,0 +1,60 @@
+<!DOCTYPE gxp:template SYSTEM "http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent">
+<!--
+ Copyright (C) 2008 Google Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<gxp:template name='com.google.gxp.compiler.functests.bundle.CallerGxp'
+              xmlns='http://www.w3.org/1999/xhtml'
+              xmlns:call='http://google.com/2001/gxp/call'
+              xmlns:gxp='http://google.com/2001/gxp'
+              xmlns:f='http://google.com/2001/gxp/call/com/google/gxp/compiler/functests/bundle'
+              xmlns:expr='http://google.com/2001/gxp/expressions'>
+
+<gxp:param name='id' type='int' />
+
+<f:CalleeGxp expr:id='id' class="theclass">
+  body
+</f:CalleeGxp>
+
+<call:CalleeGxp expr:id='id+1' expr:class='"theclass"'>
+  body
+</call:CalleeGxp>
+
+<call:CalleeGxp expr:id='id+2'>
+  <gxp:attr name='onclick'>
+    alert(<gxp:eval expr='"foo"'/>);
+    foo();
+  </gxp:attr>
+  body
+</call:CalleeGxp>
+
+<f:BooleanCalleeGxp selected="selected">
+  body
+</f:BooleanCalleeGxp>
+
+<f:BooleanCalleeGxp expr:selected='true'>
+  body
+</f:BooleanCalleeGxp>
+
+<f:BooleanCalleeGxp expr:selected='false'>
+  body
+</f:BooleanCalleeGxp>
+
+<f:CallCalleeAGxp expr:id='id' class="theclass" onclick="foo()">
+  body
+</f:CallCalleeAGxp>
+
+<call:CalleeWithRequiredAttrGxp src="fluffy.gif" alt="fluffy the cat" />
+
+</gxp:template>

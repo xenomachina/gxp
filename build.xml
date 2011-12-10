@@ -145,8 +145,8 @@
 
   <target name="compile.tests"
       depends="compile.runtime, compile.compiler, compile.dynamic-runtime">
-    <gxpc srcdir="${test.dir}/com/google/gxp/compiler/functests/"
-          srcpaths="${test.dir}"
+    <gxpc srcdir="${gxp.test.dir}/com/google/gxp/compiler/functests/"
+          srcpaths="${gxp.test.dir}"
           destdir="${genfiles.dir}"
           target="com.google.gxp.compiler.functests.messages" />
     <gxpc srcdir="${test.dir}/com/google/gxp/compiler/dynamictests/"
