@@ -39,6 +39,7 @@ final class NamespaceSet {
       CppNamespace.INSTANCE,
       JavaNamespace.INSTANCE,
       JavaScriptNamespace.INSTANCE,
+      ScalaNamespace.INSTANCE,
       MsgNamespace.INSTANCE,
       NoMsgNamespace.INSTANCE,
     }) {

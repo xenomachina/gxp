@@ -40,6 +40,7 @@ import com.google.gxp.compiler.parser.JavaScriptNamespace;
 import com.google.gxp.compiler.parser.Namespace;
 import com.google.gxp.compiler.parser.NullNamespace;
 import com.google.gxp.compiler.parser.OutputLanguageNamespace;
+import com.google.gxp.compiler.parser.ScalaNamespace;
 
 import java.util.*;
 
@@ -273,7 +274,8 @@ class AttributeMap {
   private static final ImmutableList<OutputLanguageNamespace> outputLanguageNamespaces =
       ImmutableList.of(CppNamespace.INSTANCE,
                        JavaNamespace.INSTANCE,
-                       JavaScriptNamespace.INSTANCE);
+                       JavaScriptNamespace.INSTANCE,
+                       ScalaNamespace.INSTANCE);
 
   public static Iterable<OutputLanguageNamespace> getOutputLanguageNamespaces() {
     return outputLanguageNamespaces;

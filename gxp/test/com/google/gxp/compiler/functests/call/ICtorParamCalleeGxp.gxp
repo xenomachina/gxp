@@ -18,8 +18,9 @@
                xmlns="http://www.w3.org/1999/xhtml"
                xmlns:cpp='http://google.com/2001/gxp/code/cpp'
                xmlns:gxp="http://google.com/2001/gxp"
-               xmlns:java='http://google.com/2001/gxp/code/java'>
+               xmlns:java='http://google.com/2001/gxp/code/java'
+               xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
-<gxp:param name='s' cpp:type='const char *' java:type='String' has-constructor='true' />
+<gxp:param name='s' cpp:type='const char *' java:type='String' scala:type='String' has-constructor='true' />
 
 </gxp:interface>

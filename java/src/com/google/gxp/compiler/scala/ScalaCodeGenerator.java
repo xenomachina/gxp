@@ -18,17 +18,26 @@ package com.google.gxp.compiler.scala;
 
 import static com.google.gxp.compiler.base.OutputLanguage.SCALA;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.SourcePosition;
 import com.google.gxp.compiler.alerts.common.NothingToCompileError;
+import com.google.gxp.compiler.base.BooleanType;
+import com.google.gxp.compiler.base.BundleType;
 import com.google.gxp.compiler.base.ClassImport;
+import com.google.gxp.compiler.base.ContentType;
 import com.google.gxp.compiler.base.DefaultingImportVisitor;
 import com.google.gxp.compiler.base.FormalParameter;
 import com.google.gxp.compiler.base.FormalTypeParameter;
+import com.google.gxp.compiler.base.Implementable;
 import com.google.gxp.compiler.base.Import;
 import com.google.gxp.compiler.base.ImportVisitor;
+import com.google.gxp.compiler.base.InstanceType;
 import com.google.gxp.compiler.base.Interface;
+import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.NullRoot;
 import com.google.gxp.compiler.base.PackageImport;
 import com.google.gxp.compiler.base.Parameter;
@@ -36,6 +45,9 @@ import com.google.gxp.compiler.base.Root;
 import com.google.gxp.compiler.base.RootVisitor;
 import com.google.gxp.compiler.base.Template;
 import com.google.gxp.compiler.base.TemplateName;
+import com.google.gxp.compiler.base.TemplateType;
+import com.google.gxp.compiler.base.Type;
+import com.google.gxp.compiler.base.TypeVisitor;
 import com.google.gxp.compiler.codegen.BaseCodeGenerator;
 import com.google.gxp.compiler.codegen.BracesCodeGenerator;
 import com.google.gxp.compiler.msgextract.MessageExtractedTree;
@@ -129,6 +141,85 @@ public class ScalaCodeGenerator extends BracesCodeGenerator<MessageExtractedTree
       for (Import imp : root.getImports()) {
         imp.acceptVisitor(IMPORT_VISITOR);
       }
+    } 
+    
+    protected static final String GXP_OUT_VAR = "gxp$out";
+    protected static final String GXP_CONTEXT_VAR = "gxp_context";
+
+    protected static final String GXP_SIG =
+      COMMA_JOINER.join(GXP_OUT_VAR + ": java.lang.Appendable",
+                        GXP_CONTEXT_VAR + ": com.google.gxp.base.GxpContext");
+    
+    protected String getClassName(TemplateName name) {
+      return (name == null) ? null : name.getBaseName();
+    }
+
+    protected String toScalaType(Type type) {
+      return type.acceptTypeVisitor(new TypeVisitor<String>() {
+        public String visitBooleanType(BooleanType type) {
+          return "boolean";
+        }
+
+        public String visitBundleType(BundleType type) {
+          StringBuilder sb = new StringBuilder("com.google.gxp.base.GxpAttrBundle[");
+          sb.append(type.getSchema().getScalaType());
+          sb.append("]");
+          return sb.toString();
+        }
+
+        public String visitContentType(ContentType type) {
+          return type.getSchema().getScalaType();
+        }
+
+        public String visitInstanceType(InstanceType type) {
+          return type.getTemplateName().toString() + ".Interface";
+        }
+
+        public String visitNativeType(NativeType type) {
+          return ScalaUtil.validateType(alertSink, type);
+        }
+
+        public String visitTemplateType(TemplateType type) {
+          return type.getTemplateName().toString();
+        }
+      });
+    }
+
+    protected Function<Parameter, String> parameterToCallName =
+      new Function<Parameter, String>() {
+        public String apply(Parameter param) {
+          StringBuilder sb = new StringBuilder();
+          sb.append(param.getPrimaryName());
+          sb.append(": ");
+          sb.append(toScalaType(param.getType()));
+          return sb.toString();
+        }
+      };
+    
+    protected List<String> toBoundedTypeDecls(boolean includeExtends,
+                                              Iterable<FormalTypeParameter> formalTypeParameters) {
+      List<String> result = Lists.newArrayList();
+      for (FormalTypeParameter formalTypeParameter : formalTypeParameters) {
+        if (!includeExtends || formalTypeParameter.getExtendsType() == null) {
+          result.add(formalTypeParameter.getName());
+        } else {
+          String type = ScalaUtil.validateConjunctiveType(
+              alertSink, formalTypeParameter.getExtendsType());
+          result.add(formalTypeParameter.getName() + " <: " + type);
+        }
+      }
+      return result;
+    }    
+    
+    protected void appendScalaFormalTypeParameters(
+      StringBuilder sb, boolean includeExtends,
+      List<FormalTypeParameter> formalTypeParameters) {
+      if (!formalTypeParameters.isEmpty()) {
+        sb.append("[");
+        COMMA_JOINER.appendTo(sb, toBoundedTypeDecls(includeExtends,
+                                                     formalTypeParameters));
+        sb.append("]");
+      }
     }
     
     protected static String loadFormat(String name) {
@@ -168,6 +259,78 @@ public class ScalaCodeGenerator extends BracesCodeGenerator<MessageExtractedTree
     }
 
     public void run() {
+      for (Parameter param :
+               Iterables.filter(iface.getParameters(), Implementable.NOT_INSTANCE_PARAM)) {
+        SCALA.validateName(alertSink, param, param.getPrimaryName());
+      }
+      appendHeader(iface);
+      appendImports(iface);
+      appendLine();
+      appendInterface();
+      appendLine();
+      appendFooter();
+    }
+    
+    @Override
+    protected SourcePosition getDefaultSourcePosition() {
+      return iface.getSourcePosition();
+    }
+
+    protected void appendInterface() {
+      StringBuilder sb = new StringBuilder("trait ");
+      sb.append(getClassName(iface.getName()));
+      appendScalaFormalTypeParameters(sb, true, iface.getFormalTypeParameters());
+      sb.append(" {");
+      appendLine(iface.getSourcePosition(), sb.toString());
+      appendLine(getWriteMethodSignature());
+      appendLine(getGetGxpClosureMethodSignature());
+      appendGetDefaultMethods();
+      appendConstructorMethods();
+      appendLine("}");
+    }
+
+    private String getWriteMethodSignature() {
+      StringBuilder sb = new StringBuilder("def write(");
+      sb.append(GXP_SIG);
+      for (Parameter param : Iterables.filter(iface.getParameters(),
+                                              Implementable.NOT_INSTANCE_PARAM)) {
+        sb.append(", ");
+        sb.append(parameterToCallName.apply(param));
+      }
+      sb.append("): Unit");
+      return sb.toString();
+    }
+
+    private String getGetGxpClosureMethodSignature() {
+      StringBuilder sb = new StringBuilder();
+      sb.append("def getGxpClosure(");
+      COMMA_JOINER.appendTo(sb, Iterables.transform(
+                                Iterables.filter(iface.getParameters(),
+                                                 Implementable.NOT_INSTANCE_PARAM),
+                                parameterToCallName));
+      sb.append("): ");
+      sb.append(iface.getSchema().getScalaType());
+      return sb.toString();
+    }
+
+    private void appendGetDefaultMethods() {
+      for (Parameter param : iface.getParameters()) {
+        if (param.hasDefaultFlag()) {
+          formatLine(param.getSourcePosition(), "def %s(): %s",
+                     getDefaultMethodName(param), toScalaType(param.getType()));
+        }
+      }
+    }
+
+    private void appendConstructorMethods() {
+      for (Parameter param : iface.getParameters()) {
+        if (param.hasConstructorFlag()) {
+          formatLine(param.getSourcePosition(), "def %s(%s: String): %s",
+                     getConstructorMethodName(param),
+                     param.getPrimaryName(),
+                     toScalaType(param.getType()));
+        }
+      }
     }
   }
 }
