@@ -16,7 +16,13 @@
                       com.google.gxp.js.*
                       com.google.gxp.text.*'
         javascript-type='goog.gxp.html.HtmlClosure'
-        javascript-imports='goog.gxp.html'>
+        javascript-imports='goog.gxp.html'
+        scala-type='com.google.gxp.html.HtmlClosure'
+        scala-appender='com.google.gxp.html.HtmlAppender'
+        scala-imports='com.google.gxp.css._
+                      com.google.gxp.html._
+                      com.google.gxp.js._
+                      com.google.gxp.text._'>
 
   <!-- ## DOCTYPES ####################################################### -->
   <!--

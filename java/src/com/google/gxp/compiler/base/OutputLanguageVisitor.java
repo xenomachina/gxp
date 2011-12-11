@@ -30,5 +30,6 @@ public interface OutputLanguageVisitor<K, V> {
   V visitJava(K arg);
   V visitDynamicImplJava(K arg);
   V visitJavaScript(K arg);
+  V visitScala(K arg);
   V visitXmb(K arg);
 }

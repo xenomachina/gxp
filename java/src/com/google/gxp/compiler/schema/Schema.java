@@ -61,6 +61,9 @@ public final class Schema extends SerializableAbstractNode implements Comparable
   private final ImmutableList<String> javaImports;
   private final String javaScriptType;
   private final ImmutableList<String> javaScriptImports;
+  private final String scalaType;
+  private final String scalaAppender;
+  private final ImmutableList<String> scalaImports;
   private final ContentFamily contentFamily;
   private final ImmutableList<SchemaRef> allowedSchemaRefs;
   private final Schema msgSchema;
@@ -177,6 +180,26 @@ public final class Schema extends SerializableAbstractNode implements Comparable
   }
 
   /**
+   * @return the name of the Scala type used to represent a closure of content
+   * from this schema.
+   */
+  public String getScalaType() {
+    return scalaType;
+  }
+
+  public String getScalaAppender() {
+    return scalaAppender;
+  }
+
+  /**
+   * @return a {@code List} of additional imports that should be declared in
+   * every scala file of this schema type.
+   */
+  public List<String> getScalaImports() {
+    return scalaImports;
+  }
+
+  /**
    * @return the {@code ContentFamily} of this Schema.
    */
   public ContentFamily getContentFamily() {
@@ -239,6 +262,9 @@ public final class Schema extends SerializableAbstractNode implements Comparable
                 List<String> javaImports,
                 String javaScriptType,
                 List<String> javaScriptImports,
+                String scalaType,
+                String scalaAppender,
+                List<String> scalaImports,
                 Iterable<ElementBuilder> elementBuilders,
                 Collection<SchemaRef> allowedSchemaRefs,
                 Schema msgSchema) {
@@ -257,6 +283,9 @@ public final class Schema extends SerializableAbstractNode implements Comparable
     this.javaImports = ImmutableList.copyOf(Preconditions.checkNotNull(javaImports));
     this.javaScriptType = javaScriptType;
     this.javaScriptImports = ImmutableList.copyOf(Preconditions.checkNotNull(javaScriptImports));
+    this.scalaType = scalaType;
+    this.scalaAppender = scalaAppender;
+    this.scalaImports = ImmutableList.copyOf(Preconditions.checkNotNull(scalaImports));
     this.contentFamily = ContentFamily.fromContentTypeName(
         getCanonicalContentType());
 
@@ -302,6 +331,9 @@ public final class Schema extends SerializableAbstractNode implements Comparable
         && Objects.equal(getJavaImports(), that.getJavaImports())
         && Objects.equal(getJavaScriptType(), that.getJavaScriptType())
         && Objects.equal(getJavaScriptImports(), that.getJavaScriptImports())
+        && Objects.equal(getScalaType(), that.getScalaType())
+        && Objects.equal(getScalaAppender(), that.getScalaAppender())
+        && Objects.equal(getScalaImports(), that.getScalaImports())
         && Objects.equal(getContentFamily(), that.getContentFamily())
         && Objects.equal(allowedSchemaRefs, that.allowedSchemaRefs)
         && Objects.equal(validatorMap, that.validatorMap)
@@ -326,6 +358,9 @@ public final class Schema extends SerializableAbstractNode implements Comparable
         getJavaImports(),
         getJavaScriptType(),
         getJavaScriptImports(),
+        getScalaType(),
+        getScalaAppender(),
+        getScalaImports(),
         getContentFamily(),
         allowedSchemaRefs,
         validatorMap,

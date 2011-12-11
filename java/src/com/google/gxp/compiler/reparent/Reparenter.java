@@ -93,6 +93,7 @@ import com.google.gxp.compiler.parser.OutputNamespace;
 import com.google.gxp.compiler.parser.ParsedAttribute;
 import com.google.gxp.compiler.parser.ParsedElement;
 import com.google.gxp.compiler.parser.ParsedElementVisitor;
+import com.google.gxp.compiler.parser.ScalaNamespace;
 import com.google.gxp.compiler.parser.TextElement;
 import com.google.gxp.compiler.schema.AttributeValidator;
 import com.google.gxp.compiler.schema.DocType;
@@ -223,6 +224,10 @@ public class Reparenter implements Function<IfExpandedTree, ReparentedTree> {
 
           public Attribute visitOutputNamespace(OutputNamespace ns) {
             throw new Error("TODO(laurence): implement");
+          }
+          
+          public Attribute visitScalaNamespace(ScalaNamespace ns) {
+            return defaultVisitNamespace(ns);
           }
         });
   }

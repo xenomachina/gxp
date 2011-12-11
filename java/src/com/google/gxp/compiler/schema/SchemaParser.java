@@ -100,6 +100,10 @@ public final class SchemaParser {
     private String schemaJavaScriptType;
     private List<String> schemaJavaScriptImports = Lists.newArrayList();
 
+    private String schemaScalaType;
+    private String schemaScalaAppender;
+    private List<String> schemaScalaImports = Lists.newArrayList();
+
     private boolean schemaDefaultsToSgml;
     private String schemaSgmlContentType;
 
@@ -121,6 +125,7 @@ public final class SchemaParser {
                         schemaCppType, schemaCppAppender, schemaCppImports,
                         schemaJavaType, schemaJavaAppender, schemaJavaImports,
                         schemaJavaScriptType, schemaJavaScriptImports,
+                        schemaScalaType, schemaScalaAppender, schemaScalaImports,
                         elementBuilders.values(), schemaAllowedSchemaRefs, null);
     }
 
@@ -209,6 +214,15 @@ public final class SchemaParser {
         if (javaScriptImportsStr != null) {
           for (String javaScriptImport : split(javaScriptImportsStr)) {
             schemaJavaScriptImports.add(javaScriptImport);
+          }
+        }
+        
+        schemaScalaType = attrMap.remove("scala-type");
+        schemaScalaAppender = attrMap.remove("scala-appender");
+        String scalaImportsStr = attrMap.remove("scala-imports");
+        if (scalaImportsStr != null) {
+          for (String scalaImport : split(scalaImportsStr)) {
+            schemaScalaImports.add(scalaImport);
           }
         }
 

@@ -21,6 +21,7 @@ import com.google.gxp.compiler.codegen.OutputLanguageUtil;
 import com.google.gxp.compiler.cpp.CppUtil;
 import com.google.gxp.compiler.java.JavaUtil;
 import com.google.gxp.compiler.js.JavaScriptUtil;
+import com.google.gxp.compiler.scala.ScalaUtil;
 
 /**
  * A language that we can generate code into.
@@ -58,6 +59,13 @@ public enum OutputLanguage {
     @Override
     public <K,V> V acceptVisitor(OutputLanguageVisitor<K,V> visitor, K arg) {
       return visitor.visitJavaScript(arg);
+    }
+  },
+
+  SCALA("Scala", ".scala", ScalaUtil.INSTANCE) {
+    @Override
+    public <K,V> V acceptVisitor(OutputLanguageVisitor<K,V> visitor, K arg) {
+      return visitor.visitScala(arg);
     }
   },
 

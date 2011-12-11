@@ -147,7 +147,8 @@ public class GxpcTask extends Task implements Configuration {
         : ImmutableSet.copyOf(fs.parseFilenameList(schemas));
 
     // Compute Output Languages
-    outputLanguages = ImmutableSet.of(OutputLanguage.JAVA);
+    // TODO(harryh): make this configurable
+    outputLanguages = ImmutableSet.of(OutputLanguage.JAVA, OutputLanguage.SCALA);
 
     // Compute Properties File
     propertiesFile = (target != null)

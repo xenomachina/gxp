@@ -20,6 +20,7 @@
     <pathelement location="${lib.dir}/xercesImplNoMetaInf.jar" />
     <pathelement location="${lib.dir}/guava-10.0.1.jar" />
     <pathelement location="${lib.dir}/google-base-extra.jar" />
+    <pathelement location="${scala.home}/lib/scala-library.jar" />
   </path>
 
   <target name="clean" description="Remove generated files.">
@@ -32,6 +33,13 @@
     <mkdir dir="${build.dir}/javadoc" />
     <mkdir dir="${build.dir}/compiler.javadoc" />
     <mkdir dir="${build.dir}/tests" />
+     
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="${scala.home}/lib/scala-compiler.jar" />
+        <pathelement location="${scala.home}/lib/scala-library.jar" />
+      </classpath>
+    </taskdef>
   </target>
 
   <target name="compile.runtime" depends="init">
@@ -63,6 +71,7 @@
         <include name="com/google/gxp/compiler/codegen/*.format" />
         <include name="com/google/gxp/compiler/java/*.format" />
         <include name="com/google/gxp/compiler/parser/*.ent" />
+        <include name="com/google/gxp/compiler/scala/*.format" />
         <include name="com/google/gxp/compiler/schema/*.xml" />
       </fileset>
     </copy>
@@ -179,6 +188,13 @@
         <pathelement location="${build.dir}/classes" />
       </classpath>
     </javac>
+    
+    <scalac destdir="${build.dir}/tests">
+      <src>
+        <pathelement location="${scala.test.dir}/" />
+      </src>
+      <classpath refid="classpath.jars" />
+    </scalac>
   </target>
 
   <target name="test" depends="compile.tests">

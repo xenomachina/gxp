@@ -32,4 +32,5 @@ public interface NamespaceVisitor<T> {
   T visitNoMsgNamespace(NoMsgNamespace ns);
   T visitNullNamespace(NullNamespace ns);
   T visitOutputNamespace(OutputNamespace ns);
+  T visitScalaNamespace(ScalaNamespace ns);
 }

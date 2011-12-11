@@ -1,0 +1,10 @@
+
+/*
+ This file generated from:
+
+ %s
+*/
+
+package %s
+
+import com.google.gxp.base.*
