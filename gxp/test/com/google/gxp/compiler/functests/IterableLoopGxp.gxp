@@ -20,11 +20,12 @@
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:gxp='http://google.com/2001/gxp'
-              xmlns:java='http://google.com/2001/gxp/code/java'>
+              xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
 <cpp:include library='list' />
 
-<gxp:param name='items' cpp:type='list{string}*' java:type='Iterable{String}' />
+<gxp:param name='items' cpp:type='list{string}*' java:type='Iterable{String}' scala:type='Iterable[String]' />
 
 <ul>
   <gxp:loop type='String' var='item' iterable='items'>

@@ -21,15 +21,18 @@
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
 You are running: <call:BasicCalleeGxp cpp:s='"C++"'
                                       java:s='"Java"'
-                                      js:s='"JavaScript"' />
+                                      js:s='"JavaScript"'
+                                      scala:s='"Scala"' />
 
 Is this C++? <call:BasicCalleeGxp expr:s='"No"' cpp:s='"Yes"' />
 Is this Java? <call:BasicCalleeGxp expr:s='"No"' java:s='"Yes"' />
 Is this JavaScript? <call:BasicCalleeGxp expr:s='"No"' js:s='"Yes"' />
+Is this Scala? <call:BasicCalleeGxp expr:s='"No"' scala:s='"Yes"' />
 
 You are running: <call:CalleeWithDefaultGxp />
 

@@ -20,9 +20,10 @@
               xmlns:cpp="http://google.com/2001/gxp/code/cpp"
               xmlns:expr="http://google.com/2001/gxp/expressions"
               xmlns:gxp="http://google.com/2001/gxp"
-              xmlns:java="http://google.com/2001/gxp/code/java">
+              xmlns:java="http://google.com/2001/gxp/code/java"
+              xmlns:scala="http://google.com/2001/gxp/code/scala">
 
-<gxp:param name="some_condition" cpp:type='bool' java:type='boolean' />
+<gxp:param name="some_condition" cpp:type='bool' java:type='boolean' scala:type='boolean' />
 
 <call:CondAttrCalleeGxp>
   <gxp:attr name='id' cond='some_condition'>

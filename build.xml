@@ -157,6 +157,7 @@
     <gxpc srcdir="${gxp.test.dir}/com/google/gxp/compiler/functests/"
           srcpaths="${gxp.test.dir}"
           destdir="${genfiles.dir}"
+          outputLanguages="java,scala"
           target="com.google.gxp.compiler.functests.messages" />
     <gxpc srcdir="${test.dir}/com/google/gxp/compiler/dynamictests/"
           srcpaths="${test.dir}"

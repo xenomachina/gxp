@@ -19,13 +19,15 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
 <gxp:import class='com.google.gxp.compiler.functests.IntIterable' />
 
 <gxp:loop var='i' type='int' iterable='new IntIterable(2)' cpp:delimiter='"C++"'
                                                            java:delimiter='"Java"'
-                                                           js:delimiter='"JavaScript"'>
+                                                           js:delimiter='"JavaScript"'
+                                                           scala:delimiter='"Scala"'>
   |
 </gxp:loop>
 

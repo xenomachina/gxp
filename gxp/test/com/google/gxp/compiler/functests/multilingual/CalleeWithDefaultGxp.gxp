@@ -19,11 +19,13 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
-<gxp:param name='s' cpp:type='const char *' java:type='String' cpp:default='"C++"'
-                                                               java:default='"Java"'
-                                                               js:default='"JavaScript"' />
+<gxp:param name='s' cpp:type='const char *' cpp:default='"C++"'
+                    java:type='String' java:default='"Java"'
+                    js:default='"JavaScript"'
+                    scala:type='String' scala:default='"Scala"' />
 
 <gxp:eval expr='s' />
 

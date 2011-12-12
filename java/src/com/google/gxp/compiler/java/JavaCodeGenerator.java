@@ -63,6 +63,7 @@ import com.google.gxp.compiler.base.ValidatedCall;
 import com.google.gxp.compiler.codegen.DuplicateMessageNameError;
 import com.google.gxp.compiler.codegen.LoopMissingBothIterableAndIteratorError;
 import com.google.gxp.compiler.codegen.MissingExpressionError;
+import com.google.gxp.compiler.codegen.NoMessageSourceError;
 import com.google.gxp.compiler.msgextract.MessageExtractedTree;
 import com.google.gxp.compiler.reparent.Attribute;
 import com.google.gxp.compiler.schema.AttributeValidator;

@@ -19,12 +19,14 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
-You are running: <gxp:eval cpp:expr='"C++"' java:expr='"Java"' js:expr='"JavaScript"' />
+You are running: <gxp:eval cpp:expr='"C++"' java:expr='"Java"' js:expr='"JavaScript"' scala:expr='"Scala"' />
 
 Is this C++? <gxp:eval expr='"No"' cpp:expr='"Yes"' />
 Is this Java? <gxp:eval expr='"No"' java:expr='"Yes"' />
 Is this JavaScript? <gxp:eval expr='"No"' js:expr='"Yes"' />
+Is this Scala? <gxp:eval expr='"No"' scala:expr='"Yes"' />
 
 </gxp:template>

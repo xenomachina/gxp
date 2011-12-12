@@ -27,8 +27,8 @@ import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.codegen.IllegalExpressionError;
 import com.google.gxp.compiler.codegen.IllegalNameError;
 import com.google.gxp.compiler.codegen.IllegalOperatorError;
+import com.google.gxp.compiler.codegen.IllegalTypeError;
 import com.google.gxp.compiler.reparent.IllegalVariableNameError;
-import com.google.gxp.compiler.java.IllegalJavaTypeError;
 import com.google.gxp.testing.BaseErrorTestCase;
 
 import java.util.*;
@@ -92,46 +92,46 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
   private static ImmutableList<IllegalOperatorExpression> ILLEGAL_OPERATORS
       = ImmutableList.of(
           new IllegalOperatorExpression("i++", "++",
-                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
           new IllegalOperatorExpression("i instanceof Foo", "instanceof",
-                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
           new IllegalOperatorExpression("i = 10", "=",
-                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
           new IllegalOperatorExpression("i & 1", "&",
-                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
           new IllegalOperatorExpression("i >> 2", ">>",
-                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
           new IllegalOperatorExpression("i >>> 2", ">>>",
-                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
 
           // here are a couple of expressions with java casts.  they are legal in
           // java but illegal in javascript
           new IllegalOperatorExpression("(List<List<Foo>>)genericCast", ">>",
-                                        OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
           new IllegalOperatorExpression("(List<List<List<List<Foo>>>>) deepDenericCast", ">>>",
-                                        OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
           new IllegalOperatorExpression("(Pair<List<List<Foo>>, Bar>)anotherGenericCast", ">>",
-                                        OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
 
           // here are a few illegal JS operators, that are not illegal in JS
           // (though they aren't valid so will result in a java compile error)
           new IllegalOperatorExpression("x typeof y", "typeof",
-                                        OutputLanguage.JAVASCRIPT),
+                                        OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA),
           new IllegalOperatorExpression("x in y", "in",
-                                        OutputLanguage.JAVASCRIPT));
+                                        OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA));
 
   private static ImmutableMap<String, Collection<OutputLanguage>> ILLEGAL_EXPRESSIONS =
     new ImmutableMultimap.Builder<String, OutputLanguage>()
       .putAll("\"unclosed String",
-              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA)
       .putAll("//unclosed comment",
-              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA)
       .putAll("/* unclosed comment",
-              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA)
       .putAll("(mismatched_parens",
-              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA)
       .putAll("(mismatch[)1]",
-              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT)
+              OutputLanguage.JAVA, OutputLanguage.JAVASCRIPT, OutputLanguage.SCALA)
       .build().asMap();
 
   /**
@@ -249,48 +249,63 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
     }
   }
 
-  private static String[] ILLEGAL_TYPES = {
-    "bad!type",
-    "String[10]",
-    "String][",
-    "String...",
-    "List<Integer}",
-    "List{Integer>",
-    "List{List<String}>",
-    "List<Intege>r",
-    "List<Integer",
-    "List>Integer<",
-    "ListInteger>",
-    "<Integer>",
-    "[]",
-    ".java.util.List",
-    "java.util.",
-    "java..util.List",
-  };
+  private static class TestType {
+    private final String type;
+    private final ImmutableList<OutputLanguage> illegalIn;
 
-  private static String[] LEGAL_TYPES = {
-    "int",
-    "boolean",
-    "int[]",
-    "int[][]",
-    "List<String>",
-    "List<String>[]",
-    "List<Map<String, Integer>>",
-    "Map<String, List<Integer>>",
-    "java.lang.String",
-    "java.util.List<java.lang.String>",
-    "java.lang.String[]",
-    "java.util.List<java.util.Map<java.lang.String, java.lang.Integer>>",
-    "java.util.Map<java.lang.String, java.util.List<java.lang.Integer>>",
-    "List{String}",
-    "List{String}[]",
-    "List{Map{String, Integer}}",
-    "Map{String, List{Integer}}",
-    "java.util.List{java.lang.String}",
-    "java.util.List{java.util.Map{java.lang.String, java.lang.Integer}}",
-    "java.util.Map{java.lang.String, java.util.List{java.lang.Integer}}",
-    " List < List < String > > [ ]",
-  };
+    public TestType(String type, OutputLanguage... illegalIn) {
+      this.type = type;
+      this.illegalIn = ImmutableList.copyOf(illegalIn);
+    }
+
+    public String getType() {
+      return type;
+    }
+
+    public ImmutableList<OutputLanguage> getIllegalIn() {
+      return illegalIn;
+    }
+  }
+
+  private static ImmutableList<TestType> TEST_TYPES
+      = ImmutableList.of(
+          new TestType("bad!type", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("String[10]", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("String][", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("String...", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("List<Integer}", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("List{Integer>", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("List{List<String}>", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("List<Intege>r", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("List<Integer", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("List>Integer<", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("ListInteger>", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("<Integer>", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("[]", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType(".java.util.List", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("java.util.", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("java..util.List", OutputLanguage.JAVA, OutputLanguage.SCALA),
+          new TestType("int"),
+          new TestType("boolean"),
+          new TestType("int[]"),
+          new TestType("int[][]"),
+          new TestType("List<String>", OutputLanguage.SCALA),
+          new TestType("List<String>[]", OutputLanguage.SCALA),
+          new TestType("List<Map<String, Integer>>", OutputLanguage.SCALA),
+          new TestType("Map<String, List<Integer>>", OutputLanguage.SCALA),
+          new TestType("java.lang.String"),
+          new TestType("java.util.List<java.lang.String>", OutputLanguage.SCALA),
+          new TestType("java.lang.String[]", OutputLanguage.SCALA),
+          new TestType("java.util.List<java.util.Map<java.lang.String, java.lang.Integer>>", OutputLanguage.SCALA),
+          new TestType("java.util.Map<java.lang.String, java.util.List<java.lang.Integer>>", OutputLanguage.SCALA),
+          new TestType("List{String}"),
+          new TestType("List{String}[]"),
+          new TestType("List{Map{String, Integer}}"),
+          new TestType("Map{String, List{Integer}}"),
+          new TestType("java.util.List{java.lang.String}"),
+          new TestType("java.util.List{java.util.Map{java.lang.String, java.lang.Integer}}"),
+          new TestType("java.util.Map{java.lang.String, java.util.List{java.lang.Integer}}"),
+          new TestType(" List < List < String > > [ ]", OutputLanguage.SCALA));
 
   /**
    * Givin a prefix and suffix, constructs and compiles GXPs containing the
@@ -299,18 +314,13 @@ public abstract class BaseTestCase extends BaseErrorTestCase {
    * should generetae no alerts, while illegal types should generate
    * specific alerts.
    */
-  public final void assertIllegalTypeDetected(String prefix,
-                                              String suffix)
-      throws Exception {
-    for (String legalType : LEGAL_TYPES) {
-      compile(prefix + CharEscapers.xmlEscaper().escape(legalType) + suffix);
-      assertNoUnexpectedAlerts();
-    }
-
-    SourcePosition errorPos = pos(2, 1);
-    for (String illegalType : ILLEGAL_TYPES) {
-      compile(prefix + CharEscapers.xmlEscaper().escape(illegalType) + suffix);
-      assertAlert(new IllegalJavaTypeError(errorPos, illegalType));
+  public final void assertIllegalTypeDetected(String prefix, String suffix) throws Exception {
+    for (TestType testType : TEST_TYPES) {
+      compile(prefix + CharEscapers.xmlEscaper().escape(testType.getType()) + suffix);
+      SourcePosition errorPos = pos(2, 1);
+      for (OutputLanguage outputLanguage : testType.getIllegalIn()) {
+        assertAlert(new IllegalTypeError(errorPos, outputLanguage.getDisplay(), testType.getType()));
+      }
       assertNoUnexpectedAlerts();
     }
   }

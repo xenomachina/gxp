@@ -28,6 +28,8 @@ import com.google.gxp.compiler.java.DynamicImplJavaCodeGenerator;
 import com.google.gxp.compiler.java.DynamicStubJavaCodeGenerator;
 import com.google.gxp.compiler.java.JavaCodeGenerator;
 import com.google.gxp.compiler.js.JavaScriptCodeGenerator;
+import com.google.gxp.compiler.scala.DynamicImplScalaCodeGenerator;
+import com.google.gxp.compiler.scala.DynamicStubScalaCodeGenerator;
 import com.google.gxp.compiler.scala.ScalaCodeGenerator;
 import com.google.gxp.compiler.xmb.XmbCodeGenerator;
 
@@ -148,7 +150,20 @@ public class DefaultCodeGeneratorFactory implements CodeGeneratorFactory {
           }
 
           public CodeGenerator visitScala(CompilationUnit cUnit) {
-            return new ScalaCodeGenerator(cUnit.getMessageExtractedTree());
+            if (dynamicModeEnabled) {
+              return new DynamicStubScalaCodeGenerator(
+                  cUnit.getMessageExtractedTree(),
+                  sourceFiles, schemaFiles, sourcePaths, alertPolicy);
+            } else {
+              return new ScalaCodeGenerator(cUnit.getMessageExtractedTree(),
+                                            runtimeMessageSource);
+            }
+          }
+
+          public CodeGenerator visitDynamicImplScala(CompilationUnit cUnit) {
+            return new DynamicImplScalaCodeGenerator(
+                cUnit.getMessageExtractedTree(),
+                cUnit.getCompilationVersion());
           }
 
           public CodeGenerator visitXmb(CompilationUnit cUnit) {

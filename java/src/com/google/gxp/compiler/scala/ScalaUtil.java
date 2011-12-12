@@ -18,14 +18,17 @@ package com.google.gxp.compiler.scala;
 
 import com.google.common.base.CharEscapers;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.gxp.compiler.alerts.AlertSink;
 import com.google.gxp.compiler.alerts.common.MissingTypeError;
+import com.google.gxp.compiler.base.JavaAnnotation;
 import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.OutputLanguage;
 import com.google.gxp.compiler.codegen.OutputLanguageUtil;
+import com.google.gxp.compiler.codegen.IllegalTypeError;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -286,13 +289,13 @@ public class ScalaUtil extends OutputLanguageUtil {
         tokens.add(m.group(1));
         s = m.group(2).trim();
       } else {
-        alertSink.add(new IllegalScalaTypeError(type));
+        alertSink.add(new IllegalTypeError(type, OutputLanguage.SCALA));
         return ret;
       }
     }
 
     if (!(parseType(tokens) && tokens.isEmpty())) {
-      alertSink.add(new IllegalScalaTypeError(type));
+      alertSink.add(new IllegalTypeError(type, OutputLanguage.SCALA));
     }
 
     return ret;
@@ -318,6 +321,17 @@ public class ScalaUtil extends OutputLanguageUtil {
   }
 
   /**
+   * Validate that the given {@link JavaAnnotation} contains a well formed
+   * Scala annotation.
+   *
+   * @return the well formed annotation.
+   */
+  public static String validateAnnotation(AlertSink alertSink, JavaAnnotation annotation) {
+    // TODO(harryh): actually do some validation
+    return annotation.getWith();
+  }
+
+  /**
    * Parses the following rule from the JLS:
    *   Type:
    *     Identifier [TypeArguments]{ . Identifier [TypeArguments]} {[]}
@@ -325,7 +339,7 @@ public class ScalaUtil extends OutputLanguageUtil {
    * (actually, this rule deviates from the JLS, which seems to have a
    * bug in that it doesn't allow arrays of BasicTypes)
    *
-   * MODIFIED so that {}s can sub for <>s
+   * MODIFIED so that {}s can sub for []s
    */
   private static boolean parseType(Queue<String> tokens) {
     if (isPrimitiveType(tokens.peek())) {
@@ -335,8 +349,8 @@ public class ScalaUtil extends OutputLanguageUtil {
         if (!isIdentifier(tokens.poll())) {
           return false;
         }
-        if ("<".equals(tokens.peek())) {
-          if (!parseTypeArguments(tokens, "<", ">")) {
+        if ("[".equals(tokens.peek())) {
+          if (!parseTypeArguments(tokens, "[", "]")) {
             return false;
           }
         }
@@ -366,7 +380,7 @@ public class ScalaUtil extends OutputLanguageUtil {
    *   TypeArguments:
    *     < TypeArgument {, TypeArgument} >
    *
-   * MODIFIED so that {}s can sub for <>s
+   * MODIFIED so that {}s can sub for []s
    */
   private static boolean parseTypeArguments(Queue<String> tokens,
                                             String start, String end) {
@@ -403,6 +417,128 @@ public class ScalaUtil extends OutputLanguageUtil {
       return parseType(tokens);
     }
     return true;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // Functions for moving back and forth between reference and
+  // primitive types
+  //////////////////////////////////////////////////////////////////////
+
+  /**
+   * @return the most general reference type that corresponds to the specified
+   * a Java type, or the specified Java type if it is already a reference type
+   * (ie: a class/interface).
+   */
+  public static String toReferenceType(String type) {
+    String result = PRIMITIVE_TO_BOXED_MAP.get(type);
+    return (result == null) ? type : result;
+  }
+
+  public static String unbox(String expr, String type) {
+    if (PRIMITIVE_TO_BOXED_MAP.containsKey(type)) {
+      return "(" + expr + ")." + type + "Value()";
+    } else {
+      return expr;
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // Primitive Parsing
+  //////////////////////////////////////////////////////////////////////
+
+  // strcitly check for either "true" or "false"
+  private static final Predicate<String> ISVALID_BOOLEAN
+    = new Predicate<String>() {
+      public boolean apply(String s) {
+        s = s.trim();
+        return (s.equals("true") || s.equals("false"));
+      }
+    };
+
+  private static final Predicate<String> ISVALID_BYTE
+    = new Predicate<String>() {
+      public boolean apply(String s) {
+        Byte.valueOf(s.trim());
+        return true;
+      }
+    };
+
+
+  // as long as s is a single character return it unmodified
+  private static final Predicate<String> ISVALID_CHAR
+    = new Predicate<String>() {
+      public boolean apply(String s) {
+        return (s.length() == 1);
+      }
+    };
+
+
+  private static final Predicate<String> ISVALID_DOUBLE
+    = new Predicate<String>() {
+      public boolean apply(String s) {
+        Double.valueOf(s.trim());
+        return true;
+      }
+    };
+
+
+  private static final Predicate<String> ISVALID_FLOAT
+    = new Predicate<String>() {
+      public boolean apply(String s) {
+        Float.valueOf(s.trim());
+        return true;
+      }
+    };
+
+
+  private static final Predicate<String> ISVALID_INT
+    = new Predicate<String>() {
+      public boolean apply(String s) {
+        Integer.valueOf(s.trim());
+        return true;
+      }
+    };
+
+
+  private static final Predicate<String> ISVALID_LONG
+    = new Predicate<String>() {
+      public boolean apply(String s) {
+        Long.valueOf(s.trim());
+        return true;
+      }
+    };
+
+
+  private static final Predicate<String> ISVALID_SHORT
+    = new Predicate<String>() {
+      public boolean apply(String s) {
+        Short.valueOf(s.trim());
+        return true;
+      }
+    };
+
+  private static final Map<String, Predicate<String>> PRIMITIVE_TO_VALIDATOR
+    = ImmutableMap.<String, Predicate<String>>builder()
+      .put("boolean", ISVALID_BOOLEAN)
+      .put("byte",    ISVALID_BYTE)
+      .put("char",    ISVALID_CHAR)
+      .put("double",  ISVALID_DOUBLE)
+      .put("float",   ISVALID_FLOAT)
+      .put("int",     ISVALID_INT)
+      .put("long",    ISVALID_LONG)
+      .put("short",   ISVALID_SHORT)
+      .build();
+
+  /**
+   * @return true if the primitive is a valid literal of the specified
+   * type, false otherwise.
+   */
+  public static final boolean isValidPrimitive(String primitive, String type) {
+    try {
+      return PRIMITIVE_TO_VALIDATOR.get(type).apply(primitive);
+    } catch (NumberFormatException e) {
+      return false;
+    }
   }
 
   /**

@@ -21,7 +21,8 @@
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:my='http://google.com/2001/gxp/call/com/google/gxp/compiler/functests/call'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
 <call:CtorParamCalleeGxp expr:s='"foo"' />
 
@@ -31,6 +32,7 @@
 
 <my:ICtorParamCalleeGxp s='buz'
     java:this='new CtorParamCalleeGxp.Instance()'
-    js:this='new com.google.gxp.compiler.functests.call.CtorParamCalleeGxp()' />
+    js:this='new com.google.gxp.compiler.functests.call.CtorParamCalleeGxp()'
+    scala:this='new CtorParamCalleeGxp.Instance()' />
 
 </gxp:template>

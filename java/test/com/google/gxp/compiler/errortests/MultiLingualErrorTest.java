@@ -56,6 +56,7 @@ public class MultiLingualErrorTest extends BaseTestCase {
     // attribute with java: prefix
     compile(String.format("%s java:%s='e' %s", prefix, attrName, suffix));
     assertAlert(new MissingExpressionError(pos(errorLine, errorColumn), displyName, "JavaScript"));
+    assertAlert(new MissingExpressionError(pos(errorLine, errorColumn), displyName, "Scala"));
     assertNoUnexpectedAlerts();
 
     // basic attribute and with java: prefix
@@ -102,10 +103,12 @@ public class MultiLingualErrorTest extends BaseTestCase {
 
     compile("<gxp:loop var='v' type='t' java:iterable='e' />");
     assertAlert(new MissingExpressionError(pos(2, 1), "'iterable' attribute", "JavaScript"));
+    assertAlert(new MissingExpressionError(pos(2, 1), "'iterable' attribute", "Scala"));
     assertNoUnexpectedAlerts();
 
     compile("<gxp:loop var='v' type='t' js:iterable='e' />");
     assertAlert(new MissingExpressionError(pos(2,1), "'iterable' attribute", "Java"));
+    assertAlert(new MissingExpressionError(pos(2,1), "'iterable' attribute", "Scala"));
     assertNoUnexpectedAlerts();
 
     // iterator tests
@@ -123,6 +126,7 @@ public class MultiLingualErrorTest extends BaseTestCase {
 
     compile("<gxp:loop var='v' type='t' cpp:iterator='e' />");
     assertAlert(new MissingExpressionError(pos(2, 1), "'iterator' attribute", "Java"));
+    assertAlert(new MissingExpressionError(pos(2, 1), "'iterator' attribute", "Scala"));
     assertAlert(new LoopRequiresIterableInJavaScriptError(pos(2, 1), "<gxp:loop>"));
     assertNoUnexpectedAlerts();
 
@@ -131,7 +135,7 @@ public class MultiLingualErrorTest extends BaseTestCase {
     assertNoUnexpectedAlerts();
 
     // both tests
-    compile("<gxp:loop var='v' type='t' java:iterator='e' js:iterable='e' />");
+    compile("<gxp:loop var='v' type='t' java:iterator='e' scala:iterator='e' js:iterable='e' />");
     assertNoUnexpectedAlerts();
 
     compile("<gxp:loop var='v' type='t' iterator='e' js:iterable='e' />");
@@ -153,6 +157,7 @@ public class MultiLingualErrorTest extends BaseTestCase {
 
     compile("<gxp:loop var='v' type='t' cpp:iterator='e' js:iterable='e' />");
     assertAlert(new LoopMissingBothIterableAndIteratorError(pos(2,1), "<gxp:loop>", "Java"));
+    assertAlert(new LoopMissingBothIterableAndIteratorError(pos(2,1), "<gxp:loop>", "Scala"));
     assertNoUnexpectedAlerts();
   }
 
@@ -193,6 +198,7 @@ public class MultiLingualErrorTest extends BaseTestCase {
     FileRef caller = createFile("caller", "<call:callee cpp:s='foo' java:s='bar' />");
     compileFiles(callee, caller);
     assertAlert(new MissingExpressionError(pos(2,1), "'s' attribute", "JavaScript"));
+    assertAlert(new MissingExpressionError(pos(2,1), "'s' attribute", "Scala"));
     assertNoUnexpectedAlerts();
   }
 
@@ -222,6 +228,7 @@ public class MultiLingualErrorTest extends BaseTestCase {
   public void testOutputElement_OnlyJavaAttribute() throws Exception {
     compile("<div java:class='baz'/>");
     assertAlert(new MissingExpressionError(pos(2,1), "'class' attribute", "JavaScript"));
+    assertAlert(new MissingExpressionError(pos(2,1), "'class' attribute", "Scala"));
     assertNoUnexpectedAlerts();
   }
 }

@@ -21,9 +21,10 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
-<gxp:param name='x' cpp:type='const char *' java:type='String' />
+<gxp:param name='x' cpp:type='const char *' java:type='String' scala:type='String' />
 
 <!-- Calls inside of placeholders get turned into java expressions instead of java
      statements.  This GXP tests that this works correctly.  -->
@@ -40,7 +41,8 @@
   <gxp:ph name="double_param_call" example="example"/>
     <call:DoubleParamCalleeGxp expr:x='x'
         java:this='new DoubleParamCalleeGxp.Instance()'
-        js:this='new com.google.gxp.compiler.functests.call.DoubleParamCalleeGxp()' />
+        js:this='new com.google.gxp.compiler.functests.call.DoubleParamCalleeGxp()'
+        scala:this='new DoubleParamCalleeGxp.Instance()' />
   <gxp:eph/>
 </gxp:msg>
 

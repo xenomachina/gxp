@@ -20,9 +20,10 @@
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
-<div cpp:class='"C++"' java:class='"Java"' js:class='"JavaScript"'>
+<div cpp:class='"C++"' java:class='"Java"' js:class='"JavaScript"' scala:class='"Scala"'>
 </div>
 
 </gxp:template>

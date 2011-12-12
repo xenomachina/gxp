@@ -19,7 +19,8 @@
               xmlns='http://www.w3.org/1999/xhtml'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:gxp='http://google.com/2001/gxp'
-              xmlns:java='http://google.com/2001/gxp/code/java'>
+              xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
 <java:annotate with="@BuzAnnotation" />
 <java:annotate element="class"     with="@QuxAnnotation" />
@@ -27,7 +28,7 @@
 <java:annotate element="instance"  with="@QuuuxAnnotation" />
 
 <gxp:constructor java:annotate='@FooAnnotation'>
-  <gxp:param name="s1" cpp:type='const char *' java:type="String" java:annotate='@BarAnnotation'/>
+  <gxp:param name="s1" cpp:type='const char *' java:type="String" scala:type="String" java:annotate='@BarAnnotation'/>
 </gxp:constructor>
 
 </gxp:template>

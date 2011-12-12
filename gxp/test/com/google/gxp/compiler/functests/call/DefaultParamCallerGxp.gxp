@@ -21,18 +21,22 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:my='http://google.com/2001/gxp/call/com/google/gxp/compiler/functests/call'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
+
 
 <call:DefaultParamCalleeGxp />
 <call:DefaultParamCalleeGxp expr:i='8'/>
 <call:IDefaultParamCalleeGxp
     java:this='new DefaultParamCalleeGxp.Instance()'
-    js:this='new com.google.gxp.compiler.functests.call.DefaultParamCalleeGxp' />
+    js:this='new com.google.gxp.compiler.functests.call.DefaultParamCalleeGxp'
+    scala:this='new DefaultParamCalleeGxp.Instance()' />
 
 <my:DefaultParamCalleeGxp />
 <my:DefaultParamCalleeGxp expr:i='8'/>
 <my:IDefaultParamCalleeGxp
     java:this='new DefaultParamCalleeGxp.Instance()'
-    js:this='new com.google.gxp.compiler.functests.call.DefaultParamCalleeGxp' />
+    js:this='new com.google.gxp.compiler.functests.call.DefaultParamCalleeGxp'
+    scala:this='new DefaultParamCalleeGxp.Instance()' />
 
 </gxp:template>

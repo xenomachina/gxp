@@ -1,0 +1,379 @@
+/*
+ * Copyright (C) 2008 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.gxp.compiler.scala;
+
+import static com.google.gxp.compiler.base.OutputLanguage.SCALA;
+
+import com.google.common.base.Functions;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Bytes;
+import com.google.gxp.compiler.alerts.AlertPolicy;
+import com.google.gxp.compiler.alerts.AlertSink;
+import com.google.gxp.compiler.alerts.SourcePosition;
+import com.google.gxp.compiler.base.Expression;
+import com.google.gxp.compiler.base.Parameter;
+import com.google.gxp.compiler.base.JavaAnnotation;
+import com.google.gxp.compiler.base.Template;
+import com.google.gxp.compiler.base.TemplateName;
+import com.google.gxp.compiler.base.ThrowsDeclaration;
+import com.google.gxp.compiler.fs.FileRef;
+import com.google.gxp.compiler.msgextract.MessageExtractedTree;
+import com.google.gxp.compiler.io.RuntimeIOException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * A {@code CodeGenerator} which generates scala code that is a stub for
+ * dynamic gxp compilation.
+ */
+public class DynamicStubScalaCodeGenerator extends BaseScalaCodeGenerator<MessageExtractedTree> {
+  private final Collection<FileRef> sourceFiles;
+  private final Collection<FileRef> schemaFiles;
+  private final Collection<FileRef> sourcePaths;
+  private final AlertPolicy alertPolicy;
+
+  /**
+   * @param tree the MessageExtractedTree to compile.
+   */
+  public DynamicStubScalaCodeGenerator(MessageExtractedTree tree,
+                                       Collection<FileRef> sourceFiles,
+                                       Collection<FileRef> schemaFiles,
+                                       Collection<FileRef> sourcePaths,
+                                       AlertPolicy alertPolicy) {
+    super(tree, null);
+    this.sourceFiles = Preconditions.checkNotNull(sourceFiles);
+    this.schemaFiles = Preconditions.checkNotNull(schemaFiles);
+    this.sourcePaths = Preconditions.checkNotNull(sourcePaths);
+    this.alertPolicy = Preconditions.checkNotNull(alertPolicy);
+  }
+
+  @Override
+  protected TemplateWorker createTemplateWorker(Appendable appendable,
+                                                AlertSink alertSink,
+                                                Template template,
+                                                String runtimeMessageSource) {
+    return new TemplateWorker(appendable, alertSink, template,
+                              sourceFiles, schemaFiles, sourcePaths, alertPolicy);
+  }
+
+  /**
+   * Helper class which exists mainly so we don't have to pass the CIndenter
+   * and AlertSink everywhere manually.
+   */
+  private static class TemplateWorker extends BaseScalaCodeGenerator.TemplateWorker {
+    private final Collection<FileRef> sourceFiles;
+    private final Collection<FileRef> schemaFiles;
+    private final Collection<FileRef> sourcePaths;
+    private final InnerClassTemplateWorker innerWorker;
+    private final AlertPolicy alertPolicy;
+
+    private static final String GXP_COMPILATION_EXCEPTION
+      = "com.google.gxp.base.dynamic.GxpCompilationException";
+
+    TemplateWorker(Appendable appendable,
+                   AlertSink alertSink,
+                   Template template,
+                   Collection<FileRef> sourceFiles,
+                   Collection<FileRef> schemaFiles,
+                   Collection<FileRef> sourcePaths,
+                   AlertPolicy alertPolicy) {
+      super(appendable, alertSink, template);
+      this.sourceFiles = sourceFiles;
+      this.schemaFiles = schemaFiles;
+      this.sourcePaths = sourcePaths;
+      this.innerWorker = new InnerClassTemplateWorker(appendable, alertSink, template);
+      this.alertPolicy = alertPolicy;
+    }
+
+    // Pretty much everything in the stub is based off of the template
+    // declaration itself, so let's make things a bit easier on ourselves...
+
+    @Override
+    protected SourcePosition getDefaultSourcePosition() {
+      return template.getSourcePosition();
+    }
+
+    @Override
+    protected String getBaseClassName() {
+      return "com.google.gxp.base.dynamic.StubGxpTemplate";
+    }
+
+    // TODO(harryh): factor common code to base class
+    @Override
+    protected void appendClass() {
+      TemplateName templateName = template.getName();
+      appendAnnotations(template.getJavaAnnotations(JavaAnnotation.Element.CLASS));
+      formatLine(template.getSourcePosition(), "public class %s extends %s {",
+                 getClassName(templateName), getBaseClassName());
+      appendStaticContent();
+      appendWriteMethod();
+      appendLine();
+      appendWriteImplMethod();
+      appendDefaultAccessors();
+      appendParamConstructors();
+      appendGetArgListMethod();
+      appendGetGxpClosureMethod(true);
+      appendInterface();
+      appendInstance();
+      appendLine();
+
+      // We write directly to the buffer passed into us instead of going through
+      // the append methods because for large gxps it becomes expensive to
+      // re-indent the string.
+      innerWorker.appendClass();
+
+      appendLine("}");
+    }
+
+    private String serializeAlertPolicy() {
+      try {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(alertPolicy);
+        oos.close();
+        baos.close();
+        return Joiner.on(",").join(Iterables.transform(Bytes.asList(baos.toByteArray()),
+                                                       Functions.toStringFunction()));
+      } catch (IOException e) {
+        throw new RuntimeIOException(e);
+      }
+    }
+
+    /**
+     * Appends static content necessary for runtime compilation of the
+     * template.
+     */
+    private void appendStaticContent() {
+      formatLine("private static long COMPILATION$CHECKSUM = %dL;",
+                 template.getSourcePosition().getSource().getChecksum());
+      formatLine("private static long COMPILATION$VERSION = 0;");
+
+      appendLine("private static final com.google.gxp.compiler.alerts.AlertPolicy ALERT$POLICY =");
+      formatLine("  createAlertPolicy(new byte[] {%s});", serializeAlertPolicy());
+
+      appendLine("private static final com.google.gxp.compiler.fs.FileRef SRC$GXP = ");
+      formatLine("  parseFilename(%s);",
+                 SCALA.toStringLiteral(template.getSourcePosition().getSourceName()));
+
+      final String classBase = SCALA.toStringLiteral(template.getName().toString() + "$Impl");
+
+      final String javaBase = SCALA.toStringLiteral(
+          "/" + template.getName().toString().replace('.', '/') + "$Impl");
+
+      appendLine("private static final String SCALA$BASE =");
+      formatLine("  %s;", javaBase);
+
+      appendLine("private static final String CLASS$BASE =");
+      formatLine("  %s;", classBase);
+
+      appendStaticFileRefSet("SRC$GXPS",    sourceFiles);
+      appendStaticFileRefSet("SRC$SCHEMAS", schemaFiles);
+      appendStaticFileRefSet("SRC$PATHS",   sourcePaths);
+
+      appendLine();
+      appendLine("private static com.google.gxp.compiler.fs.FileRef SCALA$FILE = null;");
+
+      appendLine();
+      appendLine("private static java.util.Map<String, java.lang.reflect.Method> METHODS$ =");
+      formatLine("  getMethodMap(%s.class);",
+                 innerWorker.getClassName(template.getName()));
+      appendLine();
+
+      // recompile method
+      appendLine("private static final void recompile() {");
+      appendLine("long LAST$CHECKSUM = SRC$GXP.getChecksum();");
+      appendLine("if ((LAST$CHECKSUM != 0 && LAST$CHECKSUM != COMPILATION$CHECKSUM)");
+      appendLine("    || METHODS$ == null) {");
+      appendLine("COMPILATION$VERSION++;");
+      appendLine("com.google.gxp.compiler.fs.InMemoryFileSystem MEM$FS =");
+      appendLine("    new com.google.gxp.compiler.fs.InMemoryFileSystem();");
+      appendLine("SCALA$FILE = compileGxp(MEM$FS, SRC$GXPS, SRC$SCHEMAS, SRC$PATHS,");
+      appendLine("                        SCALA$BASE, COMPILATION$VERSION, ALERT$POLICY);");
+      appendLine("METHODS$ = compileScala(MEM$FS, CLASS$BASE, COMPILATION$VERSION);");
+      appendLine("COMPILATION$CHECKSUM = LAST$CHECKSUM;");
+      appendLine("}");
+      appendLine("}");
+      appendLine();
+    }
+
+    private void appendStaticFileRefSet(String varName, Iterable<FileRef> files) {
+      appendLine();
+      formatLine("private static final java.util.Set<com.google.gxp.compiler.fs.FileRef> %s = " +
+                 "parseFilenames(", varName);
+      List<String> parseFiles = Lists.newArrayList();
+      for (FileRef file : files) {
+        parseFiles.add("    " + SCALA.toStringLiteral(file.toFilename()));
+      }
+      appendLine(Joiner.on(",\n").join(parseFiles) + ");");
+    }
+
+    /**
+     * Generates accessor methods for retrieving default parameters.
+     */
+    private void appendDefaultAccessors() {
+      for (Parameter param : template.getAllParameters()) {
+        Expression defaultValue = param.getDefaultValue();
+        if (defaultValue != null) {
+          String methodName = getDefaultMethodName(param);
+          String paramType = toScalaType(param.getType());
+          appendLine();
+          formatLine("public static %s %s() {", paramType, methodName);
+          appendLine("recompile();");
+          formatLine("return %s.<%s>execNoExceptions(METHODS$, \"%s\", new Object[] {});",
+                     getBaseClassName(), toReferenceType(paramType), methodName);
+          appendLine("}");
+        }
+      }
+    }
+
+    /**
+     * Generates methods for constructing object parameters from strings.
+     */
+    private void appendParamConstructors() {
+      for (Parameter param : template.getAllParameters()) {
+        if (param.getConstructor() != null) {
+          String methodName = getConstructorMethodName(param);
+          String paramType = toScalaType(param.getType());
+          String paramName = param.getPrimaryName();
+          appendLine();
+          formatLine("public static %s %s(String %s) {", paramType, methodName, paramName);
+          appendLine("recompile();");
+          formatLine("return %s.<%s>execNoExceptions(METHODS$, \"%s\", new Object[] { %s });",
+                     getBaseClassName(), toReferenceType(paramType), methodName, paramName);
+          appendLine("}");
+        }
+      }
+    }
+
+    private static final String TEMP_OUT_VAR = "temp$out";
+
+    /**
+     * In the write method of stub classes we cache the output of the gxps at the top level
+     * and only send it to the real output if there are no errors durring dynamic compilation.
+     *
+     * If there is an error, we throw away whatever output we've seen so far, and write the error
+     * to the real output
+     */
+    @Override
+    protected void appendWriteMethodBody() {
+      StringBuilder sb = new StringBuilder();
+      sb.append("writeImpl(%s, gxp_context");
+      for (Parameter param : template.getAllParameters()) {
+        sb.append(", ");
+        sb.append(param.getPrimaryName());
+      }
+      sb.append(");");
+      String writeLine = sb.toString();
+
+      appendLine("if (gxp_context.isTopLevelCall()) {");
+      appendLine("try {");
+      formatLine("java.io.StringWriter %s = new java.io.StringWriter();", TEMP_OUT_VAR);
+      formatLine(writeLine, TEMP_OUT_VAR);
+      formatLine("%s.append(%s.toString());", GXP_OUT_VAR, TEMP_OUT_VAR);
+      formatLine("} catch (%s gxp$e) {", GXP_COMPILATION_EXCEPTION);
+      formatLine("gxp$e.write(%s, gxp_context);", GXP_OUT_VAR);
+      appendLine("}");
+      appendLine("} else {");
+      formatLine(writeLine, GXP_OUT_VAR);
+      appendLine("}");
+    }
+
+    protected void appendWriteImplMethod() {
+      // built a set of throws types
+      List<String> throwsTypes = Lists.newArrayList();
+      for (ThrowsDeclaration throwsDeclaration : template.getThrowsDeclarations()) {
+        throwsTypes.add(throwsDeclaration.getExceptionType());
+      }
+      throwsTypes.add("java.io.IOException");
+      throwsTypes.add("java.lang.RuntimeException");
+
+      appendLine(getWriteMethodSignature(Access._private, true, "writeImpl") + " {");
+      appendLine("recompile();");
+      appendLine("try {");
+      StringBuilder sb = new StringBuilder("exec(METHODS$, \"write\", ");
+      sb.append("new Object[] {");
+      sb.append(GXP_OUT_VAR);
+      sb.append(", gxp_context");
+      for (Parameter param : template.getAllParameters()) {
+        sb.append(", ");
+        sb.append(param.getPrimaryName());
+      }
+      sb.append("});");
+      appendLine(sb);
+      appendLine("} catch (Throwable gxp$t) {");
+      appendLine("rewriteStackTraceElements(gxp$t, SCALA$FILE);");
+      for (String throwType : throwsTypes) {
+        formatLine("if (gxp$t instanceof %s) {", throwType);
+        formatLine("throw (%s)gxp$t;", throwType);
+        appendLine("}");
+      }
+      formatLine("throw new %s.Throw(gxp$t);", GXP_COMPILATION_EXCEPTION);
+      appendLine("}");
+      appendLine("}");
+    }
+  }
+
+  protected static class InnerClassTemplateWorker
+      extends DynamicImplScalaCodeGenerator.TemplateWorker {
+    protected InnerClassTemplateWorker(Appendable appendable, AlertSink alertSink,
+                                       Template template) {
+      super(appendable, alertSink, template, 0);
+      out.addIndent();
+    }
+
+    @Override
+    protected void appendClassDecl() {
+      formatLine(template.getSourcePosition(), "public static class %s extends %s {",
+                 getClassName(template.getName()), getBaseClassName());
+    }
+  }
+
+  // TODO(harryh): everything below this line should probably be in ScalaUtil
+  //               it's a tiny bit different because the Map goes to
+  //               specific types instead of things like Number
+
+  private static final Map<String, String> PRIMITIVE_TO_BOXED_MAP =
+    ImmutableMap.<String, String>builder()
+      .put("boolean", "Boolean")
+      .put("byte", "Byte")
+      .put("char", "Character")
+      .put("double", "Double")
+      .put("float", "Float")
+      .put("int", "Integer")
+      .put("long", "Long")
+      .put("short", "Short")
+      .build();
+
+  /**
+   * @return the most specific reference type that corresponds to the specified
+   * a Scala type, or the specified Scala type if it is already a reference type
+   * (ie: a class/interface).
+   */
+  private static String toReferenceType(String type) {
+    String result = PRIMITIVE_TO_BOXED_MAP.get(type);
+    return (result == null) ? type : result;
+  }
+}

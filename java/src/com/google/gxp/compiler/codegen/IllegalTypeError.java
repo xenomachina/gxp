@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.gxp.compiler.java;
+package com.google.gxp.compiler.codegen;
 
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;
@@ -22,15 +22,15 @@ import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.OutputLanguage;
 
 /**
- * {@code ErrorAlert} which indicates that an illegal native java type
+ * {@code ErrorAlert} which indicates that an illegal native type
  * was encountered.
  */
-public class IllegalJavaTypeError extends ErrorAlert {
-  public IllegalJavaTypeError(SourcePosition pos, String type) {
-    super(pos, "Illegal java type: " + type);
+public class IllegalTypeError extends ErrorAlert {
+  public IllegalTypeError(SourcePosition pos, String outputLanguage, String type) {
+    super(pos, "Illegal " + outputLanguage + " type: " + type);
   }
 
-  public IllegalJavaTypeError(NativeType type) {
-    this(type.getSourcePosition(), type.getNativeType(OutputLanguage.JAVA));
+  public IllegalTypeError(NativeType type, OutputLanguage outputLanguage) {
+    this(type.getSourcePosition(), outputLanguage.getDisplay(), type.getNativeType(outputLanguage));
   }
 }

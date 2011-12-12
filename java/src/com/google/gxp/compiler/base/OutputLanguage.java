@@ -69,6 +69,13 @@ public enum OutputLanguage {
     }
   },
 
+  DYNAMIC_IMPL_SCALA("Dynamic Scala", "$Impl%d.scala", ScalaUtil.INSTANCE) {
+    @Override
+    public <K,V> V acceptVisitor(OutputLanguageVisitor<K,V> visitor, K arg) {
+      return visitor.visitDynamicImplScala(arg);
+    }
+  },
+
   XMB("Xmb", ".xmb", null) {
     @Override
     public <K,V> V acceptVisitor(OutputLanguageVisitor<K,V> visitor, K arg) {

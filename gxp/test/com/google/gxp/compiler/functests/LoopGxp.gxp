@@ -20,13 +20,15 @@
               xmlns:call='http://google.com/2001/gxp/call'
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
 <gxp:param name='count' type='int' />
 
 <b>
   <gxp:loop type='int' var='i' java:iterator='new IntIterator(count)'
-                               js:iterable='new IntIterable(count)'>
+                               js:iterable='new IntIterable(count)'
+                               scala:iterator='new IntIterator(count)'>
     !
   </gxp:loop>
 </b>

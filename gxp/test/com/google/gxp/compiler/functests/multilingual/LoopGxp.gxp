@@ -19,7 +19,8 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
 <gxp:import class='com.google.gxp.compiler.functests.IntIterator' />
 <gxp:import class='com.google.gxp.compiler.functests.IntIterable' />
@@ -27,10 +28,12 @@
 <gxp:param name='count' type='int' />
 
 <gxp:loop var='i' type='int' java:iterable='new IntIterable(count+1)'
-                             js:iterable='new IntIterable(count+2)'>
+                             js:iterable='new IntIterable(count+2)'
+                             scala:iterable='new IntIterable(count+3)'>                             
   *
 </gxp:loop> | <gxp:loop var='i' type='int' java:iterator='new IntIterator(count+1)'
-                                           js:iterable='new IntIterable(count+2)'>
+                                           js:iterable='new IntIterable(count+2)'
+                                           scala:iterable='new IntIterable(count+3)'>
   *
 </gxp:loop>
 

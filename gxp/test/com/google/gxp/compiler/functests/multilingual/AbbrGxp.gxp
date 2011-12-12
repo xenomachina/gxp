@@ -19,10 +19,13 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
-<gxp:abbr name='language' java:type='String' cpp:type='const char *'
-          cpp:expr='"C++"' java:expr='"Java"' js:expr='"JavaScript"'>
+<gxp:abbr name='language' cpp:type='const char *' cpp:expr='"C++"'
+                          java:type='String' java:expr='"Java"' 
+                          scala:type='String' scala:expr='"Scala"' 
+                          js:expr='"JavaScript"'>
 
   You are running: <gxp:eval expr='language' />
 

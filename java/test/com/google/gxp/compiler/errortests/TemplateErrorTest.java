@@ -70,7 +70,7 @@ public class TemplateErrorTest extends BaseTestCase {
     FileRef gxp = createFile("Holy!Cow!", "Hello");
     compileFiles(gxp);
     assertAlert(new InvalidNameError(
-             pos(1, 648), "com.google.gxp.compiler.errortests.Holy!Cow!"));
+             pos(1, 700), "com.google.gxp.compiler.errortests.Holy!Cow!"));
     assertNoUnexpectedAlerts();
   }
 
@@ -207,20 +207,27 @@ public class TemplateErrorTest extends BaseTestCase {
 
   public void testParam_noTypeAttributes() throws Exception {
     compile("<gxp:param name='foo' />");
-    assertAlert(new MissingTypeError(pos(2,1), "<gxp:param>", "Java"));
     assertAlert(new MissingTypeError(pos(2,1), "<gxp:param>", "C++"));
+    assertAlert(new MissingTypeError(pos(2,1), "<gxp:param>", "Java"));
+    assertAlert(new MissingTypeError(pos(2,1), "<gxp:param>", "Scala"));
     assertNoUnexpectedAlerts();
   }
 
   public void testParam_noCppTypeAttributes() throws Exception {
-    compile("<gxp:param name='foo' java:type='String' />");
+    compile("<gxp:param name='foo' java:type='String' scala:type='String' />");
     assertAlert(new MissingTypeError(pos(2,1), "<gxp:param>", "C++"));
     assertNoUnexpectedAlerts();
   }
 
   public void testParam_noJavaTypeAttributes() throws Exception {
-    compile("<gxp:param name='foo' cpp:type='string' />");
+    compile("<gxp:param name='foo' cpp:type='string' scala:type='String' />");
     assertAlert(new MissingTypeError(pos(2,1), "<gxp:param>", "Java"));
+    assertNoUnexpectedAlerts();
+  }
+
+  public void testParam_noScalaTypeAttributes() throws Exception {
+    compile("<gxp:param name='foo' cpp:type='string' java:type='String' />");
+    assertAlert(new MissingTypeError(pos(2,1), "<gxp:param>", "Scala"));
     assertNoUnexpectedAlerts();
   }
 

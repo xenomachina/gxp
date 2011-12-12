@@ -27,6 +27,7 @@ import com.google.gxp.compiler.alerts.common.MissingTypeError;
 import com.google.gxp.compiler.base.JavaAnnotation;
 import com.google.gxp.compiler.base.NativeType;
 import com.google.gxp.compiler.base.OutputLanguage;
+import com.google.gxp.compiler.codegen.IllegalTypeError;
 import com.google.gxp.compiler.codegen.OutputLanguageUtil;
 
 import java.util.*;
@@ -274,13 +275,13 @@ public class JavaUtil extends OutputLanguageUtil {
         tokens.add(m.group(1));
         s = m.group(2).trim();
       } else {
-        alertSink.add(new IllegalJavaTypeError(type));
+        alertSink.add(new IllegalTypeError(type, OutputLanguage.JAVA));
         return ret;
       }
     }
 
     if (!(parseType(tokens) && tokens.isEmpty())) {
-      alertSink.add(new IllegalJavaTypeError(type));
+      alertSink.add(new IllegalTypeError(type, OutputLanguage.JAVA));
     }
 
     return ret;

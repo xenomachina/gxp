@@ -18,16 +18,17 @@
               xmlns='http://www.w3.org/1999/xhtml'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:gxp='http://google.com/2001/gxp'
-              xmlns:java='http://google.com/2001/gxp/code/java'>
+              xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
 <gxp:implements java:interface="GetGxpClosureInterface" />
 <gxp:implements java:interface="WriteInterface" />
 
 <gxp:constructor>
-  <gxp:param name="s1" cpp:type='const char *' java:type="String" default='"default"' />
+  <gxp:param name="s1" cpp:type='const char *' java:type="String" scala:type="String" default='"default"' />
 </gxp:constructor>
 
-<gxp:param name="s2" cpp:type='const char *' java:type="String" />
+<gxp:param name="s2" cpp:type='const char *' java:type="String" scala:type="String" />
 
 <gxp:eval expr="s1" />
 <gxp:eval expr="s2" />

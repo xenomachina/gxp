@@ -21,10 +21,11 @@
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'
               xmlns:my='http://google.com/2001/gxp/call/com/google/gxp/compiler/functests'>
 
 <gxp:param name='y' type='int' />
-<gxp:param name='s' cpp:type='const char *' java:type='String' />
+<gxp:param name='s' cpp:type='const char *' java:type='String' scala:type='String' />
 
 <div id='html'>
   <my:HtmlContentCalleeGxp expr:y='y'>

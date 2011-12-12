@@ -19,9 +19,10 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
-              xmlns:java='http://google.com/2001/gxp/code/java'>
+              xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
-<gxp:param name='the_name' cpp:type='const char *' java:type='String' />
+<gxp:param name='the_name' cpp:type='const char *' java:type='String' scala:type='String' />
 
 <gxp:msg>
   hello <gxp:eval expr='the_name' />

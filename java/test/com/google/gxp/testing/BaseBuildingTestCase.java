@@ -152,6 +152,7 @@ public abstract class BaseBuildingTestCase extends TestCase {
     sb.append(" xmlns:cpp='http://google.com/2001/gxp/code/cpp'");
     sb.append(" xmlns:java='http://google.com/2001/gxp/code/java'");
     sb.append(" xmlns:js='http://google.com/2001/gxp/code/javascript'");
+    sb.append(" xmlns:scala='http://google.com/2001/gxp/code/scala'");
     for (String s : extraHeaders()) {
       sb.append(' ');
       sb.append(s);

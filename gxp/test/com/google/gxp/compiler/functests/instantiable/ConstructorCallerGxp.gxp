@@ -21,10 +21,11 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
-<gxp:param name='s1' cpp:type='const char *' java:type='String' />
-<gxp:param name='s2' cpp:type='const char *' java:type='String' />
+<gxp:param name='s1' cpp:type='const char *' java:type='String' scala:type='String' />
+<gxp:param name='s2' cpp:type='const char *' java:type='String' scala:type='String' />
 
 <call:ConstructorGxp expr:s1='s1' expr:s2='s2' />
 
@@ -32,6 +33,7 @@
 
 <call:ConstructorGxp expr:s2='s2'
     java:this='new ConstructorGxp.Instance(s1)'
-    js:this='new com.google.gxp.compiler.functests.instantiable.ConstructorGxp(s1)' />
+    js:this='new com.google.gxp.compiler.functests.instantiable.ConstructorGxp(s1)'
+    scala:this='new ConstructorGxp.Instance(s1)' />
 
 </gxp:template>

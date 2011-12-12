@@ -29,6 +29,7 @@ import com.google.gxp.compiler.bind.InvalidParameterFailedRegexError;
 import com.google.gxp.compiler.escape.TypeError;
 import com.google.gxp.compiler.fs.FileRef;
 import com.google.gxp.compiler.java.IllegalJavaPrimitiveError;
+import com.google.gxp.compiler.scala.IllegalScalaPrimitiveError;
 
 /**
  * Tests of proper error reporting by the GXP compiler relating to calls.
@@ -161,6 +162,7 @@ public class CallErrorTest extends BaseTestCase {
     compile("<gxp:param name='x' type='int' />",
             "<my:TestCall_nonExprAttributes x='bad' />");
     assertAlert(new IllegalJavaPrimitiveError(pos(3, 1), "bad", "int"));
+    assertAlert(new IllegalScalaPrimitiveError(pos(3, 1), "bad", "int"));
     assertNoUnexpectedAlerts();
 
     // good char
@@ -173,6 +175,7 @@ public class CallErrorTest extends BaseTestCase {
     compile("<gxp:param name='x' type='char' />",
             "<my:TestCall_nonExprAttributes x='bad' />");
     assertAlert(new IllegalJavaPrimitiveError(pos(3, 1), "bad", "char"));
+    assertAlert(new IllegalScalaPrimitiveError(pos(3, 1), "bad", "char"));
     assertNoUnexpectedAlerts();
 
     // good boolean
@@ -189,6 +192,9 @@ public class CallErrorTest extends BaseTestCase {
     assertAlert(new IllegalJavaPrimitiveError(pos(3, 1), "True", "boolean"));
     assertAlert(new IllegalJavaPrimitiveError(pos(4, 1), "TRUE", "boolean"));
     assertAlert(new IllegalJavaPrimitiveError(pos(5, 1), "bad", "boolean"));
+    assertAlert(new IllegalScalaPrimitiveError(pos(3, 1), "True", "boolean"));
+    assertAlert(new IllegalScalaPrimitiveError(pos(4, 1), "TRUE", "boolean"));
+    assertAlert(new IllegalScalaPrimitiveError(pos(5, 1), "bad", "boolean"));
     assertNoUnexpectedAlerts();
   }
 

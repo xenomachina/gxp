@@ -19,7 +19,8 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
 <gxp:import class='java.util.List' />
 <cpp:include library='list' />
@@ -27,7 +28,7 @@
 <gxp:typeparam name='E'/>
 
 <gxp:param name='specialItem' type='E' />
-<gxp:param name='items' cpp:type='list{E}' java:type='List{E}' />
+<gxp:param name='items' cpp:type='list{E}' java:type='List{E}' scala:type='List[E]' />
 
 <gxp:loop var='i' type='E' iterable='items'>
   <gxp:if cond='i.equals(specialItem)' js:cond='i == specialItem'>

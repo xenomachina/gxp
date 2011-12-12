@@ -21,11 +21,12 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
   
 <gxp:throws exception='JavaCodeTest.ArbitraryCheckedException'/>
 
-<gxp:param name='fail' cpp:type='bool' java:type='boolean' />
+<gxp:param name='fail' cpp:type='bool' java:type='boolean' scala:type='boolean' />
 
 <div id="outer">
   <call:ContainerCalleeGxp y='5'>
@@ -33,7 +34,8 @@
       <gxp:if cond='fail'>
         <!-- XXX don't do things like this in real code!!! -->
         <gxp:eval java:expr='JavaCodeTest.throwException("A problem!")'
-                  js:expr='throwException("A problem!")'/>
+                  js:expr='throwException("A problem!")'
+                  scala:expr='ScalaCodeTest.throwException("A problem!")' />
       <gxp:else/>
         No problem.
       </gxp:if>

@@ -60,7 +60,7 @@ public class UnextractableContentAlertTest extends BaseTestCase {
   public void testBase_text() throws Exception {
     compile("hello, world!");
     // position is fragile because text starts right after gxp:template. :-(
-    assertAlert(new UnextractableContentAlert(pos(1, 652), "text"));
+    assertAlert(new UnextractableContentAlert(pos(1, 704), "text"));
 
     assertNoUnexpectedAlerts();
   }
@@ -403,7 +403,7 @@ public class UnextractableContentAlertTest extends BaseTestCase {
   public void testPlaintext() throws Exception {
     extraHeaders.add("content-type='text/plain'");
     compile("alert('hello, world!');");
-    assertAlert(new UnextractableContentAlert(pos(1, 678), "text"));
+    assertAlert(new UnextractableContentAlert(pos(1, 730), "text"));
     assertNoUnexpectedAlerts();
   }
 

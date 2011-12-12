@@ -27,7 +27,8 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
     assertOutputEquals("You are running: Java\n"
                        + "Is this C++? No\n"
                        + "Is this Java? Yes\n"
-                       + "Is this JavaScript? No");
+                       + "Is this JavaScript? No\n"
+                       + "Is this Scala? No");
   }
 
   public void testAbbr() throws Exception {
@@ -66,6 +67,7 @@ public class JavaCodeTest extends BaseFunctionalTestCase {
                        + "Is this C++? No\n"
                        + "Is this Java? Yes\n"
                        + "Is this JavaScript? No\n"
+                       + "Is this Scala? No\n"
                        + "You are running: Java");
   }
 }

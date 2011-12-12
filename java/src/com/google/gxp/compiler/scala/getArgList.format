@@ -1,0 +1,10 @@
+/**
+ * @return the names of the user defined arguments to this template.
+ * This is sort of like a mapping between the positional and named
+ * parameters. The first two parameters (common to all templates) are
+ * not included in this list. (BTW: No, Java reflection does not
+ * provide this information)
+ */
+public static java.util.List<String> getArgList() {
+  return GXP$ARGLIST;
+}

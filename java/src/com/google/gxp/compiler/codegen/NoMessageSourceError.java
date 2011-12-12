@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.gxp.compiler.java;
+package com.google.gxp.compiler.codegen;
 
 import com.google.gxp.compiler.alerts.ErrorAlert;
 import com.google.gxp.compiler.alerts.SourcePosition;

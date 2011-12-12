@@ -21,10 +21,10 @@
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:cpp='http://google.com/2001/gxp/code/cpp'
               xmlns:java='http://google.com/2001/gxp/code/java'
-              xmlns:js='http://google.com/2001/gxp/code/javascript'>
+              xmlns:js='http://google.com/2001/gxp/code/javascript'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'>
 
-
-<gxp:param name='x' cpp:type='const char *' java:type='String' />
+<gxp:param name='x' cpp:type='const char *' java:type='String' scala:type='String' />
 
 <!-- Calls inside of javascript attributes get turned into escapable java expressions
      instead of java statements.  This GXP tests that this works correctly.  -->
@@ -41,7 +41,8 @@
   <gxp:attr name='onclick'>
     <call:DoubleParamJavascriptCalleeGxp expr:x='x'
         java:this='new DoubleParamJavascriptCalleeGxp.Instance()'
-        js:this='new com.google.gxp.compiler.functests.call.DoubleParamJavascriptCalleeGxp()' />
+        js:this='new com.google.gxp.compiler.functests.call.DoubleParamJavascriptCalleeGxp()'
+        scala:this='new DoubleParamJavascriptCalleeGxp.Instance()' />
   </gxp:attr>
 </div>
 

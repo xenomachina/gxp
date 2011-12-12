@@ -20,10 +20,11 @@
               xmlns:expr='http://google.com/2001/gxp/expressions'
               xmlns:gxp='http://google.com/2001/gxp'
               xmlns:java='http://google.com/2001/gxp/code/java'
+              xmlns:scala='http://google.com/2001/gxp/code/scala'
               content-type="text/javascript">
 
-<gxp:param name='x' cpp:type='const char *' java:type='String' default='"default x"'/>
-<gxp:param name='y' cpp:type='const char *' java:type='String' default='"default y"'/>
+<gxp:param name='x' cpp:type='const char *' java:type='String' scala:type='String' default='"default x"'/>
+<gxp:param name='y' cpp:type='const char *' java:type='String' scala:type='String' default='"default y"'/>
 
 alert(<gxp:eval expr='x'/>); alert(<gxp:eval expr='y'/>);
 

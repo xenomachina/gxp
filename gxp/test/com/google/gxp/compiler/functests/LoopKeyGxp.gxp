@@ -18,12 +18,13 @@
               xmlns='http://www.w3.org/1999/xhtml'
               xmlns:cpp="http://google.com/2001/gxp/code/cpp"
               xmlns:gxp='http://google.com/2001/gxp'
-              xmlns:java="http://google.com/2001/gxp/code/java">
+              xmlns:java="http://google.com/2001/gxp/code/java"
+              xmlns:scala="http://google.com/2001/gxp/code/scala">
 
 <gxp:import class='java.util.List' />
 <cpp:include library='list' />
 
-<gxp:param name='names' cpp:type='list{string}' java:type='List{String}' />
+<gxp:param name='names' cpp:type='list{string}' java:type='List{String}' scala:type='List[String]' />
 
 <gxp:loop key='key' var='name' type='String' iterable='names'>
   <gxp:eval expr='key' />:<gxp:eval expr='name' />

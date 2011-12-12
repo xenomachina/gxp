@@ -41,9 +41,7 @@ import com.google.gxp.compiler.parser.FileSystemEntityResolver;
 import com.google.gxp.compiler.parser.SourceEntityResolver;
 
 import java.io.File;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -66,7 +64,7 @@ public class GxpcTask extends Task implements Configuration {
   private FileRef outputDir;
   private ImmutableSet<FileRef> sourceFiles;
   private ImmutableSet<FileRef> schemaFiles;
-  private ImmutableSet<OutputLanguage> outputLanguages;
+  private ImmutableSet<OutputLanguage> outputLanguages = ImmutableSet.of(OutputLanguage.JAVA);
   private DefaultCodeGeneratorFactory codeGeneratorFactory;
   private FileRef propertiesFile;
   private AlertPolicy alertPolicy;
@@ -146,10 +144,6 @@ public class GxpcTask extends Task implements Configuration {
         ? ImmutableSet.<FileRef>of()
         : ImmutableSet.copyOf(fs.parseFilenameList(schemas));
 
-    // Compute Output Languages
-    // TODO(harryh): make this configurable
-    outputLanguages = ImmutableSet.of(OutputLanguage.JAVA, OutputLanguage.SCALA);
-
     // Compute Properties File
     propertiesFile = (target != null)
         ? outputDir.join("/" + target.replace(".", "/") + "_en.properties")
@@ -206,6 +200,14 @@ public class GxpcTask extends Task implements Configuration {
 
   public void setTarget(String target) {
     this.target = target;
+  }
+
+  public void setOutputLanguages(String outputLanguages) {
+    Set<OutputLanguage> tmpOutputLanguages = EnumSet.noneOf(OutputLanguage.class);
+    for (String outputLanguage : outputLanguages.split(",")) {
+      tmpOutputLanguages.add(OutputLanguage.valueOf(outputLanguage.trim().toUpperCase()));
+    }
+    this.outputLanguages = ImmutableSet.copyOf(tmpOutputLanguages);
   }
 
   public void setDynamic(boolean dynamic) {
